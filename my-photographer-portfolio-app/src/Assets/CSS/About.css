@@ -1,0 +1,67 @@
+.about-container {
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  text-align: center;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #222;
+
+}
+
+.about-name {
+  margin-top: 40px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.about-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.about-avatar {
+  width: 656px;
+  height: 682px;
+  opacity: 1;
+  top: 264px;
+  left: 208px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.about-description {
+  max-width: 380px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+}
+
+.about-client-section {
+  margin-top: 60px;
+}
+
+.about-client-section h2 {
+  text-transform: lowercase;
+  font-weight: 400;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.about-client-list {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.client-circle {
+  width: 60px;
+  height: 60px;
+  background-color: #ddd;
+  border-radius: 50%;
+}

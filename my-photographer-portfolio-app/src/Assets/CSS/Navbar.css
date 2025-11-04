@@ -1,0 +1,102 @@
+/* --- Navbar Container --- */
+.navbar-container {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* --- Navbar Layout --- */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Logo --- */
+.navbar-logo a {
+  text-decoration: none;
+  color: #000;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* --- Menu Links --- */
+.navbar-menu {
+  display: flex;
+  gap: 24px;
+  transition: all 0.3s ease;
+}
+
+.navbar-menu a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.navbar-menu a:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.navbar-menu a.active {
+  color: #fff;
+  background-color: #000;
+}
+
+/* --- Toggle (hamburger icon) --- */
+.navbar-toggle {
+  display: none;
+  cursor: pointer;
+  color: #000;
+  z-index: 1101;
+}
+
+/* --- Overlay (mờ nền khi mở menu) --- */
+.navbar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  z-index: 1100;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* --- Responsive Mobile View --- */
+@media (max-width: 768px) {
+  .navbar-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 240px;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 80px 20px;
+    gap: 20px;
+    transition: right 0.3s ease;
+    z-index: 1102;
+  }
+
+  .navbar-menu.active {
+    right: 0;
+  }
+
+  .navbar-toggle {
+    display: block;
+  }
+}

@@ -1,0 +1,87 @@
+.showcase-container {
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: "Poppins", "Helvetica Neue", Arial, sans-serif;
+  color: #222;
+}
+
+.showcase-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #222;
+}
+
+.showcase-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 40px;
+  padding: 0;
+}
+
+.showcase-nav li {
+  list-style: none;
+}
+
+.showcase-nav a {
+  text-decoration: none;
+  color: #555;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.showcase-nav a:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+/* ✅ Mỗi ảnh chiếm full width */
+.showcase-item {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.showcase-caption {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.showcase-image {
+  width: 100%;
+  height: auto;
+  max-height: 700px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.showcase-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .showcase-container {
+    padding: 20px;
+  }
+
+  .showcase-image {
+    max-height: 400px;
+  }
+
+  .showcase-caption {
+    font-size: 1rem;
+  }
+}
