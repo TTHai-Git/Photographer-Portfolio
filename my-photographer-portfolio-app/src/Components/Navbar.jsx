@@ -2,26 +2,29 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../Assets/CSS/Navbar.css";
 import { Menu, X } from "lucide-react";
+import Logo from "../Assets/Images/Logo.png";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const closeMenu = () => setIsOpen(false);
 
   return (
     <header className="navbar-container">
       <div className="navbar">
-        {/* Logo */}
+        {/* ✅ Logo + Text Centered */}
         <div className="navbar-logo">
-          <NavLink to="/">Hoang Truc Portfolio</NavLink>
+          <NavLink to="/">
+            <img src={Logo} alt="logo" />
+            <span>Hoang Truc Portfolio</span>
+          </NavLink>
         </div>
 
-        {/* Hamburger icon */}
+        {/* Hamburger Icon */}
         <div className="navbar-toggle" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X size={26} /> : <Menu size={26} />}
         </div>
 
-        {/* Navigation menu */}
+        {/* Menu */}
         <nav className={`navbar-menu ${isOpen ? "active" : ""}`}>
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
           <NavLink to="/show-case" onClick={closeMenu}>Show Case</NavLink>
@@ -31,7 +34,7 @@ export const Navbar = () => {
         </nav>
       </div>
 
-      {/* ✅ Overlay (mờ nền khi menu mở) */}
+      {/* Overlay */}
       {isOpen && <div className="navbar-overlay" onClick={closeMenu}></div>}
     </header>
   );

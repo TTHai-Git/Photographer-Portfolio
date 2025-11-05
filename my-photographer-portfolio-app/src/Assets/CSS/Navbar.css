@@ -13,17 +13,83 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
+  padding: 12px 24px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* --- Logo --- */
+/* --- Logo Section --- */
+.navbar-logo {
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  align-items: center;
+  text-align: center;
+}
+
+.navbar-logo a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #111;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+/* --- Logo Image --- */
+.navbar-logo img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo img:hover {
+  transform: scale(1.05);
+}
+
+/* --- Logo Text --- */
+.navbar-logo span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.navbar-logo a:hover span {
+  color: #555;
+}
+
+/* --- Responsive for Mobile --- */
+@media (max-width: 768px) {
+  .navbar-logo img {
+    height: 40px;
+  }
+
+  .navbar-logo span {
+    font-size: 1rem;
+  }
+}
+
+/* --- Logo Text --- */
 .navbar-logo a {
   text-decoration: none;
-  color: #000;
+  color: #111;
   font-size: 1.4rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.navbar-logo a:hover {
+  color: #555;
+}
+
+/* ✅ Align logo image + text horizontally */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* --- Menu Links --- */
@@ -76,6 +142,19 @@
 
 /* --- Responsive Mobile View --- */
 @media (max-width: 768px) {
+  .navbar {
+    padding: 12px 18px;
+  }
+
+  /* ✅ Make logo smaller */
+  .navbar img {
+    height: 36px;
+  }
+
+  .navbar-logo a {
+    font-size: 1.2rem;
+  }
+
   .navbar-menu {
     position: fixed;
     top: 0;
