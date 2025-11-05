@@ -70,6 +70,7 @@ img {
   max-width: 100%;
   display: block;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 /* Responsive text sizes */
