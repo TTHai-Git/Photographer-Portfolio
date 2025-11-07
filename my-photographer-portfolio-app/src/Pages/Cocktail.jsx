@@ -6,9 +6,9 @@ import LightBox from "../utils/LightBox";
 const Cocktail = () => {
   const images = importAllImagesByDir(
     require.context(
-      "../Assets/Images/showcase/verdant-cocktail-bar/",
+      "../Assets/Images/showcase/verdant-cocktail-bar/webp/",
       false,
-      /\.(png|jpe?g|svg)$/
+      /\.(png|jpe?g|svg|webp)$/
     )
   );
 

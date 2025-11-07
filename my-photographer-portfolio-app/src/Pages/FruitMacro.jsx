@@ -5,9 +5,9 @@ import LightBox from "../utils/LightBox";
 export const FruitMacro = () => {
   const images = importAllImagesByDir(
       require.context(
-        "../Assets/Images/showcase/fruit-macro",
+        "../Assets/Images/showcase/fruit-macro/webp",
         false,
-        /\.(png|jpe?g|svg)$/ // load all images
+        /\.(png|jpe?g|svg|webp)$/ // load all images
       )
     );
   

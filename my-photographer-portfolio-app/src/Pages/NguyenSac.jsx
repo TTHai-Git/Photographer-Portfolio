@@ -6,9 +6,9 @@ import LightBox from "../utils/LightBox";
 const NguyenSac = () => {
   const images = importAllImagesByDir(
     require.context(
-      '../Assets/Images/showcase/nguyen-sac/',
+      '../Assets/Images/showcase/nguyen-sac/webp/',
       false,
-      /\.(png|jpe?g|svg)$/
+      /\.(png|jpe?g|svg|webp)$/
     )
   );
 

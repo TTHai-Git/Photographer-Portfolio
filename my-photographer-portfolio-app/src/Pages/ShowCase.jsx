@@ -6,7 +6,7 @@ import LightBox from "../utils/LightBox";
 
 export const ShowCase = () => {
   const images = importAllImagesByDir(
-    require.context("../Assets/Images/showcase", false, /\.(png|jpe?g|svg)$/)
+    require.context("../Assets/Images/showcase/webp/", false, /\.(png|jpe?g|svg|webp)$/)
   );
 
   const [isOpen, setIsOpen] = useState(false);

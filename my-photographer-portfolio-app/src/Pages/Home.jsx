@@ -9,8 +9,10 @@ import "../Assets/CSS/Home.css"; // ✅ import the CSS
 
 export const Home = () => {
   const itemData = importAllImagesByDir(
-    require.context("../Assets/Images/home", false, /\.(png|jpe?g|svg)$/)
+    require.context("../Assets/Images/home/webp/", false, /\.(png|jpe?g|svg|webp)$/)
   );
+
+  console.log("itemData", itemData)
 
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);

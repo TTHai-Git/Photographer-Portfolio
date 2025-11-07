@@ -7,9 +7,9 @@ import LightBox from "../utils/LightBox";
 export const BoBai = () => {
   const images = importAllImagesByDir(
     require.context(
-      "../Assets/Images/showcase/deep-connection-vsersion-2/",
+      "../Assets/Images/showcase/deep-connection-vsersion-2/webp/",
       false,
-      /\.(png|jpe?g|svg)$/ // load all images
+      /\.(png|jpe?g|svg|webp)$/ // load all images
     )
   );
 

@@ -1,4 +1,4 @@
-import Avatar from '../Assets/Images/Avatar.png';
+import Avatar from '../Assets/Images/about/webp/Avatar.webp';
 import '../Assets/CSS/About.css';
 
 export const About = () => {
