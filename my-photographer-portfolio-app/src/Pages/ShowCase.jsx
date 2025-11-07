@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 import LightBox from "../utils/LightBox";
 import { loadImagesByDir } from "../hooks/loadImagesData";
+import { NavLink } from "react-router-dom";
 
 export const ShowCase = () => {
   const[images, setImages] = useState({})
@@ -34,11 +35,50 @@ export const ShowCase = () => {
       {/* --- Navigation Bar --- */}
       <nav>
         <ul className="showcase-nav">
-          <li><a href="/show-case/cocktail">Cocktail</a></li>
-          <li><a href="/show-case/nguyen-sac">Nguyen Sac</a></li>
-          <li><a href="/show-case/bo-bai">Bo Bai</a></li>
-          <li><a href="/show-case/fruit-macro">Fruit Macro</a></li>
-          <li><a href="/show-case/kinh-boi">Kinh Boi</a></li>
+          <li>
+            <NavLink 
+              to="/show-case/cocktail"
+              className={({ isActive }) => isActive ? "active-link" : ""}
+            >
+              <span>Cocktail</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink 
+              to="/show-case/nguyen-sac"
+              className={({ isActive }) => isActive ? "active-link" : ""}
+            >
+              <span>Nguyen Sac</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink 
+              to="/show-case/bo-bai"
+              className={({ isActive }) => isActive ? "active-link" : ""}
+            >
+              <span>Bo Bai</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink 
+              to="/show-case/fruit-macro"
+              className={({ isActive }) => isActive ? "active-link" : ""}
+            >
+              <span>Fruit Macro</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink 
+              to="/show-case/kinh-boi"
+              className={({ isActive }) => isActive ? "active-link" : ""}
+            >
+              <span>Kinh Boi</span>
+            </NavLink>
+          </li>
         </ul>
       </nav>
 
