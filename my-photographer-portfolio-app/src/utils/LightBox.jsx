@@ -18,7 +18,7 @@ export const LightBox = ({ isOpen, slides, startIndex, onClose }) => {
   // Sync external isOpen state
   useEffect(() => {
     setOpen(isOpen);
-    console.log("Slides", slides)
+    // console.log("Slides", slides)
   }, [isOpen]);
 
   return (

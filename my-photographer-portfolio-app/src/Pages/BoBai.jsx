@@ -1,18 +1,11 @@
 // BoBai.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../Assets/CSS/BoBai.css";
-import { importAllImagesByDir } from "../utils/index";
 import LightBox from "../utils/LightBox";
+import { loadImagesByDir } from "../hooks/loadImagesData";
 
 export const BoBai = () => {
-  const images = importAllImagesByDir(
-    require.context(
-      "../Assets/Images/showcase/deep-connection-vsersion-2/webp/",
-      false,
-      /\.(png|jpe?g|svg|webp)$/ // load all images
-    )
-  );
-
+  const [images, setImages] = useState({})
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
@@ -21,7 +14,7 @@ export const BoBai = () => {
     const slideList = Object.keys(images).map((key) => ({
       src: images[key],
       title: key
-        .replace(/\.(png|jpe?g|svg)$/, "")
+        .replace(/\.(png|jpe?g|svg|webp)$/, "")
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
@@ -29,6 +22,10 @@ export const BoBai = () => {
     setStartIndex(index);
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    setImages(loadImagesByDir(require.context("../Assets/Images/showcase/deep-connection-vsersion-2/webp/", false, /\.(png|jpe?g|svg|webp)$/)))
+  }, [])
 
 
   return (

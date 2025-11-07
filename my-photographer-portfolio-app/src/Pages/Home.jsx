@@ -2,27 +2,21 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LightBox from "../utils/LightBox";
-import { importAllImagesByDir } from "../utils";
 import "../Assets/CSS/Home.css"; // ✅ import the CSS
+import { loadImagesByDir } from "../hooks/loadImagesData";
 
 export const Home = () => {
-  const itemData = importAllImagesByDir(
-    require.context("../Assets/Images/home/webp/", false, /\.(png|jpe?g|svg|webp)$/)
-  );
-
-  console.log("itemData", itemData)
-
+  const [itemData, setItemData] = useState({})
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
-
   const handleImageClick = (index) => {
     const slideList = Object.keys(itemData).map((key) => ({
       src: itemData[key],
       title: key
-        .replace(/\.(png|jpe?g|svg)$/, "")
+        .replace(/\.(png|jpe?g|svg|webp)$/, "")
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
@@ -30,6 +24,10 @@ export const Home = () => {
     setStartIndex(index);
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    setItemData(loadImagesByDir(require.context("../Assets/Images/home/webp/", false, /\.(png|jpe?g|svg|webp)$/)))
+  }, [])
 
   return (
     <Box className="home-container">
@@ -47,8 +45,7 @@ export const Home = () => {
         {Object.keys(itemData).map((key, index) => (
           <ImageListItem key={itemData[key]}>
             <img
-              srcSet={`${itemData[key]}?w=248&fit=crop&auto=format&dpr=2 2x`}
-              src={`${itemData[key]}?w=248&fit=crop&auto=format`}
+              src={`${itemData[key]}?w=auto&fit=crop&auto=format`}
               alt={key}
               onClick={() => handleImageClick(index)}
               loading="lazy"

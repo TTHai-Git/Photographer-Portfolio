@@ -1,15 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "../Assets/CSS/FruitMarco.css";
-import { importAllImagesByDir } from "../utils/index";
 import LightBox from "../utils/LightBox";
+import { loadImagesByDir } from '../hooks/loadImagesData';
 export const FruitMacro = () => {
-  const images = importAllImagesByDir(
-      require.context(
-        "../Assets/Images/showcase/fruit-macro/webp",
-        false,
-        /\.(png|jpe?g|svg|webp)$/ // load all images
-      )
-    );
+  const [images, setImages] = useState({}) 
   
     const [isOpen, setIsOpen] = useState(false);
     const [slides, setSlides] = useState([]);
@@ -19,7 +13,7 @@ export const FruitMacro = () => {
       const slideList = Object.keys(images).map((key) => ({
         src: images[key],
         title: key
-          .replace(/\.(png|jpe?g|svg)$/, "")
+          .replace(/\.(png|jpe?g|svg|webp)$/, "")
           .replace(/[-_]+/g, " ")
           .replace(/\b\w/g, (c) => c.toUpperCase()),
       }));
@@ -28,7 +22,14 @@ export const FruitMacro = () => {
       setIsOpen(true);
     };
   
-  
+    useEffect(() => {
+      setImages(loadImagesByDir(require.context(
+        "../Assets/Images/showcase/fruit-macro/webp",
+        false,
+        /\.(png|jpe?g|svg|webp)$/ // load all images
+      )))
+    }, [])
+
     return (
       <div className="FruitMacro-container">
         <h1 className="FruitMacro-title">FRUIT MACRO CONNECTION</h1>

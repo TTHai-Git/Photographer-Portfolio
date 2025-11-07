@@ -1,16 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../Assets/CSS/Cocktail.css";
-import { importAllImagesByDir } from "../utils/index";
 import LightBox from "../utils/LightBox";
+import { loadImagesByDir } from "../hooks/loadImagesData";
 
 const Cocktail = () => {
-  const images = importAllImagesByDir(
-    require.context(
-      "../Assets/Images/showcase/verdant-cocktail-bar/webp/",
-      false,
-      /\.(png|jpe?g|svg|webp)$/
-    )
-  );
+  const [images, setImages] = useState({}) 
 
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
@@ -20,7 +14,7 @@ const Cocktail = () => {
     const slideList = Object.keys(images).map((key) => ({
       src: images[key],
       title: key
-        .replace(/\.(png|jpe?g|svg)$/, "")
+        .replace(/\.(png|jpe?g|svg|webp)$/, "")
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
@@ -29,6 +23,14 @@ const Cocktail = () => {
     setIsOpen(true);
   };
 
+
+  useEffect(() => {
+    setImages(loadImagesByDir(require.context(
+      "../Assets/Images/showcase/verdant-cocktail-bar/webp/",
+      false,
+      /\.(png|jpe?g|svg|webp)$/
+    )))
+  }, [])
 
   return (
     <div className="Cocktail-container">

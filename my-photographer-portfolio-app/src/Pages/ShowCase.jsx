@@ -1,14 +1,11 @@
 // ShowCase.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
-import { importAllImagesByDir } from "../utils";
 import LightBox from "../utils/LightBox";
+import { loadImagesByDir } from "../hooks/loadImagesData";
 
 export const ShowCase = () => {
-  const images = importAllImagesByDir(
-    require.context("../Assets/Images/showcase/webp/", false, /\.(png|jpe?g|svg|webp)$/)
-  );
-
+  const[images, setImages] = useState({})
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
@@ -17,7 +14,7 @@ export const ShowCase = () => {
     const slideList = Object.keys(images).map((key) => ({
       src: images[key],
       title: key
-        .replace(/\.(png|jpe?g|svg)$/, "")
+        .replace(/\.(png|jpe?g|svg|webp)$/, "")
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
@@ -25,6 +22,10 @@ export const ShowCase = () => {
     setStartIndex(index);
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    setImages(loadImagesByDir(require.context("../Assets/Images/showcase/webp/", false, /\.(png|jpe?g|svg|webp)$/)))
+  }, [])
 
   return (
     <div className="showcase-container">

@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../Assets/CSS/NguyenSac.css";
-import { importAllImagesByDir } from '../utils/index';
 import LightBox from "../utils/LightBox";
+import { loadImagesByDir } from '../hooks/loadImagesData';
 
 const NguyenSac = () => {
-  const images = importAllImagesByDir(
-    require.context(
-      '../Assets/Images/showcase/nguyen-sac/webp/',
-      false,
-      /\.(png|jpe?g|svg|webp)$/
-    )
-  );
+  const [images, setImages] = useState({}) 
 
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
@@ -20,7 +14,7 @@ const NguyenSac = () => {
     const slideList = Object.keys(images).map((key) => ({
       src: images[key],
       title: key
-        .replace(/\.(png|jpe?g|svg)$/, "")
+        .replace(/\.(png|jpe?g|svg|webp)$/, "")
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
@@ -28,6 +22,14 @@ const NguyenSac = () => {
     setStartIndex(index);
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    setImages(loadImagesByDir(require.context(
+      '../Assets/Images/showcase/nguyen-sac/webp/',
+      false,
+      /\.(png|jpe?g|svg|webp)$/
+    )))
+  }, [])
 
   return (
     <div className="NguyenSac-container">
