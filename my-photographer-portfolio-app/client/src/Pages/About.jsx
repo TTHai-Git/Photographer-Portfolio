@@ -3,7 +3,7 @@ import '../Assets/CSS/About.css';
 import { useCloudinaryImages } from '../hooks/loadImagesOnCloudinary';
 
 export const About = () => {
-  const { images, loading, count } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/about");
+  const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/about");
   return (
     <div className="about-container">
       <h1 className="about-name">Hoàng Trúc</h1>

@@ -3,7 +3,7 @@ import "../Assets/CSS/FruitMarco.css";
 import LightBox from "../utils/LightBox";
 import { useCloudinaryImages } from '../hooks/loadImagesOnCloudinary';
 export const FruitMacro = () => {
-    const { images, loading, count } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase/fruit-macro");
+    const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase/fruit-macro");
   
     const [isOpen, setIsOpen] = useState(false);
     const [slides, setSlides] = useState([]);

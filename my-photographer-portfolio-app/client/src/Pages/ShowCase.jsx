@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
 
 export const ShowCase = () => {
-  const { images, loading, count } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase");
+  const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase");
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);

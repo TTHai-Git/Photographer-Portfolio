@@ -8,7 +8,7 @@ import "../Assets/CSS/Home.css"; // ✅ import the CSS
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
 
 export const Home = () => {
-  const { images, loading, count } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/home");
+  const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/home");
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);

@@ -4,7 +4,7 @@ import LightBox from "../utils/LightBox";
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
 
 const Cocktail = () => {
-  const { images, loading, count } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase/verdant-cocktail-bar");
+  const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/showcase/verdant-cocktail-bar");
 
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
