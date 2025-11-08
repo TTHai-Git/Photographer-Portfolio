@@ -1,0 +1,40 @@
+# Dependency directories
+/node_modules
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.production
+
+# Local build artifacts
+/build
+/dist
+/out
+/tmp
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test coverage reports
+/coverage
+
+# Compiled output (if not handled by build tools)
+*.js.map
+*.d.ts
+
+# Other common files to ignore
+*.log
+*.sqlite
+*.sqlite3
