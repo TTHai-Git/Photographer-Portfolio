@@ -3,7 +3,7 @@ import APIs, { endpoints } from "../config/APIs"
 
 export const useCloudinaryImages = (directory) => {
   const [images, setImages] = useState([]);
-  const [setCount] = useState(0)
+  const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const useCloudinaryImages = (directory) => {
     };
 
     fetchImages();
-  }, [directory]);
+  }, [directory, count]);
 
   return { images, loading };
 };
