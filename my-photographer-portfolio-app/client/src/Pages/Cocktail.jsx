@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import "../Assets/CSS/Cocktail.css";
 import LightBox from "../utils/LightBox";
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
