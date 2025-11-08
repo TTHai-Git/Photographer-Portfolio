@@ -1,0 +1,146 @@
+/* ===============================
+   🍸 COCKTAIL SHOWCASE STYLES
+   =============================== */
+
+/* Container */
+.Cocktail-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #1A0A0A;
+  text-align: center;
+  padding-bottom: 60px;
+}
+
+/* Headings */
+.Cocktail-title {
+  color: #FFFFFF;
+  margin: 40px 0 20px 0;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 48px;
+  letter-spacing: 1px;
+}
+
+.Cocktail-content {
+  color: #FFFFFF;
+  margin: 40px auto;
+  width: 70%;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* --- Top grid (8 images: 2 rows x 4 columns) --- */
+.Cocktail-showcase-top {
+  width: 90%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px 40px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.Cocktail-item-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Cocktail-image-top {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Cocktail-image-top:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(255, 255, 255, 0.1);
+}
+
+/* --- Bottom 2 centered images --- */
+.Cocktail-showcase-bottom {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.Cocktail-item-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Cocktail-image-bottom {
+  width: 100%;
+  max-width: 800px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Cocktail-image-bottom:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 18px rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Fade-in Animation ===== */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .Cocktail-showcase-top {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .Cocktail-title {
+    font-size: 32px;
+  }
+
+  .Cocktail-content {
+    width: 85%;
+    font-size: 16px;
+  }
+
+  .Cocktail-showcase-top {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .Cocktail-image-top {
+    max-width: 100%;
+  }
+
+  .Cocktail-image-bottom {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .Cocktail-showcase-top {
+    grid-template-columns: 1fr;
+  }
+}
