@@ -1,5 +1,5 @@
 import getRedisClient from "../config/redisCloud.config.js";
-export const getOrSetCachedData = async (key, callback, ttl = 300) => {
+export const getOrSetCachedData = async (key, callback, ttl = 1800) => {
   const cacheData = await getRedisClient.get(key);
 
   if (cacheData) {
