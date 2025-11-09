@@ -1,6 +1,6 @@
 export const welcomeToServer = (req, res) => {
-  res.send("Welcome to server of Pet Shop!");
+  res.send("Welcome to server of Hoang Truc Photography Portfolio!");
 };
-export const welcomeToAPIOfPetShop = (req, res) => {
-  res.send("Welcome to the Pet Shop API!");
+export const welcomeToAPIsOfServer = (req, res) => {
+  res.send("Welcome to the Hoang Truc Photography Portfolio API!");
 };

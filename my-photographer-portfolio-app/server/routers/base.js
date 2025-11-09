@@ -1,12 +1,12 @@
 import { Router } from "express";
 import {
-  welcomeToAPIOfPetShop,
+  welcomeToAPIsOfServer,
   welcomeToServer,
 } from "../controllers/baseController.js";
 
 const baseRoutes = new Router();
 
 baseRoutes.get("/", welcomeToServer);
-baseRoutes.get("/v1", welcomeToAPIOfPetShop);
+baseRoutes.get("/v1", welcomeToAPIsOfServer);
 
 export default baseRoutes;

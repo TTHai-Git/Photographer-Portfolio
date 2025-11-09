@@ -15,6 +15,10 @@ export const useCloudinaryImages = (directory) => {
             setImages(response.data.images)
             setCount(response.data.count)
         }
+        else {
+          setImages([])
+          setCount(0)
+        }
 
     } catch (error) {
         console.error("Error loading images from Cloudinary:", error)
@@ -26,7 +30,7 @@ export const useCloudinaryImages = (directory) => {
     };
 
     fetchImages();
-  }, [directory, count]);
+  }, [directory]);
 
   return { images, loading };
 };
