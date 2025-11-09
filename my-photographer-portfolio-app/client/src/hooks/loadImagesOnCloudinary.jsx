@@ -3,7 +3,7 @@ import APIs, { endpoints } from "../config/APIs"
 
 export const useCloudinaryImages = (directory) => {
   const [images, setImages] = useState([]);
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,11 +13,11 @@ export const useCloudinaryImages = (directory) => {
         const response = await APIs.get(`${endpoints.getImages}?folder=${directory}`)
         if (response.status === 200) {
             setImages(response.data.images)
-            setCount(response.data.count)
+            // setCount(response.data.count)
         }
         else {
           setImages([])
-          setCount(0)
+          // setCount(0)
         }
 
     } catch (error) {

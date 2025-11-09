@@ -35,7 +35,7 @@ export const getImagesOnCloudinary = async (req, res) => {
         };
       });
       return {
-        count: images.length,
+        // count: images.length,
         images,
       };
     });
