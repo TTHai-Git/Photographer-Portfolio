@@ -6,7 +6,7 @@ import {
 
 const baseRoutes = new Router();
 
-baseRoutes.get("/", welcomeToServer);
-baseRoutes.get("/v1", welcomeToAPIsOfServer);
+baseRoutes.get("/healthz", welcomeToServer);
+baseRoutes.get("/v1/healthz", welcomeToAPIsOfServer);
 
 export default baseRoutes;
