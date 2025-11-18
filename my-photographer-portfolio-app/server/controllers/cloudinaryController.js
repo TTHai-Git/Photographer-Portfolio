@@ -25,12 +25,8 @@ export const getImagesOnCloudinary = async (req, res) => {
 
       // Nếu muốn chỉ lấy link ảnh:
       const images = result.resources.map((img) => {
-        const segments = img.public_id.split("/"); // tách theo folder path
-        const fileName = segments[segments.length - 1]; // lấy phần cuối
-
         return {
           asset_id: img.asset_id,
-          file_name: fileName, // ✅ tên file bạn muốn
           url: img.secure_url,
         };
       });

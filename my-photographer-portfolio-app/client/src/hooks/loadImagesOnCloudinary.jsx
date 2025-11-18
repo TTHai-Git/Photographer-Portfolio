@@ -13,6 +13,7 @@ export const useCloudinaryImages = (directory) => {
         const response = await APIs.get(`${endpoints.getImages}?folder=${directory}`)
         if (response.status === 200) {
             setImages(response.data.images)
+            // console.log("response.data.images", response.data.images)
             // setCount(response.data.count)
         }
         else {

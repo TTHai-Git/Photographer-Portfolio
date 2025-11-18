@@ -5,7 +5,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Download from "yet-another-react-lightbox/plugins/download";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import Captions from "yet-another-react-lightbox/plugins/captions";
+// import Captions from "yet-another-react-lightbox/plugins/captions";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
@@ -30,21 +30,21 @@ export const LightBox = ({ isOpen, slides, startIndex, onClose }) => {
       }}
       slides={slides}
       index={startIndex}
-      plugins={[Zoom, Download, Fullscreen, Thumbnails, Captions, Slideshow]}
-      captions={{
-        showToggle: true,
-        descriptionTextAlign: 'end'
-      }}
+      plugins={[Zoom, Download, Fullscreen, Thumbnails, Slideshow]}
+      // captions={{
+      //   showToggle: true,
+      //   descriptionTextAlign: 'end'
+      // }}
       controller={{ closeOnBackdropClick: true }}
       zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
-        render={{
-            caption: ({ slide }) => (
-                <div className="lightbox-caption">
-                    {slide.title && <strong>{slide.title}</strong>}
-                    {slide.src && <p>{slide.src}</p>}
-                </div>
-            ),
-        }}
+        // render={{
+        //     caption: ({ slide }) => (
+        //         <div className="lightbox-caption">
+        //             {slide.title && <strong>{slide.title}</strong>}
+        //             {slide.src && <p>{slide.src}</p>}
+        //         </div>
+        //     ),
+        // }}
     />
   );
 };
