@@ -4,28 +4,29 @@ import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import LightBox from "../utils/LightBox";
-import "../Assets/CSS/Home.css"; // ✅ import the CSS
+import "../Assets/CSS/Home.css";
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
 
 export const Home = () => {
-  const { images} = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/home");
+  const { images, loading } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/HOME");
+
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
-
 
   const handleImageClick = (index) => {
     const slideList = images.map((image) => ({
       src: image.url,
       title: image.file_name
     }));
+
     setSlides(slideList);
     setStartIndex(index);
     setIsOpen(true);
   };
 
   return (
-  <Box className="home-container">
+    <Box className="home-container">
       <Typography
         variant="h3"
         component="div"
@@ -36,6 +37,14 @@ export const Home = () => {
         Welcome to My Photography Portfolio
       </Typography>
 
+      {/* --- Loading Overlay --- */}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"></div>
+        </div>
+      )}
+
+      {/* --- Masonry Image Grid --- */}
       <ImageList variant="masonry" cols={3} gap={12}>
         {images.map((image, index) => (
           <ImageListItem key={image.asset_id}>
@@ -50,6 +59,7 @@ export const Home = () => {
         ))}
       </ImageList>
 
+      {/* --- LightBox --- */}
       {isOpen && (
         <LightBox
           isOpen={isOpen}
@@ -59,7 +69,6 @@ export const Home = () => {
         />
       )}
     </Box>
-
   );
 };
 

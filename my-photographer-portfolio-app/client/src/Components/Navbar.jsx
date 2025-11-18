@@ -14,7 +14,7 @@ export const Navbar = () => {
         {/* ✅ Logo + Text Centered */}
         <div className="navbar-logo">
           <NavLink to="/">
-            <img src={Logo} alt="logo" />
+            {/* <img src={Logo} alt="logo" /> */}
             <span>Hoang Truc Portfolio</span>
           </NavLink>
         </div>
@@ -28,9 +28,9 @@ export const Navbar = () => {
         <nav className={`navbar-menu ${isOpen ? "active" : ""}`}>
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
           <NavLink to="/show-case" onClick={closeMenu}>Show Case</NavLink>
-          <NavLink to="/motion" onClick={closeMenu}>Motion</NavLink>
+          {/* <NavLink to="/motion" onClick={closeMenu}>Motion</NavLink>
           <NavLink to="/social" onClick={closeMenu}>Social</NavLink>
-          <NavLink to="/about" onClick={closeMenu}>About</NavLink>
+          <NavLink to="/about" onClick={closeMenu}>About</NavLink> */}
         </nav>
       </div>
 

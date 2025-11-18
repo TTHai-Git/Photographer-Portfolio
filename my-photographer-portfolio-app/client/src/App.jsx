@@ -27,37 +27,37 @@ function App() {
           element: <ShowCase />,      
         },
         {
-          path: "/show-case/cocktail",
+          path: "/show-case/verdant-cocktail-bar",
           element: <Cocktail/>
         },
         {
-          path: "/show-case/nguyen-sac",
+          path: "/show-case/nguyen-sac-candle",
           element: <NguyenSac/>
         },
         {
-          path: "/show-case/bo-bai",
+          path: "/show-case/ghien-mysteri-deep-connection-card",
           element: <BoBai/>
         },
         {
-          path: "/show-case/fruit-macro",
+          path: "/show-case/macro",
           element: <FruitMacro/>
         },
         {
-          path: "/show-case/kinh-boi",
+          path: "/show-case/swimming-equipment",
           element: <KinhBoi/>
         },
-        {
-          path: "social",
-          element: <Social />,
-        },
-        {
-          path: "motion",
-          element: <Motion />,
-        },
-        {
-          path: "about",
-          element: <About />,
-        },
+        // {
+        //   path: "social",
+        //   element: <Social />,
+        // },
+        // {
+        //   path: "motion",
+        //   element: <Motion />,
+        // },
+        // {
+        //   path: "about",
+        //   element: <About />,
+        // },
       ],
     },
   ]);

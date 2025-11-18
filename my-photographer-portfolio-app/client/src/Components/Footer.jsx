@@ -1,6 +1,6 @@
 import React from 'react';
 import '../Assets/CSS/Footer.css';
-import { FaFacebookF, FaInstagram, FaTiktok, FaArrowUp } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaArrowUp, FaBehance } from 'react-icons/fa';
 
 export const Footer = () => {
   const scrollToTop = () => {
@@ -15,7 +15,7 @@ export const Footer = () => {
       <div className='footer-content'>
         <div className='footer-left'>
           <p>📞 Phone: 079 8207 241</p>
-          <p>📧 Email: Phamthihoangtruc74@gmail.com</p>
+          <p>📧 Email: hoangtruc7499@gmail.com</p>
         </div>
 
         <div className='footer-right'>
@@ -28,7 +28,7 @@ export const Footer = () => {
             <FaFacebookF className='social-icon' />
           </a>
           <a
-            href='https://www.instagram.com/'
+            href='https://www.instagram.com/trucluvyelou/'
             target='_blank'
             rel='noopener noreferrer'
             aria-label='Instagram'
@@ -36,12 +36,12 @@ export const Footer = () => {
             <FaInstagram className='social-icon' />
           </a>
           <a
-            href='https://www.tiktok.com/'
+            href='https://www.behance.net/trucpham3'
             target='_blank'
             rel='noopener noreferrer'
-            aria-label='TikTok'
+            aria-label='Behance'
           >
-            <FaTiktok className='social-icon' />
+            <FaBehance className='social-icon' />
           </a>
         </div>
       </div>
