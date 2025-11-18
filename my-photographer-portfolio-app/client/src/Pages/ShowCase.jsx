@@ -125,7 +125,7 @@ export const ShowCase = () => {
             src={GHIEN_MYSTERI_DEEP_CONNECTION_CARD}
             alt={"GHIEN MYSTERI DEEP CONNECTION CARD"}
             className="showcase-image"
-            onClick={() => handleImageClick("GHIEN MYSTERI_ DEEP CONNECTION CARD",0)}
+            onClick={() => handleImageClick("GHIEN MYSTERI_DEEP CONNECTION CARD",0)}
           />
         </div>
         <div key={"MACRO"} className="showcase-item fade-in">
