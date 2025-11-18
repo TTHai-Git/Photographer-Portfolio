@@ -116,7 +116,7 @@ export const ShowCase = () => {
             src={AMY_CAKE_CHRISTMAS_CAKE}
             alt={"AMY CAKE CHRISTMAS CAKE"}
             className="showcase-image"
-            onClick={() => handleImageClick("AMY CAKE_ CHRISTMAS CAKE",0)}
+            onClick={() => handleImageClick("AMY CAKE_CHRISTMAS CAKE",0)}
           />
         </div>
         <div key={"GHIEN MYSTERI DEEP CONNECTION CARD"} className="showcase-item fade-in">
