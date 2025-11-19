@@ -4,7 +4,7 @@ import APIs, { endpoints } from "../config/APIs"
 export const useCloudinaryImages = (directory) => {
   const [images, setImages] = useState([]);
   // const [count, setCount] = useState(0)
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchImages = async () => {

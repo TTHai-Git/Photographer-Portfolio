@@ -15,7 +15,6 @@ import VERDANT_COCKTAIL_BAR from "../Assets/Images/SHOW CASE/VERDANT COCKTAIL BA
 
 export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
-  const [openLoading, setOpenLoading] = useState(false);
   const { images, loading } = useCloudinaryImages(folder);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +22,6 @@ export const ShowCase = () => {
   const [startIndex, setStartIndex] = useState(0);
 
     const handleImageClick = (folderDir, index) => {
-      setOpenLoading(true); // bật loading trước
       setFolder(`Hoang-Truc-Photographer-Portfolio/SHOW CASE/${folderDir}`);
       setStartIndex(index);
     };
@@ -35,10 +33,8 @@ export const ShowCase = () => {
   }));
 
     useEffect(() => {
-      if (!loading && folder) {
-        setOpenLoading(false); // tắt loading
-        setIsOpen(true);        // mở LightBox
-      }
+      if (!loading && folder) setIsOpen(true);        // mở LightBox
+
     }, [loading, folder]);
 
 
@@ -148,7 +144,7 @@ export const ShowCase = () => {
         </div>
       </div>
 
-      {openLoading && (
+      {loading && (
         <div className="loading-overlay">
           <div className="spinner"></div>
         </div>

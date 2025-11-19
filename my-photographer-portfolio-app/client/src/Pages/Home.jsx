@@ -60,7 +60,7 @@ export const Home = () => {
       </ImageList>
 
       {/* --- LightBox --- */}
-      {isOpen && (
+      {!loading && isOpen && (
         <LightBox
           isOpen={isOpen}
           slides={slides}
