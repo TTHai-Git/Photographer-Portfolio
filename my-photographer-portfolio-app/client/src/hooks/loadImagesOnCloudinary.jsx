@@ -7,10 +7,12 @@ export const useCloudinaryImages = (directory) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log("directory", directory)
     const fetchImages = async () => {
       try {
         setLoading(true)
-        const response = await APIs.get(`${endpoints.getImages}?folder=${directory}`)
+        if (directory) {
+          const response = await APIs.get(`${endpoints.getImages}?folder=${directory}`)
         if (response.status === 200) {
             setImages(response.data.images)
             // console.log("response.data.images", response.data.images)
@@ -20,7 +22,7 @@ export const useCloudinaryImages = (directory) => {
           setImages([])
           // setCount(0)
         }
-
+        }
     } catch (error) {
         console.error("Error loading images from Cloudinary:", error)
         throw error
@@ -29,7 +31,6 @@ export const useCloudinaryImages = (directory) => {
         setLoading(false)
     }
     };
-
     fetchImages();
   }, [directory]);
 

@@ -12,6 +12,7 @@ import NGUYEN_SAC_CANDLE from "../Assets/Images/SHOW CASE/NGUYEN SAC CANDLE/mat_
 import PRODUCT_SET_UP from "../Assets/Images/SHOW CASE/PRODUCT SET UP/dau son.webp"
 import SWIMMING_EQUIPMENT from "../Assets/Images/SHOW CASE/SWIMMING EQUIPMENT/anti fog_2.webp"
 import VERDANT_COCKTAIL_BAR from "../Assets/Images/SHOW CASE/VERDANT COCKTAIL BAR/1.webp"
+import LazyImage from "../Components/LazyImage";
 
 export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
@@ -28,8 +29,7 @@ export const ShowCase = () => {
 
 
   const slides = images.map(img => ({
-    src: img.url,
-    title: img.file_name
+    src: img.optimized_url,
   }));
 
     useEffect(() => {
@@ -60,88 +60,96 @@ export const ShowCase = () => {
 
       {/* --- Each Image (full width) --- */}
       <div className="showcase-list">
-       
         <div key={"VERDANT COCKTAIL BAR"} className="showcase-item fade-in">
           <p className="showcase-caption">VERDANT COCKTAIL BAR</p>
-          <img
+          <LazyImage
             src={VERDANT_COCKTAIL_BAR}
-            alt={"VERDANT COCKTAIL BAR"}
+            alt="VERDANT COCKTAIL BAR"
             className="showcase-image"
-            onClick={() => handleImageClick("VERDANT COCKTAIL BAR",0)}
+            onClick={() => handleImageClick("VERDANT COCKTAIL BAR", 0)}
           />
         </div>
+
         <div key={"CHOI XUAN GIFT BOX"} className="showcase-item fade-in">
           <p className="showcase-caption">CHOI XUAN GIFT BOX</p>
-          <img
+          <LazyImage
             src={CHOI_XUAN_GIFT_BOX}
-            alt={"CHOI XUAN GIFT BOX"}
+            alt="CHOI XUAN GIFT BOX"
             className="showcase-image"
-            onClick={() => handleImageClick("CHOI XUAN_GIFT BOX",0)}
+            onClick={() => handleImageClick("CHOI XUAN_GIFT BOX", 0)}
           />
         </div>
+
         <div key={"NGUYEN SAC CANDLE"} className="showcase-item fade-in">
           <p className="showcase-caption">NGUYEN SAC CANDLE</p>
-          <img
+          <LazyImage
             src={NGUYEN_SAC_CANDLE}
-            alt={"NGUYEN SAC CANDLE"}
+            alt="NGUYEN SAC CANDLE"
             className="showcase-image"
-            onClick={() => handleImageClick("NGUYEN SAC CANDLE",0)}
+            onClick={() => handleImageClick("NGUYEN SAC CANDLE", 0)}
           />
         </div>
+
         <div key={"PRODUCT SET UP"} className="showcase-item fade-in">
           <p className="showcase-caption">PRODUCT SET UP</p>
-          <img
+          <LazyImage
             src={PRODUCT_SET_UP}
-            alt={"PRODUCT SET UP"}
+            alt="PRODUCT SET UP"
             className="showcase-image"
-            onClick={() => handleImageClick("PRODUCT SET UP",0)}
+            onClick={() => handleImageClick("PRODUCT SET UP", 0)}
           />
         </div>
+
         <div key={"AMY CAKE LUNAR NEW YEAR"} className="showcase-item fade-in">
           <p className="showcase-caption">AMY CAKE LUNAR NEW YEAR</p>
-          <img
+          <LazyImage
             src={AMY_CAKE_LUNAR_NEW_YEAR}
-            alt={"AMY CAKE LUNAR NEW YEAR"}
+            alt="AMY CAKE LUNAR NEW YEAR"
             className="showcase-image"
-            onClick={() => handleImageClick("AMY CAKE_LUNAR NEW YEAR",0)}
+            onClick={() => handleImageClick("AMY CAKE_LUNAR NEW YEAR", 0)}
           />
         </div>
+
         <div key={"AMY CAKE CHRISTMAS CAKE"} className="showcase-item fade-in">
           <p className="showcase-caption">AMY CAKE CHRISTMAS CAKE</p>
-          <img
+          <LazyImage
             src={AMY_CAKE_CHRISTMAS_CAKE}
-            alt={"AMY CAKE CHRISTMAS CAKE"}
+            alt="AMY CAKE CHRISTMAS CAKE"
             className="showcase-image"
-            onClick={() => handleImageClick("AMY CAKE_CHRISTMAS CAKE",0)}
+            onClick={() => handleImageClick("AMY CAKE_CHRISTMAS CAKE", 0)}
           />
         </div>
+
         <div key={"GHIEN MYSTERI DEEP CONNECTION CARD"} className="showcase-item fade-in">
           <p className="showcase-caption">GHIEN MYSTERI DEEP CONNECTION CARD</p>
-          <img
+          <LazyImage
             src={GHIEN_MYSTERI_DEEP_CONNECTION_CARD}
-            alt={"GHIEN MYSTERI DEEP CONNECTION CARD"}
+            alt="GHIEN MYSTERI DEEP CONNECTION CARD"
             className="showcase-image"
-            onClick={() => handleImageClick("GHIEN MYSTERI_DEEP CONNECTION CARD",0)}
+            onClick={() => handleImageClick("GHIEN MYSTERI_DEEP CONNECTION CARD", 0)}
           />
         </div>
+
         <div key={"MACRO"} className="showcase-item fade-in">
           <p className="showcase-caption">MACRO</p>
-          <img
+          <LazyImage
             src={MACRO}
-            alt={"MACRO"}
+            alt="MACRO"
             className="showcase-image"
-            onClick={() => handleImageClick("MACRO",0)}
+            onClick={() => handleImageClick("MACRO", 0)}
           />
         </div>
+
         <div key={"SWIMMING EQUIPMENT"} className="showcase-item fade-in">
           <p className="showcase-caption">SWIMMING EQUIPMENT</p>
-          <img
+          <LazyImage
             src={SWIMMING_EQUIPMENT}
-            alt={"SWIMMING EQUIPMENT"}
+            alt="SWIMMING EQUIPMENT"
             className="showcase-image"
-            onClick={() => handleImageClick("SWIMMING EQUIPMENT",0)}
+            onClick={() => handleImageClick("SWIMMING EQUIPMENT", 0)}
           />
         </div>
+
       </div>
 
       {loading && (

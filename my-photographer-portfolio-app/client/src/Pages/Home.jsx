@@ -6,6 +6,7 @@ import { useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
+import LazyImage from "../Components/LazyImage";
 
 export const Home = () => {
   const { images, loading } = useCloudinaryImages("Hoang-Truc-Photographer-Portfolio/HOME");
@@ -16,8 +17,7 @@ export const Home = () => {
 
   const handleImageClick = (index) => {
     const slideList = images.map((image) => ({
-      src: image.url,
-      title: image.file_name
+      src: image.optimized_url,
     }));
 
     setSlides(slideList);
@@ -47,13 +47,19 @@ export const Home = () => {
       {/* --- Masonry Image Grid --- */}
       <ImageList variant="masonry" cols={3} gap={12}>
         {images.map((image, index) => (
-          <ImageListItem key={image.asset_id}>
-            <img
-              src={`${image.url}?w=auto&fit=crop&auto=format`}
+          <ImageListItem key={image.public_id}>
+            {/* <img
+              src={`${image.optimized_url}?w=auto&fit=crop&auto=format`}
               alt={image.file_name}
               onClick={() => handleImageClick(index)}
               loading="lazy"
               className="fade-in"
+            /> */}
+            <LazyImage
+              src={image.optimized_url}
+              alt={image.file_name}
+              className="fade-in"
+              onClick={() => handleImageClick(index)}
             />
           </ImageListItem>
         ))}
