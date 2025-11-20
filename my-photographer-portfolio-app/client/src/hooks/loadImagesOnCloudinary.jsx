@@ -7,7 +7,7 @@ export const useCloudinaryImages = (directory) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("directory", directory)
+    // console.log("directory", directory)
     const fetchImages = async () => {
       try {
         setLoading(true)
