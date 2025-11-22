@@ -75,6 +75,10 @@ export const clearCacheByKeyword = async (keyword) => {
     console.error("Error clearing cache:", error);
   }
 };
+
+const ATTEMPT_KEY = (ip, method, path) => `ip:attempt:${ip}:${method}:${path}`;
+const BLOCK_KEY = (ip) => `ip:block:${ip}`;
+
 export const ipRateCheck = (opts = {}) => {
   const {
     maxAttempts = 100, // số lần request tối đa
