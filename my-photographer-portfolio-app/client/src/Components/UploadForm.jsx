@@ -96,7 +96,7 @@ const UploadForm = () => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (res.status === 201) alert(res.data.message);
+    if (res.status === 201)  alert(res.data.message);
   } catch (err) {
     alert(err.response.data.message);
     console.error(err);
@@ -111,6 +111,13 @@ const UploadForm = () => {
     setShowPassword(false);
   } finally {
     setUploading(false);
+    setFiles([]);
+    setPreviews([]);
+    setSelectedFolder("");
+    setPassword("");
+    setTotalSize(0);
+    setDragActive(false);
+    setShowPassword(false);
   }
 
 };
