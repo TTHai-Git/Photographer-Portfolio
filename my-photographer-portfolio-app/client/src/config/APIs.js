@@ -2,6 +2,8 @@ import axios from "axios";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 export const endpoints = {
   getImages: "/cloudinaries",
+  getFolders: "/cloudinaries/get-folders",
+  upload: "/cloudinaries/upload",
 };
 export default axios.create({
   baseURL: BASE_URL,

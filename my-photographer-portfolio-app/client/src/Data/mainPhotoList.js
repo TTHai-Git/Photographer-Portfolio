@@ -7,6 +7,8 @@ import NGUYEN_SAC_CANDLE from "../Assets/Images/SHOW CASE/NGUYEN SAC CANDLE/mat_
 import PRODUCT_SET_UP from "../Assets/Images/SHOW CASE/PRODUCT SET UP/dau son.webp";
 import SWIMMING_EQUIPMENT from "../Assets/Images/SHOW CASE/SWIMMING EQUIPMENT/anti fog_2.webp";
 import VERDANT_COCKTAIL_BAR from "../Assets/Images/SHOW CASE/VERDANT COCKTAIL BAR/1.webp";
+import YEN_SAO_PHUONG_DONG from "../Assets/Images/SHOW CASE/YEN SAO PHUONG DONG/DSC02825_chinh logo.webp";
+import YVES_ROCHER from "../Assets/Images/SHOW CASE/YVES ROCHER/DSC00206-2.webp";
 
 export const mainPhotoList = [
   {
@@ -34,6 +36,15 @@ export const mainPhotoList = [
     alt: "nguyen-sac-candle",
     caption: "NGUYEN SAC CANDLE",
     rootFolder: "NGUYEN SAC CANDLE",
+    indexImageList: 0,
+  },
+  {
+    key: "yen-sao-phuong-dong",
+    id: "YEN-SAO-PHUONG-DONG",
+    src: YEN_SAO_PHUONG_DONG,
+    alt: "yen-sao-phuong-dong",
+    caption: "YEN SAO PHUONG DONG",
+    rootFolder: "YEN SAO PHUONG DONG",
     indexImageList: 0,
   },
   {
@@ -88,6 +99,15 @@ export const mainPhotoList = [
     alt: "swimming-equipment",
     caption: "SWIMMING EQUIPMENT",
     rootFolder: "SWIMMING EQUIPMENT",
+    indexImageList: 0,
+  },
+  {
+    key: "yves-rocher",
+    id: "YVES-ROCHER",
+    src: YVES_ROCHER,
+    alt: "yves-rocher",
+    caption: "YVES ROCHER",
+    rootFolder: "YVES ROCHER",
     indexImageList: 0,
   },
 ];

@@ -10,6 +10,7 @@ import Social from "./Pages/Social";
 import Motion from "./Pages/Motion";
 import FruitMacro from "./Pages/FruitMacro";
 import KinhBoi from "./Pages/KinhBoi";
+import UploadForm from "./Components/UploadForm"
 
 
 function App() {
@@ -46,6 +47,10 @@ function App() {
           path: "/show-case/swimming-equipment",
           element: <KinhBoi/>
         },
+        {
+          path:"upload",
+          element: <UploadForm/>
+        }
         // {
         //   path: "social",
         //   element: <Social />,
