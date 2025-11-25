@@ -18,9 +18,16 @@ export const ShowCase = () => {
     setStartIndex(index);
   };
 
-  const slides = images.map(img => ({
-    src: img.optimized_url,
-  }));
+  const slides = images.map(img => {
+    const parts = img.public_id.split("/"); 
+    const folderName = parts[parts.length - 2];
+
+    return {
+      src: img.optimized_url,
+      title: folderName,
+    };
+});
+
 
   useEffect(() => {
     if (!loading && folder) setIsOpen(true);        // mở LightBox
@@ -49,7 +56,7 @@ export const ShowCase = () => {
         {mainPhotoList.map((image) => {
           return (
             <div key={image.key} id={image.id} className="showcase-item fade-in" >
-              <p className="showcase-caption">{image.caption}</p>
+              {/* <p className="showcase-caption">{image.caption}</p> */}
               <ShowCaseItem
                 key={image.key}
                 src={image.src}

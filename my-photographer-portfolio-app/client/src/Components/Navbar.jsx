@@ -28,6 +28,7 @@ export const Navbar = () => {
         <nav className={`navbar-menu ${isOpen ? "active" : ""}`}>
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
           <NavLink to="/show-case" onClick={closeMenu}>Show Case</NavLink>
+          {/* <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink> */}
           {/* <NavLink to="/motion" onClick={closeMenu}>Motion</NavLink>
           <NavLink to="/social" onClick={closeMenu}>Social</NavLink>
           <NavLink to="/about" onClick={closeMenu}>About</NavLink> */}

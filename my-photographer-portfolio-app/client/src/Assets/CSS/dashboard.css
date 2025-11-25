@@ -1,0 +1,60 @@
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6fa;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 30%;
+  background: white;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.btn {
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-green {
+  background: #28a745;
+  color: white;
+}
+
+.btn-red {
+  background: #bd1212;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.spinner {
+  border: 3px solid #fff2;
+  border-top: 3px solid white;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,18 +1,13 @@
 import { useState } from "react";
-import { useCloudinaryFolders } from "../hooks/loadFoldersOnCloudinary";
 import APIs, { endpoints } from "../config/APIs";
 import "../Assets/CSS/UploadForm.css"
+import "../Assets/CSS/modal.css";
 
-const UploadForm = () => {
-  const { folders, loading } = useCloudinaryFolders(
-    "Hoang-Truc-Photographer-Portfolio"
-  );
-
+const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLoading, loadImages ,onClose }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [dragActive, setDragActive] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false);
   const [totalSize, setTotalSize] = useState(0); // tổng dung lượng bytes
@@ -86,7 +81,7 @@ const UploadForm = () => {
   if (totalSize > MAX_TOTAL_SIZE) return alert("Tổng dung lượng ảnh vượt quá 100MB!");
 
   try {
-    setUploading(true);
+    setActionImagesLoading(true);
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
     formData.append("folder", selectedFolder);
@@ -110,7 +105,7 @@ const UploadForm = () => {
     setDragActive(false);
     setShowPassword(false);
   } finally {
-    setUploading(false);
+    setActionImagesLoading(false);
     setFiles([]);
     setPreviews([]);
     setSelectedFolder("");
@@ -118,31 +113,37 @@ const UploadForm = () => {
     setTotalSize(0);
     setDragActive(false);
     setShowPassword(false);
+    onClose()
+    await loadImages()
   }
 
+  
+
 };
+  if (!open) return null
   return (
-    <div className="upload-container">
+    <div className="modal-backdrop">
+      <div className="modal-box">
+        <div className="modal-header">Upload Images</div>
+        <div className="upload-container">
 
       <h2>Tải ảnh lên trên Cloudinary</h2>
 
       {/* Select Folder */}
       <label className="label">Chọn thư mục</label>
-      {!loading && (
         <select
           className="select"
           value={selectedFolder}
           onChange={(e) => setSelectedFolder(e.target.value)}
         >
-          <option value="">-- Select folder --</option>
+          <option value="" disabled={true}>-- Select folder --</option>
+          <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
           {folders.map((folder) => (
             <option key={folder} value={folder}>
               {folder}
             </option>
           ))}
         </select>
-      )}
-
       {/* Drag & Drop Area */}
       <div
         className={`dropzone ${dragActive ? "active" : ""}`}
@@ -190,7 +191,7 @@ const UploadForm = () => {
         </div>
       )}
 
-      {uploading && (
+      {actionImagesLoading && (
         <div className="loading-overlay">
           <div className="spinner"></div>
           <p>Đang tải ảnh lên...</p>
@@ -216,11 +217,17 @@ const UploadForm = () => {
 
 
       {/* Upload Button */}
-      <button className="upload-btn" onClick={handleUpload} disabled={uploading}>
-        {uploading ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
-      </button>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+        <button className="btn" onClick={onClose}>Cancel</button>
+        <button className="upload-btn" onClick={handleUpload} disabled={actionImagesLoading}>
+        {actionImagesLoading ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
+        </button>
+      </div>
     </div>
+      </div>
+    </div>
+    
   );
 };
 
-export default UploadForm;
+export default UploadImageModal;

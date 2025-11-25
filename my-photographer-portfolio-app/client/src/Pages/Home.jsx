@@ -18,6 +18,7 @@ export const Home = () => {
   const handleImageClick = (index) => {
     const slideList = images.map((image) => ({
       src: image.optimized_url,
+      title: "HOME"
     }));
 
     setSlides(slideList);

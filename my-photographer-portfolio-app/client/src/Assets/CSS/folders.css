@@ -1,0 +1,60 @@
+.folder-list {
+  padding: 15px;
+}
+
+.folder-item {
+  /* display: flex;
+  justify-content: space-between; */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+.folder-item:hover {
+  background: #f0f0f0;
+}
+
+.folder-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.folder-icon {
+  color: #eab308;
+}
+
+.folder-delete {
+  color: red;
+  cursor: pointer;
+}
+
+/* folders.css */
+.folder-skeleton {
+  height: 40px;
+  margin: 8px 0;
+  border-radius: 6px;
+  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 400% 400%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* images.css */
+.image-skeleton {
+  width: 120px;
+  height: 120px;
+  margin: 8px;
+  border-radius: 8px;
+  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 400% 400%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

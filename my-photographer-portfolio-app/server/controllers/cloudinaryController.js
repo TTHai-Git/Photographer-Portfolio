@@ -70,7 +70,7 @@ async function getAllFoldersOnCloudinary(path = "") {
 // 🟩 Controller API
 export const getAllFolders = async (req, res) => {
   try {
-    const cacheKey = "get-folders";
+    const cacheKey = "GET:/v1/cloudinaries/get-folders";
     const root = "Hoang-Truc-Photographer-Portfolio";
 
     const cachedData = await getOrSetCachedData(
@@ -136,7 +136,7 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
     }
 
     // Clear cache Redis
-    clearCacheByKeyword(folder);
+    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${folder}`);
 
     return res.status(201).json({
       message: "Tải ảnh lên thành công!",
@@ -145,5 +145,88 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Tải ảnh lên thất bại" });
+  }
+};
+
+export const handleDeleteImages = async (req, res) => {
+  try {
+    // console.log("req.body", req.body);
+    const public_ids = req.body.public_ids;
+    const selectedFolder = req.body.selectedFolder;
+
+    if (!public_ids || public_ids.length === 0) {
+      return res.status(400).json({ message: "No public IDs provided" });
+    }
+
+    const result = await cloudinary.api.delete_resources(public_ids);
+
+    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${selectedFolder}`);
+
+    return res.json({
+      message: "Images deleted successfully",
+      result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to delete images" });
+  }
+};
+
+export const handleDeleteFolders = async (req, res) => {
+  try {
+    // console.log("req.body.folderDirs", req.body.folderDirs);
+    const folderDirs = req.body.folderDirs;
+
+    if (!folderDirs || folderDirs.length === 0) {
+      return res.status(400).json({ message: "No folders provided" });
+    }
+
+    const results = [];
+
+    for (const folderPrefix of folderDirs) {
+      const deleteRes = await cloudinary.api.delete_resources_by_prefix(
+        folderPrefix
+      );
+
+      // Optionally delete folder metadata:
+      await cloudinary.api.delete_folder(folderPrefix).catch(() => {});
+
+      results.push({ folderPrefix, deleteRes });
+    }
+
+    clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
+
+    return res.status(200).json({
+      message: "Folders deleted successfully",
+      results,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to delete folders" });
+  }
+};
+
+export const handleCreateFolder = async (req, res) => {
+  try {
+    const { rootDir, folderName } = req.body;
+
+    if (!rootDir || !folderName) {
+      return res.status(400).json({ message: "Missing folder info" });
+    }
+
+    const folderPath = `${rootDir}/${folderName}`;
+
+    const result = await cloudinary.api.create_folder(folderPath);
+
+    clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
+
+    return res.status(201).json({
+      message: "Folder created successfully",
+      folderPath,
+      result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ error: "Failed to create folder" });
   }
 };

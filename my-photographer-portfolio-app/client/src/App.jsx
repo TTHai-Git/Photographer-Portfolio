@@ -10,7 +10,7 @@ import Social from "./Pages/Social";
 import Motion from "./Pages/Motion";
 import FruitMacro from "./Pages/FruitMacro";
 import KinhBoi from "./Pages/KinhBoi";
-import UploadForm from "./Components/UploadForm"
+import Dashboard from "./Pages/Dashboard";
 
 
 function App() {
@@ -23,6 +23,10 @@ function App() {
           index: true,     // default child route
           element: <Home />,
         },
+        // {
+        //   path: "dashboard",
+        //   element: <Dashboard/>
+        // },
         {
           path: "show-case",
           element: <ShowCase />,      
@@ -47,10 +51,6 @@ function App() {
           path: "/show-case/swimming-equipment",
           element: <KinhBoi/>
         },
-        {
-          path:"upload",
-          element: <UploadForm/>
-        }
         // {
         //   path: "social",
         //   element: <Social />,
