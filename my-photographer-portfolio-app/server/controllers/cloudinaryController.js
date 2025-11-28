@@ -85,7 +85,9 @@ export const getAllFolders = async (req, res) => {
     return res.status(200).json(cachedData);
   } catch (err) {
     console.error("Error loading Cloudinary folders:", err);
-    return res.status(500).json({ message: "Cannot load folders" });
+    return res
+      .status(500)
+      .json({ message: "Không thể tải danh sách các thư mục!" });
   }
 };
 
@@ -96,14 +98,14 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
 
     // Validate ảnh
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No images provided" });
+      return res.status(400).json({ message: "Thiếu ảnh để tải lên!" });
     }
 
     // Check quyền upload
     const isValidPassword = await checkAdminPassword(password);
     if (!isValidPassword) {
       return res.status(403).json({
-        message: "You don't have permission to upload images!",
+        message: "Bạn không phải là Admin nên không thể tải ảnh lên được!",
       });
     }
 
@@ -139,12 +141,12 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
     clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${folder}`);
 
     return res.status(201).json({
-      message: "Tải ảnh lên thành công!",
+      message: "Tải ảnh lên thành công.",
       urls,
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Tải ảnh lên thất bại" });
+    return res.status(500).json({ message: "Tải ảnh lên thất bại!" });
   }
 };
 
@@ -155,20 +157,22 @@ export const handleDeleteImages = async (req, res) => {
     const selectedFolder = req.body.selectedFolder;
 
     if (!public_ids || public_ids.length === 0) {
-      return res.status(400).json({ message: "No public IDs provided" });
+      return res
+        .status(400)
+        .json({ message: "Chưa cung cấp public_ids của các ảnh để xóa!" });
     }
 
     const result = await cloudinary.api.delete_resources(public_ids);
 
     clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${selectedFolder}`);
 
-    return res.json({
-      message: "Images deleted successfully",
+    return res.status(200).json({
+      message: "Xóa ảnh thành công.",
       result,
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Failed to delete images" });
+    return res.status(500).json({ message: "Xóa ảnh thất bại!" });
   }
 };
 
@@ -178,7 +182,9 @@ export const handleDeleteFolders = async (req, res) => {
     const folderDirs = req.body.folderDirs;
 
     if (!folderDirs || folderDirs.length === 0) {
-      return res.status(400).json({ message: "No folders provided" });
+      return res.status(400).json({
+        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục!",
+      });
     }
 
     const results = [];
@@ -197,12 +203,12 @@ export const handleDeleteFolders = async (req, res) => {
     clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
 
     return res.status(200).json({
-      message: "Folders deleted successfully",
+      message: "Xóa thư mục thành công.",
       results,
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Failed to delete folders" });
+    return res.status(500).json({ message: "Xóa thư mục thất bại!" });
   }
 };
 
@@ -211,7 +217,9 @@ export const handleCreateFolder = async (req, res) => {
     const { rootDir, folderName } = req.body;
 
     if (!rootDir || !folderName) {
-      return res.status(400).json({ message: "Missing folder info" });
+      return res.status(400).json({
+        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục! ",
+      });
     }
 
     const folderPath = `${rootDir}/${folderName}`;
@@ -221,12 +229,65 @@ export const handleCreateFolder = async (req, res) => {
     clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
 
     return res.status(201).json({
-      message: "Folder created successfully",
+      message: "Tạo thư mục thành công.",
       folderPath,
       result,
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ error: "Failed to create folder" });
+    return res.status(400).json({ error: "Tạo thư mục thất bại!" });
+  }
+};
+
+export const handleMoveImage = async (oldPublicId, newFolder) => {
+  const fileName = oldPublicId.split("/").pop();
+  const newPublicId = `${newFolder}/${fileName}`;
+
+  try {
+    const result = await cloudinary.uploader.rename(oldPublicId, newPublicId);
+    return { success: true, oldPublicId, newPublicId, result };
+  } catch (err) {
+    return { success: false, oldPublicId, error: err.message };
+  }
+};
+
+export const handleMoveImages = async (req, res) => {
+  // console.log("req.body", req.body);
+  try {
+    const oldPublicIds = req.body.oldPublicIds;
+    const newFolder = req.body.newFolder;
+
+    if (!oldPublicIds || !newFolder)
+      return res.status(400).json({ message: "Bad request" });
+
+    // Tạo danh sách Promises
+    const moveTasks = oldPublicIds.map((id) => handleMoveImage(id, newFolder));
+
+    // Chạy song song tất cả
+    const results = await Promise.all(moveTasks);
+
+    const hasError = results.some((r) => !r.success);
+
+    if (hasError) {
+      return res.status(207).json({
+        message: "Một số ảnh không thể di chuyển!",
+        results,
+      });
+    }
+
+    const oldDir = oldPublicIds[0].substring(
+      0,
+      oldPublicIds[0].lastIndexOf("/")
+    );
+    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${oldDir}`);
+    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${newFolder}`);
+
+    return res.status(200).json({
+      message: `Di chuyển toàn bộ ảnh sang thư mục ${newFolder} thành công!`,
+      results,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server has error" });
   }
 };

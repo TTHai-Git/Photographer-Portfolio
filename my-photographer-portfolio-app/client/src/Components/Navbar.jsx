@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../Assets/CSS/Navbar.css";
 import { Menu, X } from "lucide-react";
 import Logo from "../Assets/Images/navbar/Logo.png";
+import { useAuth } from "../Context/AuthContext";
 
 export const Navbar = () => {
+  const {user, logout} = useAuth()
   const [isOpen, setIsOpen] = useState(false);
   const closeMenu = () => setIsOpen(false);
+  const navigate = useNavigate()
 
   return (
     <header className="navbar-container">
@@ -29,6 +32,21 @@ export const Navbar = () => {
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
           <NavLink to="/show-case" onClick={closeMenu}>Show Case</NavLink>
           {/* <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink> */}
+          {user ? (
+            <div className="nav-user-dropdown">
+              <span className="nav-user">
+                Xin chào {user.username}
+              </span>
+
+              <div className="nav-user-menu">
+                <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink>
+                <NavLink to="/" onClick={() => { logout(); closeMenu(); navigate("/") }}>logout</NavLink>
+              </div>
+            </div>
+          ) : (
+            <NavLink to="/login" onClick={closeMenu}>Login</NavLink>
+          )}
+
           {/* <NavLink to="/motion" onClick={closeMenu}>Motion</NavLink>
           <NavLink to="/social" onClick={closeMenu}>Social</NavLink>
           <NavLink to="/about" onClick={closeMenu}>About</NavLink> */}

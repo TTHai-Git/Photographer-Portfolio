@@ -1,4 +1,6 @@
-/* --- Navbar Container --- */
+/* -------------------------------
+   NAVBAR CONTAINER
+-------------------------------- */
 .navbar-container {
   width: 100%;
   background-color: #fff;
@@ -8,7 +10,9 @@
   z-index: 1000;
 }
 
-/* --- Navbar Layout --- */
+/* -------------------------------
+   NAVBAR LAYOUT
+-------------------------------- */
 .navbar {
   display: flex;
   align-items: center;
@@ -18,81 +22,53 @@
   margin: 0 auto;
 }
 
-/* --- Logo Section --- */
-.navbar-logo {
-  display: flex;
-  flex-direction: column; /* stack vertically */
-  align-items: center;
-  text-align: center;
-}
-
-.navbar-logo a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #111;
-  font-weight: 700;
-  transition: color 0.3s ease;
-}
-
-/* --- Logo Image --- */
-.navbar-logo img {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  margin-bottom: 4px;
-  transition: transform 0.3s ease;
-}
-
-.navbar-logo img:hover {
-  transform: scale(1.05);
-}
-
-/* --- Logo Text --- */
-.navbar-logo span {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-.navbar-logo a:hover span {
-  color: #555;
-}
-
-/* --- Responsive for Mobile --- */
-@media (max-width: 768px) {
-  .navbar-logo img {
-    height: 40px;
-  }
-
-  .navbar-logo span {
-    font-size: 1rem;
-  }
-}
-
-/* --- Logo Text --- */
-.navbar-logo a {
-  text-decoration: none;
-  color: #111;
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  transition: color 0.3s ease;
-}
-
-.navbar-logo a:hover {
-  color: #555;
-}
-
-/* ✅ Align logo image + text horizontally */
+/* -------------------------------
+   LOGO
+-------------------------------- */
 .navbar-logo {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* --- Menu Links --- */
+.navbar-logo a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #111;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.4px;
+  transition: color 0.25s ease;
+}
+
+.navbar-logo a:hover {
+  color: #555;
+}
+
+.navbar-logo img {
+  height: 48px;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.navbar-logo img:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .navbar-logo img {
+    height: 40px;
+  }
+  .navbar-logo a {
+    font-size: 1.2rem;
+  }
+}
+
+/* -------------------------------
+   MENU LINKS
+-------------------------------- */
 .navbar-menu {
   display: flex;
   gap: 24px;
@@ -106,7 +82,7 @@
   font-weight: 500;
   padding: 8px 12px;
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .navbar-menu a:hover {
@@ -118,7 +94,72 @@
   background-color: #000;
 }
 
-/* --- Toggle (hamburger icon) --- */
+/* -------------------------------
+   USER DROPDOWN
+-------------------------------- */
+.nav-user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-user {
+  cursor: pointer;
+  padding: 8px 12px;
+  display: inline-block;
+  color: #333;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.nav-user:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Container dropdown */
+.nav-user-dropdown {
+  position: relative;
+  display: block;
+}
+
+/* Text Xin chào */
+.nav-user {
+  cursor: pointer;
+  padding: 8px 12px;
+  display: block;
+  color: #333;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+/* Menu */
+.nav-user-menu {
+  position: absolute;
+  top: 100%;   /* sát dưới, không tạo khoảng hở */
+  right: 0;
+  background: #fff;
+  min-width: 160px;
+  padding: 8px 0;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+
+  /* FIX FLICKER bằng cách ẩn bằng opacity thay vì display */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover mở dropdown */
+.nav-user-dropdown:hover .nav-user-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+
+/* -------------------------------
+   HAMBURGER TOGGLE (MOBILE)
+-------------------------------- */
 .navbar-toggle {
   display: none;
   cursor: pointer;
@@ -126,33 +167,28 @@
   z-index: 1101;
 }
 
-/* --- Overlay (mờ nền khi mở menu) --- */
+/* -------------------------------
+   OVERLAY (MOBILE BACKDROP)
+-------------------------------- */
 .navbar-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(3px);
   z-index: 1100;
   opacity: 1;
   transition: opacity 0.3s ease;
 }
 
-/* --- Responsive Mobile View --- */
+/* -------------------------------
+   MOBILE RESPONSIVE MENU
+-------------------------------- */
 @media (max-width: 768px) {
   .navbar {
     padding: 12px 18px;
-  }
-
-  /* ✅ Make logo smaller */
-  .navbar img {
-    height: 36px;
-  }
-
-  .navbar-logo a {
-    font-size: 1.2rem;
   }
 
   .navbar-menu {

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import APIs, { endpoints } from "../config/APIs";
-import "../Assets/CSS/UploadForm.css"
+import APIs, { authApi, endpoints } from "../config/APIs";
+import "../Assets/CSS/UploadImageModal.css"
 import "../Assets/CSS/modal.css";
+import { useNotification } from "../Context/NotificationContext";
 
-const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLoading, loadImages ,onClose }) => {
+const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
@@ -13,6 +14,8 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
   const [totalSize, setTotalSize] = useState(0); // tổng dung lượng bytes
   const MAX_FILES = 20;      // số lượng ảnh tối đa
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
+  const [loadingUpload, setLoadingUpload] = useState(false)
+  const {showNotification} = useNotification()
 
   const handleFiles = (fileList) => {
     const arr = Array.from(fileList);
@@ -22,12 +25,12 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
 
     // Kiểm tra giới hạn
     if (arr.length > MAX_FILES) {
-      alert(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`);
+      showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
       return;
     }
 
     if (newTotalSize > MAX_TOTAL_SIZE) {
-      alert("Tổng dung lượng ảnh vượt quá 100MB!");
+      showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
       return;
     }
 
@@ -75,25 +78,28 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
 
 
   const handleUpload = async () => {
-  if (!files.length) return alert("Please select images first!");
-  if (!selectedFolder) return alert("Please select a folder!");
-  if (files.length > MAX_FILES) return alert(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`);
-  if (totalSize > MAX_TOTAL_SIZE) return alert("Tổng dung lượng ảnh vượt quá 100MB!");
+  if (!files.length) return showNotification("Please select images first!", "info");
+  if (!selectedFolder) return showNotification("Please select a folder!", "info");
+  if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
+  if (totalSize > MAX_TOTAL_SIZE) return showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
 
   try {
-    setActionImagesLoading(true);
+    setLoadingUpload(true);
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
     formData.append("folder", selectedFolder);
     formData.append("password", password)
 
-    const res = await APIs.post(endpoints.upload, formData, {
+    const res = await authApi.post(endpoints.upload, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (res.status === 201)  alert(res.data.message);
+    if (res.status === 201) {
+      showNotification(res.data.message, "success");
+      await loadImages()
+    }  
   } catch (err) {
-    alert(err.response.data.message);
+    showNotification(err.response.data.message, "error");
     console.error(err);
 
     // Reset component state
@@ -105,7 +111,7 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
     setDragActive(false);
     setShowPassword(false);
   } finally {
-    setActionImagesLoading(false);
+    setLoadingUpload(false);
     setFiles([]);
     setPreviews([]);
     setSelectedFolder("");
@@ -124,19 +130,19 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
-        <div className="modal-header">Upload Images</div>
+        <div className="modal-header">Biểu Mẫu Tải Ảnh Lên</div>
         <div className="upload-container">
 
-      <h2>Tải ảnh lên trên Cloudinary</h2>
+      {/* <h2>Tải ảnh lên trên Cloudinary</h2> */}
 
       {/* Select Folder */}
-      <label className="label">Chọn thư mục</label>
+      <label className="label">Chọn Đường Dẫn</label>
         <select
           className="select"
           value={selectedFolder}
           onChange={(e) => setSelectedFolder(e.target.value)}
         >
-          <option value="" disabled={true}>-- Select folder --</option>
+          <option value="" disabled={true}>-- Chọn Đường Dẫn --</option>
           <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
           {folders.map((folder) => (
             <option key={folder} value={folder}>
@@ -191,7 +197,7 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
         </div>
       )}
 
-      {actionImagesLoading && (
+      {loadingUpload && (
         <div className="loading-overlay">
           <div className="spinner"></div>
           <p>Đang tải ảnh lên...</p>
@@ -218,9 +224,9 @@ const UploadImageModal = ({open, folders, actionImagesLoading, setActionImagesLo
 
       {/* Upload Button */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-        <button className="btn" onClick={onClose}>Cancel</button>
-        <button className="upload-btn" onClick={handleUpload} disabled={actionImagesLoading}>
-        {actionImagesLoading ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
+        <button className="cancel-btn" onClick={onClose}>Hủy</button>
+        <button className="upload-btn" onClick={handleUpload} disabled={loadingUpload}>
+        {loadingUpload ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
         </button>
       </div>
     </div>

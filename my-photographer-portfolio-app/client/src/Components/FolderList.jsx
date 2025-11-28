@@ -1,31 +1,42 @@
 import "../Assets/CSS/folders.css"
 import { FaTrash, FaFolder } from "react-icons/fa";
-import APIs, { endpoints } from "../config/APIs";
+import APIs, { authApi, endpoints } from "../config/APIs";
 import { useState } from "react";
 import CreateFolderModal from "./CreateFolderModal";
+import { useNotification } from "../Context/NotificationContext";
 
 export default function FolderList({  folders,
-  loading,           // skeleton loading
-  actionFoldersLoading,      // spinner for delete/create
-  setActionFoldersLoading,
+  loading,          
   loadFolders,
   setImages,
+  selectedFolder,
   onSelectFolder }) {
   const [folderDirs, setFolderDirs] = useState([])
   const [openCreate, setOpenCreate] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false)
+  const {showNotification} = useNotification()
 
   const handleDeletedFolders = async () => {
     try {
-      setActionFoldersLoading(true);
-      const res = await APIs.delete(endpoints.deleteFolders, {
+      setLoadingDelete(true)
+      if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không?")) return
+      // const res = await APIs.delete(endpoints.deleteFolders, {
+      //   data: { folderDirs }
+      // });
+      const res = await authApi.delete(endpoints.deleteFolders, {
         data: { folderDirs }
       });
-      if (res.status === 200) alert(res.data.message)
+      if (res.status === 200) 
+      {
+        showNotification(res.data.message, "success")
+        await loadFolders();
+      }
 
     } catch (error) {
       console.log(error);
+      showNotification (error.response.data.message, "error")
     } finally {
-      setActionFoldersLoading(false);
+      setLoadingDelete(false)
       setFolderDirs([])
       setImages([])
       await loadFolders();
@@ -54,12 +65,21 @@ export default function FolderList({  folders,
 
   return (
     <div className="folder-list">
-       <button className="btn btn-green" onClick={() => setOpenCreate(true)}>
-          + Created Folder
-        </button>
-        <button className="btn btn-red" onClick={handleDeletedFolders} disabled={actionFoldersLoading}>
-          {actionFoldersLoading ? <span className="spinner" /> : <><FaTrash /> Delete Folders ({folderDirs.length})</>}
-        </button>
+       <div className="folder-section-header">
+          <button className="btn btn-green" onClick={() => setOpenCreate(true)}>
+          + Tạo thư mục
+          </button>
+          <button className="btn btn-red" onClick={handleDeletedFolders} disabled={loadingDelete}>
+            {loadingDelete ?  <>
+            <span className="spinner-btn" ></span> 
+            <span>Đang xóa thư mục...</span>
+            
+            </> : <>
+            <FaTrash /> Xóa thư mục ({folderDirs.length})
+            </>}
+          </button>
+       </div>
+       
         <div
           key={"Hoang-Truc-Photographer-Portfolio"}
           className="folder-item"
@@ -75,27 +95,31 @@ export default function FolderList({  folders,
           </div>
         </div>
       {folders.map((folder) => (
-        <div
-          key={folder}
-          className="folder-item"
-          onClick={() => onSelectFolder(folder)}
-        >
-          <input type="checkbox" value={folder} onClick={(e) => {
-            e.stopPropagation();   // prevent opening folder when clicking checkbox
-            handleAddFolderDirs(folder);
-          }} />
-          <div className="folder-left">
-            <FaFolder className="folder-icon" />
-            <span>{folder}</span>
+          <div
+            key={folder}
+            className={`folder-item ${selectedFolder === folder ? "active-folder" : ""}`}
+            onClick={() => onSelectFolder(folder)}
+          >
+            <input 
+              type="checkbox" 
+              value={folder}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddFolderDirs(folder);
+              }} 
+            />
+
+            <div className="folder-left">
+              <FaFolder className="folder-icon" />
+              <span>{folder}</span>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+
       {/* Modals */}
       <CreateFolderModal
         open={openCreate}
         folders={folders}
-        actionFoldersLoading={actionFoldersLoading}
-        setActionFoldersLoading={setActionFoldersLoading}
         loadFolders={loadFolders}
         onClose={() => setOpenCreate(false)}
       />

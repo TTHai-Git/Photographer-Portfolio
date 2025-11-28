@@ -11,6 +11,7 @@ import Motion from "./Pages/Motion";
 import FruitMacro from "./Pages/FruitMacro";
 import KinhBoi from "./Pages/KinhBoi";
 import Dashboard from "./Pages/Dashboard";
+import Login from "./Pages/Login";
 
 
 function App() {
@@ -23,10 +24,14 @@ function App() {
           index: true,     // default child route
           element: <Home />,
         },
-        // {
-        //   path: "dashboard",
-        //   element: <Dashboard/>
-        // },
+        {
+          path: "login",
+          element: <Login/>
+        },
+        {
+          path: "dashboard",
+          element: <Dashboard/>
+        },
         {
           path: "show-case",
           element: <ShowCase />,      

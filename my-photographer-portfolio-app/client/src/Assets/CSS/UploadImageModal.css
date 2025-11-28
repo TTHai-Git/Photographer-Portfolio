@@ -109,6 +109,19 @@
   flex-shrink: 0;
 }
 
+.cancel-btn {
+  width: 100%;
+  margin-top: 25px;
+  padding: 14px;
+  border: none;
+  font-size: 16px;
+  border-radius: 12px;
+  color: white;
+  background: #d80909;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
 .upload-btn {
   width: 100%;
   margin-top: 25px;

@@ -6,6 +6,7 @@ const corsInit = () =>
       process.env.REACT_APP_PUBLIC_URL_VERCEL_CLIENT,
       "http://localhost:3000",
       "http://localhost:8080",
+      "http://localhost:5000",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,

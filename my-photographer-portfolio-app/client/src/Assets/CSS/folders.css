@@ -1,21 +1,72 @@
+/* ======================= FOLDER LIST ======================= */
+
+.folder-section-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap; /* mobile wrap */
+}
+
 .folder-list {
   padding: 15px;
 }
 
+/* Skeleton block */
+.folder-skeleton {
+  width: 100%;
+  height: 55px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: linear-gradient(
+    90deg,
+    #e0e0e0 0%,
+    #f5f5f5 50%,
+    #e0e0e0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .folder-item {
-  /* display: flex;
-  justify-content: space-between; */
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  border-radius: 8px;
+  margin-bottom: 10px;
   cursor: pointer;
   background: #fafafa;
-  transition: 0.2s;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .folder-item:hover {
-  background: #f0f0f0;
+  background: rgb(194, 191, 191);
+}
+
+/* Active folder — clicked one */
+.folder-item.active-folder {
+  background: #007bff;       /* blue background */
+  color: white;              /* text color */
+}
+
+.folder-item.active-folder .folder-icon {
+  color: white;              /* make folder icon white too */
+}
+
+.folder-item.active-folder span {
+  color: white;              /* text inside span */
 }
 
 .folder-left {
@@ -26,35 +77,28 @@
 
 .folder-icon {
   color: #eab308;
+  font-size: 20px;
 }
 
-.folder-delete {
-  color: red;
-  cursor: pointer;
+
+/* Checkbox lớn hơn - UX tốt */
+.folder-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
 }
 
-/* folders.css */
-.folder-skeleton {
-  height: 40px;
-  margin: 8px 0;
-  border-radius: 6px;
-  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.5s infinite;
+/* Tablet */
+@media (max-width: 1024px) {
+  .folder-item {
+    padding: 8px;
+  }
 }
 
-/* images.css */
-.image-skeleton {
-  width: 120px;
-  height: 120px;
-  margin: 8px;
-  border-radius: 8px;
-  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+/* Mobile */
+@media (max-width: 640px) {
+  .folder-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+  }
 }

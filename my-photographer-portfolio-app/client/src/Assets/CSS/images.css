@@ -1,13 +1,63 @@
+/* ======================= IMAGE LIST ======================= */
+
 .image-section-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  align-items: center;
   margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap; /* mobile wrap */
+}
+
+/* Skeleton block */
+.image-skeleton {
+  width: 100%;
+  height: 55px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    #e0e0e0 0%,
+    #f5f5f5 50%,
+    #e0e0e0 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .images-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Tablet: 3 cột */
+@media (max-width: 1024px) {
+  .images-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile: 2 cột */
+@media (max-width: 768px) {
+  .images-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small screen: 1 cột */
+@media (max-width: 500px) {
+  .images-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .image-card {
@@ -16,45 +66,21 @@
 
 .image-thumb {
   width: 100%;
-  height: 130px;
+  height: 150px;
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #ddd;
 }
 
+/* Delete icon */
 .image-delete-btn {
   position: absolute;
-  top: 29px;
-  right: 5px;
-  background: rgba(0,0,0,0.5);
+  top: 34px;
+  right: 6px;
+  background: rgba(0,0,0,0.55);
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   color: white;
-}
-
-/* folders.css */
-.folder-skeleton {
-  height: 40px;
-  margin: 8px 0;
-  border-radius: 6px;
-  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* images.css */
-.image-skeleton {
-  width: 120px;
-  height: 120px;
-  margin: 8px;
-  border-radius: 8px;
-  background: linear-gradient(-90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  font-size: 14px;
 }

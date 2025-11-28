@@ -1,3 +1,5 @@
+/* ======================= Dashboard Layout ======================= */
+
 .dashboard {
   display: flex;
   min-height: 100vh;
@@ -5,29 +7,37 @@
   font-family: Arial, sans-serif;
 }
 
+/* Sidebar trên desktop */
 .sidebar {
-  width: 30%;
+  width: 28%;
   background: white;
   border-right: 1px solid #ddd;
+  padding-bottom: 20px;
+  overflow-y: auto;
 }
 
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+/* Nội dung chính */
+.content {
+  flex: 1;
+  padding: 20px;
 }
+
+/* ======================= BUTTONS ======================= */
 
 .btn {
-  padding: 6px 10px;
+  padding: 8px 14px;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.btn-primary {
-  background: #007bff;
-  color: white;
+.btn:hover {
+  opacity: 0.85;
 }
 
 .btn-green {
@@ -40,21 +50,52 @@
   color: white;
 }
 
-.content {
-  flex: 1;
-  padding: 20px;
+.btn-primary {
+  background: #007bff;
+  color: white;
 }
 
-.spinner {
-  border: 3px solid #fff2;
-  border-top: 3px solid white;
-  width: 16px;
-  height: 16px;
+/* Spinner animation */
+.spinner-btn {
+  width: 20px;
+  height: 20px;
+  border: 6px solid #ccc;
+  border-top-color: #007bff;
   border-radius: 50%;
-  display: inline-block;
   animation: spin 0.8s linear infinite;
+  margin-bottom: 10px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+
+/* Mobile: nút full width */
+@media (max-width: 640px) {
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* Tablet: Sidebar thu nhỏ */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 35%;
+  }
+}
+
+/* Mobile: Sidebar thành overlay */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .content {
+    padding: 15px;
+  }
 }
