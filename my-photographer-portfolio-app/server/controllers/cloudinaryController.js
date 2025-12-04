@@ -1,6 +1,11 @@
 import cloudinary from "../config/cloudinary.config.js";
+import getRedisClient from "../config/redisCloud.config.js";
 import { checkAdminPassword } from "../helpers/HandlePasswordOfAdmin.js";
 import { compressToWebp } from "../helpers/imageCompression.js";
+import FolderOfCloudinary from "../models/folderModel.js";
+import ImageOfCloudinary from "../models/imageModel.js";
+import { deleteFolders } from "./folderController.js";
+import { createImages, deletedImages } from "./imageController.js";
 import {
   clearCacheByKeyword,
   getOrSetCachedData,
@@ -96,37 +101,32 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
     const folder = req.body.folder || "uploads";
     const password = req.body.password;
 
-    // Validate ảnh
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "Thiếu ảnh để tải lên!" });
+      return res.status(400).json({ message: "Missing images to upload!" });
     }
 
-    // Check quyền upload
+    // check admin
     const isValidPassword = await checkAdminPassword(password);
     if (!isValidPassword) {
-      return res.status(403).json({
-        message: "Bạn không phải là Admin nên không thể tải ảnh lên được!",
-      });
+      return res.status(403).json({ message: "You are not Admin!" });
     }
 
-    const urls = [];
+    const uploadedData = [];
 
-    // Upload từng ảnh
     for (const file of req.files) {
-      // Bước 1: Nén & tối ưu WebP
+      // compress to webp
       const compressed = await compressToWebp(file.buffer);
 
-      // Bước 2: Upload lên Cloudinary
+      // upload
       const uploaded = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder,
             resource_type: "image",
             format: "webp",
-
-            // bật auto optimize của Cloudinary
             quality: "auto",
-            fetch_format: "auto",
+            transformation: [{ width: "auto", crop: "limit" }, { dpr: "auto" }],
+            // fetch_format: "auto",
           },
           (err, result) => (err ? reject(err) : resolve(result))
         );
@@ -134,19 +134,28 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
         streamifier.createReadStream(compressed).pipe(uploadStream);
       });
 
-      urls.push(uploaded.secure_url);
+      uploadedData.push({
+        public_id: uploaded.public_id,
+        url: uploaded.secure_url,
+      });
     }
 
-    // Clear cache Redis
-    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${folder}`);
+    // save to DB
+    await createImages(uploadedData, folder);
+
+    // clear cache
+    // clearCacheByKeyword(`GET:/v1/images?path=${folder}`);
+    // clearCacheByKeyword(`GET:/v1/folders?`);
+
+    await getRedisClient.flushAll();
 
     return res.status(201).json({
-      message: "Tải ảnh lên thành công.",
-      urls,
+      message: "Tải ảnh lên thành công!",
+      images: uploadedData,
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Tải ảnh lên thất bại!" });
+    return res.status(500).json({ message: "Tải ảnh thất bại" });
   }
 };
 
@@ -162,9 +171,13 @@ export const handleDeleteImages = async (req, res) => {
         .json({ message: "Chưa cung cấp public_ids của các ảnh để xóa!" });
     }
 
+    // Delete Images Onto Cloudinary
     const result = await cloudinary.api.delete_resources(public_ids);
 
-    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${selectedFolder}`);
+    // Delete Images Into DB
+    await deletedImages(public_ids);
+    // clearCacheByKeyword(`GET:/v1/images?path=${selectedFolder}`);
+    await getRedisClient.flushAll();
 
     return res.status(200).json({
       message: "Xóa ảnh thành công.",
@@ -189,6 +202,7 @@ export const handleDeleteFolders = async (req, res) => {
 
     const results = [];
 
+    // delete folders onto Cloudinary
     for (const folderPrefix of folderDirs) {
       const deleteRes = await cloudinary.api.delete_resources_by_prefix(
         folderPrefix
@@ -200,7 +214,11 @@ export const handleDeleteFolders = async (req, res) => {
       results.push({ folderPrefix, deleteRes });
     }
 
-    clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
+    // handle delete folders into DB
+    await deleteFolders(folderDirs);
+
+    // clearCacheByKeyword("GET:/v1/folders?");
+    await getRedisClient.flushAll();
 
     return res.status(200).json({
       message: "Xóa thư mục thành công.",
@@ -224,9 +242,16 @@ export const handleCreateFolder = async (req, res) => {
 
     const folderPath = `${rootDir}/${folderName}`;
 
+    // create Folder onto Cloudinary
     const result = await cloudinary.api.create_folder(folderPath);
 
-    clearCacheByKeyword("GET:/v1/cloudinaries/get-folders");
+    // create Folder into DB
+    const newFolder = await FolderOfCloudinary.create({ path: folderPath });
+
+    // clearCacheByKeyword("GET:/v1/folders?");
+    // clearCacheByKeyword(`GET:/v1/folders?page=1&limit=500&sort=oldest`);
+
+    await getRedisClient.flushAll();
 
     return res.status(201).json({
       message: "Tạo thư mục thành công.",
@@ -244,47 +269,73 @@ export const handleMoveImage = async (oldPublicId, newFolder) => {
   const newPublicId = `${newFolder}/${fileName}`;
 
   try {
+    // 1. Move on Cloudinary
     const result = await cloudinary.uploader.rename(oldPublicId, newPublicId);
-    return { success: true, oldPublicId, newPublicId, result };
+
+    return {
+      success: true,
+      oldPublicId,
+      newPublicId,
+      secure_url: result.secure_url,
+    };
   } catch (err) {
     return { success: false, oldPublicId, error: err.message };
   }
 };
 
 export const handleMoveImages = async (req, res) => {
-  // console.log("req.body", req.body);
   try {
-    const oldPublicIds = req.body.oldPublicIds;
-    const newFolder = req.body.newFolder;
+    const { oldPublicIds, newFolder } = req.body;
 
     if (!oldPublicIds || !newFolder)
       return res.status(400).json({ message: "Bad request" });
 
-    // Tạo danh sách Promises
-    const moveTasks = oldPublicIds.map((id) => handleMoveImage(id, newFolder));
+    // Move on Cloudinary
+    const moveResults = await Promise.all(
+      oldPublicIds.map((id) => handleMoveImage(id, newFolder))
+    );
 
-    // Chạy song song tất cả
-    const results = await Promise.all(moveTasks);
+    // Update Database
+    const newFolderDoc = await FolderOfCloudinary.findOne({ path: newFolder });
 
-    const hasError = results.some((r) => !r.success);
-
-    if (hasError) {
-      return res.status(207).json({
-        message: "Một số ảnh không thể di chuyển!",
-        results,
+    if (!newFolderDoc) {
+      return res.status(404).json({
+        message: "New folder does not exist in database",
       });
     }
 
+    // Loop through results and update DB
+    for (const item of moveResults) {
+      if (!item.success) continue;
+
+      await ImageOfCloudinary.findOneAndUpdate(
+        { public_id: item.oldPublicId },
+        {
+          public_id: item.newPublicId,
+          optimized_url: item.secure_url,
+          folderOfCloudinary: newFolderDoc._id,
+        }
+      );
+    }
+
+    // Clear redis
     const oldDir = oldPublicIds[0].substring(
       0,
       oldPublicIds[0].lastIndexOf("/")
     );
-    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${oldDir}`);
-    clearCacheByKeyword(`GET:/v1/cloudinaries?folder=${newFolder}`);
 
-    return res.status(200).json({
-      message: `Di chuyển toàn bộ ảnh sang thư mục ${newFolder} thành công!`,
-      results,
+    // clearCacheByKeyword(`GET:/v1/images?path=${oldDir}`);
+    // clearCacheByKeyword(`GET:/v1/images?path=${newFolder}`);
+
+    await getRedisClient.flushAll();
+
+    const hasError = moveResults.some((r) => !r.success);
+
+    return res.status(hasError ? 207 : 200).json({
+      message: hasError
+        ? "Một số ảnh không thể di chuyển!"
+        : `Di chuyển toàn bộ ảnh sang thư mục ${newFolder} thành công!`,
+      results: moveResults,
     });
   } catch (error) {
     console.error(error);

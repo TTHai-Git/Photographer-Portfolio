@@ -1,85 +1,175 @@
 import "../Assets/CSS/dashboard.css";
-
 import { useState, useEffect } from "react";
-import FolderList from "../Components/FolderList";
 import ImageList from "../Components/ImageList";
 import APIs, { authApi, endpoints } from "../config/APIs";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Button, Stack, Typography } from "@mui/material";
+import FolderList from "../Components/FolderList";
 
-const  Dashboard = () => {
-  const { user } = useAuth()
-  const rootDir = "Hoang-Truc-Photographer-Portfolio";
+export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Folder params (tách riêng)
+  const [folderParams, setFolderParams] = useState({
+    page: 1,
+    search: "",
+    sortFolders: "",
+  });
+
+  // Image params (tách riêng)
+  const [imageParams, setImageParams] = useState({
+    page: 1,
+    sortImages: "",
+  });
+
   const [folders, setFolders] = useState([]);
-  const [selectedFolder, setSelectedFolder] = useState("");
+  const [foldersForCombobox, setFoldersForCombobox] = useState([]);
   const [images, setImages] = useState([]);
-  const [foldersLoading, setFoldersLoading] = useState(false);
-  const [imagesLoading, setImagesLoading] = useState(false);
-  const navigate = useNavigate()
 
+  const [loadingFolders, setLoadingFolders] = useState(false);
+  const [loadingImages, setLoadingImages] = useState(false);
+
+  const [selectedFolder, setSelectedFolder] = useState("");
+
+  const [totalPagesOfFolders, setTotalPagesOfFolders] = useState(0);
+  const [totalPagesOfImages, setTotalPagesOfImages] = useState(0);
+
+  const sortFileds = [
+    { label: "Latest", id: "latest" },
+    { label: "Oldest", id: "oldest" },
+    { label: "A-Z", id: "az" },
+    { label: "Z-A", id: "za" },
+    { label: "None", id: "none" },
+  ];
+
+  /** Load folders */
   const loadFolders = async () => {
     try {
-      setFoldersLoading(true);
-      const res = await APIs.get(`${endpoints.getFolders}?rootFolder=${rootDir}`);
+      setLoadingFolders(true);
+      const res = await APIs.get(
+        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sortFolders=${folderParams.sortFolders}`
+      );
       setFolders(res.data.folders);
-    } catch (error) {
-      alert(error.response?.data?.message || "Error loading folders");
+      setTotalPagesOfFolders(res.data.totalPages);
     } finally {
-      setFoldersLoading(false);
+      setLoadingFolders(false);
     }
   };
 
-  const loadImages = async (folder) => {
+  /** For MoveImageModal, UploadImageModal */
+  const loadFoldersForCombobox = async () => {
+    const res = await APIs.get(
+      `${endpoints.getFoldersFromDB}?page=1&limit=500&sort=oldest`
+    );
+    setFoldersForCombobox(res.data.folders);
+  };
+
+  /** Load images inside folder */
+  const loadImages = async () => {
+    if (!selectedFolder) return;
+
     try {
-      setImagesLoading(true);
-      // const res = await APIs.get(`${endpoints.getImages}?folder=${folder}`);
-      const res = await authApi.get(`${endpoints.getImages}?folder=${folder}`);
+      setLoadingImages(true);
+      const res = await authApi.get(
+        `${endpoints.getImagesFromDB}?path=${selectedFolder}&page=${imageParams.page}&limit=10&sortImages=${imageParams.sortImages}`
+      );
       setImages(res.data.images);
-    } catch (error) {
-      alert(error.response?.data?.message || "Error loading images");
+      setTotalPagesOfImages(res.data.totalPages);
     } finally {
-      setImagesLoading(false);
+      setLoadingImages(false);
     }
   };
 
+  useEffect(() => {
+  if (!user) navigate("/login")
+  const delayDebounce = setTimeout(() => {
+    loadFolders(); // chỉ gọi API khi người dùng ngừng gõ 500ms
+  }, 1500);
 
-    useEffect(() => {
-      if (!user)
-      {
-        navigate("/login")
-      }
-      loadFolders();
-    }, []);
+  return () => clearTimeout(delayDebounce);
+}, [folderParams.search, folderParams.sortFolders, folderParams.page]);
 
-    useEffect(() => {
-      if (selectedFolder) loadImages(selectedFolder);
-    }, [selectedFolder]);
 
+  /** Load image list when selectedFolder OR imageParams changed */
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+    loadImages(); // chỉ gọi API khi người dùng ngừng gõ 500ms
+  }, 500);
+
+  return () => clearTimeout(delayDebounce);
+  }, [selectedFolder, imageParams.sortImages, imageParams.page]);
 
   return (
     <div className="dashboard">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2>THƯ VIỆN ẢNH</h2>
-        </div>
+      {/* LEFT */}
+      <div className="sidebar-left">
+        <h2>THƯ VIỆN ẢNH</h2>
+
         <FolderList
           folders={folders}
-          loading={foldersLoading}
+          foldersForCombobox={foldersForCombobox}
+          loadFoldersForCombobox={loadFoldersForCombobox}
+          loading={loadingFolders}
+          setImages={setImages}
+          loadFolders={loadFolders}
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
-          loadFolders={loadFolders}
-          setImages={setImages}
-          onSelectFolder={setSelectedFolder}
+          folderParams={folderParams}
+          setFolderParams={setFolderParams}
+          sortFileds={sortFileds}
+        />
+
+        <Pagination
+          page={folderParams.page}
+          total={totalPagesOfFolders}
+          onPageChange={(p) =>
+            setFolderParams((prev) => ({ ...prev, page: p }))
+          }
         />
       </div>
-      <ImageList
-        folders={folders}
-        selectedFolder={selectedFolder}
-        images={images}
-        loading={imagesLoading}
-        loadImages={() => loadImages(selectedFolder)}
-      />
+
+      {/* RIGHT */}
+      <div className="sidebar-right">
+        <ImageList
+          foldersForCombobox={foldersForCombobox}
+          loadFoldersForCombobox={loadFoldersForCombobox}
+          selectedFolder={selectedFolder}
+          images={images}
+          loading={loadingImages}
+          loadImages={loadImages}
+          imageParams={imageParams}
+          setImageParams={setImageParams}
+          sortFileds={sortFileds}
+        />
+
+        {selectedFolder && (
+          <Pagination
+            page={imageParams.page}
+            total={totalPagesOfImages}
+            onPageChange={(p) =>
+              setImageParams((prev) => ({ ...prev, page: p }))
+            }
+          />
+        )}
+      </div>
     </div>
   );
 }
-export default Dashboard
+
+function Pagination({ page, total, onPageChange }) {
+  if (!total) return null;
+
+  return (
+    <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
+      <Button onClick={() => onPageChange(1)} disabled={page === 1}>First</Button>
+      <Button onClick={() => onPageChange(page - 1)} disabled={page === 1}>Prev</Button>
+
+      <Typography>Page {page} / {total}</Typography>
+
+      <Button onClick={() => onPageChange(page + 1)} disabled={page === total}>Next</Button>
+      <Button onClick={() => onPageChange(total)} disabled={page === total}>Last</Button>
+    </Stack>
+  );
+}

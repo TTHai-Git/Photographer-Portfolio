@@ -3,9 +3,13 @@ import routers from "./routers/index.js";
 import "./config/dotenv.config.js"; // ✅ loads environment variables once
 import { testRedisCloud } from "./utils/testRedisCloud.js";
 import initMiddlewares from "./middlewares/index.js";
+import handleConnectToMongoDB from "./config/mongodb.config.js";
 
 const app = express();
 app.set("trust proxy", 1);
+
+// Connect DB
+handleConnectToMongoDB();
 
 // Test Connect Redis Cloud
 testRedisCloud();

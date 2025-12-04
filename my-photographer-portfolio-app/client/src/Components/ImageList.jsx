@@ -1,148 +1,159 @@
-import "../Assets/CSS/images.css"
+import "../Assets/CSS/images.css";
 import { FaTrash } from "react-icons/fa";
-import APIs, { authApi, endpoints } from "../config/APIs";
 import { useState } from "react";
 import UploadImageModal from "./UploadImageModal";
 import { useNotification } from "../Context/NotificationContext";
 import { MoveImageModal } from "./MoveImageModal";
-export default function ImageList({folders, selectedFolder, images, loading, loadImages }) {
-  const [publicIDS, setPublicIDS] = useState([])
+import { Autocomplete, InputAdornment, TextField } from "@mui/material";
+import SortIcon from "@mui/icons-material/Sort";
+import { authApi, endpoints } from "../config/APIs";
+
+export default function ImageList({
+  foldersForCombobox,
+  loadFoldersForCombobox,
+  selectedFolder,
+  images,
+  loading,
+  loadImages,
+  imageParams,
+  setImageParams,
+  sortFileds,
+}) {
+  const [oldPublicIds, setOldPublicIds] = useState([]);
   const [openUpload, setOpenUpload] = useState(false);
-  const [openMove, setOpenMove] = useState(false)
-  const [loadingDelete, setLoadingDelete] = useState(false)
-  const {showNotification} = useNotification()
+  const [openMove, setOpenMove] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const { showNotification } = useNotification();
 
-  const handleDeletedImages = async (public_ids) => {
-      // console.log("public_ids", public_ids)
-      try {
-        setLoadingDelete(true)
-        if(!window.confirm("Bạn có muốn xóa các ảnh không?")) return
-        // const res = await APIs.delete(endpoints.deleteImages,{
-        //   data: {public_ids,selectedFolder}
-        // })
-        const res = await authApi.delete(endpoints.deleteImages,{
-          data: {public_ids,selectedFolder}
-        })
-        if (res.status === 200) {
-          showNotification(res.data.message, "success")
-          await loadImages()
-        }
-
-      } catch (error) {
-        console.log(error)
-        showNotification (error.response.data.message, "error")
-      } finally {
-        setLoadingDelete(false)
-        setPublicIDS([])
-        await loadImages()
-      }
-  }
-
-  const handleAddPublicIDS = (id) => {
-    setPublicIDS((prev) =>
-      prev.includes(id)
-        ? prev.filter((p) => p !== id)
-        : [...prev, id]
-    );
+  const updateParams = (key, val) => {
+    setImageParams((prev) => ({
+      ...prev,
+      page: 1,
+      [key]: val,
+    }));
   };
 
-  if (loading) {
-    return (
-      <div className="images-grid">
+  const handleDelete = async () => {
+    if (!oldPublicIds.length) return;
+    if (!window.confirm("Bạn có muốn xóa các ảnh không?")) return;
+
+    try {
+      setLoadingDelete(true);
+
+      const res = await authApi.delete(endpoints.deleteImages, {
+        data: { public_ids: oldPublicIds, selectedFolder },
+      });
+
+      showNotification(res.data.message, "success");
+    } catch (err) {
+      showNotification(err.response?.data?.message, "error");
+    } finally {
+      setOldPublicIds([]);
+      setLoadingDelete(false);
+      loadImages();
+      loadFoldersForCombobox();
+    }
+  };
+
+  if (!selectedFolder) return <p>Vui lòng chọn thư mục</p>;
+
+  return (
+    <div className="content">
+      <h3>Đường dẫn đang chọn: {selectedFolder}</h3>
+
+      <div className="image-section-header">
+        <div className="image-section-header-left">
+          <button className="btn btn-green" onClick={() => setOpenUpload(true)}>
+            + Tải ảnh lên
+          </button>
+
+          <button className="btn btn-primary" onClick={() => setOpenMove(true)}>
+            + Di chuyển ảnh ({oldPublicIds.length})
+          </button>
+
+          {images.length > 0 && (
+            <button
+              className="btn btn-red"
+              onClick={handleDelete}
+              disabled={loadingDelete}
+            >
+              {loadingDelete ? "Đang xóa..." : <><FaTrash /> Xóa ({oldPublicIds.length})</>}
+            </button>
+          )}
+        </div>
+
+        <div>
+          <Autocomplete
+            disablePortal
+            options={sortFileds}
+            value={sortFileds.find((o) => o.id === imageParams.sortImages) || null}
+            onChange={(e, v) => updateParams("sortImages", v?.id || "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sắp xếp theo"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SortIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+            sx={{ width: 250, bgcolor: "white", borderRadius: 2 }}
+          />
+        </div>
+      </div>
+      {loading ? (
+        <div className="images-grid">
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="image-skeleton"></div>
         ))}
       </div>
-    );
-  }
-
-  // if (images.length === 0) return <p>No images found.</p>;
-
-
-  return (
-  <div className="content">
-    <h3>Đường dẫn thư mục đang chọn: {selectedFolder}</h3>
-    {selectedFolder && (
-      
-      <div className="image-section-header">
-        
-
-        <button
-          className="btn btn-green"
-          onClick={() => setOpenUpload(true)}
-        >
-          + Tải ảnh lên
-        </button>
-
-         <button
-          className="btn btn-primary"
-          onClick={() => setOpenMove(true)}
-        >
-          + Di Chuyển ảnh ({publicIDS.length})
-        </button>
-
-       {images.length !== 0 ?  <button
-          className="btn btn-red"
-          onClick={() => handleDeletedImages(publicIDS)}
-          disabled={loadingDelete}
-        >
-          {loadingDelete ? <>
-            <span>Đang xóa ảnh...</span>
-            <span className="spinner-btn" />
-          </> : (
-            <>
-              <FaTrash /> Xóa ảnh ({publicIDS.length})
-            </>
-          )}
-        </button> :<></> }
-      </div>
-    )}
-
-    {/* Check images length here */}
-    {images.length === 0 ? (
-      <p>No images found.</p>
-    ) : (
-      <div className="images-grid">
+      ) : (
+        <div className="images-grid">
         {images.map((img) => (
-          <div className="image-card" key={img.public_id}>
+          <div key={img.public_id} className="image-item">
             <input
               type="checkbox"
-              value={img.public_id}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddPublicIDS(img.public_id);
-              }}
+              checked={oldPublicIds.includes(img.public_id)}
+              onChange={() =>
+                setOldPublicIds((prev) =>
+                  prev.includes(img.public_id)
+                    ? prev.filter((x) => x !== img.public_id)
+                    : [...prev, img.public_id]
+                )
+              }
             />
-            {/* <div className="image-delete-btn">
-              <FaTrash  />
-            </div> */}
-            <img
-              src={img.optimized_url}
-              className="image-thumb"
-              alt={img.public_id}
-            />
+
+            <img src={img.optimized_url} alt="" />
           </div>
         ))}
       </div>
-    )}
+      )}
+      
 
-    {/* Modals */}
-    <UploadImageModal
-      open={openUpload}
-      folders={folders}
-      loadImages={loadImages}
-      onClose={() => setOpenUpload(false)}
-    />
+      <UploadImageModal
+        open={openUpload}
+        onClose={() => setOpenUpload(false)}
+        selectedFolder={selectedFolder}
+        loadImages={loadImages}
+        folders={foldersForCombobox}
+        loadFoldersForCombobox={loadFoldersForCombobox}
+      />
 
-    <MoveImageModal
-      open={openMove}
-      folders={folders}
-      oldPublicIds={publicIDS}
-      setOldPublicIds={setPublicIDS}
-      loadImages={loadImages}
-      onClose={() => setOpenMove(false)}
-    />
-  </div>
-);
-
+      <MoveImageModal
+        open={openMove}
+        onClose={() => setOpenMove(false)}
+        folders={foldersForCombobox}
+        loadFoldersForCombobox={loadFoldersForCombobox}
+        selectedFolder={selectedFolder}
+        oldPublicIds={oldPublicIds}
+        setOldPublicIds={setOldPublicIds}
+        loadImages={loadImages}
+      />
+    </div>
+  );
 }

@@ -1,129 +1,173 @@
-import "../Assets/CSS/folders.css"
+import "../Assets/CSS/folders.css";
 import { FaTrash, FaFolder } from "react-icons/fa";
-import APIs, { authApi, endpoints } from "../config/APIs";
-import { useState } from "react";
+import React, { useState } from "react";
 import CreateFolderModal from "./CreateFolderModal";
 import { useNotification } from "../Context/NotificationContext";
+import { handleGetFolderName } from "../Helpers/getFolderName";
+import {
+  Autocomplete,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import SortIcon from "@mui/icons-material/Sort";
+import { authApi, endpoints } from "../config/APIs";
 
-export default function FolderList({  folders,
-  loading,          
+const FolderList = ({
+  folders,
+  foldersForCombobox,
+  loadFoldersForCombobox,
+  loading,
   loadFolders,
   setImages,
   selectedFolder,
-  onSelectFolder }) {
-  const [folderDirs, setFolderDirs] = useState([])
+  setSelectedFolder,
+  folderParams,
+  setFolderParams,
+  sortFileds,
+}) => {
+  const [selectedDirs, setSelectedDirs] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false)
-  const {showNotification} = useNotification()
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const { showNotification } = useNotification();
 
-  const handleDeletedFolders = async () => {
+  const updateParams = (key, val) => {
+    setFolderParams((prev) => ({
+      ...prev,
+      page: 1,
+      [key]: val,
+    }));
+  };
+
+  const handleDeleteFolders = async () => {
+    if (!selectedDirs.length) return;
+    if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không?")) return;
+
     try {
-      setLoadingDelete(true)
-      if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không?")) return
-      // const res = await APIs.delete(endpoints.deleteFolders, {
-      //   data: { folderDirs }
-      // });
-      const res = await authApi.delete(endpoints.deleteFolders, {
-        data: { folderDirs }
-      });
-      if (res.status === 200) 
-      {
-        showNotification(res.data.message, "success")
-        await loadFolders();
-      }
+      setLoadingDelete(true);
 
-    } catch (error) {
-      console.log(error);
-      showNotification (error.response.data.message, "error")
+      const res = await authApi.delete(endpoints.deleteFolders, {
+        data: { folderDirs: selectedDirs },
+      });
+      if (res.status === 200) {
+        showNotification(res.data.message, "success");
+        await loadFolders();
+        setSelectedDirs([]);
+        setImages([]);
+      } 
+    } catch (err) {
+      showNotification(err.response?.data?.message, "error");
     } finally {
-      setLoadingDelete(false)
-      setFolderDirs([])
-      setImages([])
-      await loadFolders();
+      setLoadingDelete(false);
     }
   };
 
-
-  const handleAddFolderDirs = (folder) => {
-    setFolderDirs((prev) =>
-      prev.includes(folder)
-        ? prev.filter((f) => f !== folder)
-        : [...prev, folder]
-    );
-  };
-
-
-  if (loading) {
-    return (
-      <div className="folder-list">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="folder-skeleton"></div>
-        ))}
-      </div>
-    );
-  }
+  
 
   return (
     <div className="folder-list">
-       <div className="folder-section-header">
-          <button className="btn btn-green" onClick={() => setOpenCreate(true)}>
+      <div className="folder-section-header">
+        <button className="btn btn-green" onClick={() => setOpenCreate(true)}>
           + Tạo thư mục
-          </button>
-          <button className="btn btn-red" onClick={handleDeletedFolders} disabled={loadingDelete}>
-            {loadingDelete ?  <>
-            <span className="spinner-btn" ></span> 
-            <span>Đang xóa thư mục...</span>
-            
-            </> : <>
-            <FaTrash /> Xóa thư mục ({folderDirs.length})
-            </>}
-          </button>
-       </div>
-       
-        <div
-          key={"Hoang-Truc-Photographer-Portfolio"}
-          className="folder-item"
-          onClick={() => onSelectFolder("Hoang-Truc-Photographer-Portfolio")}
+        </button>
+
+        <button
+          className="btn btn-red"
+          onClick={handleDeleteFolders}
+          disabled={loadingDelete}
         >
-          <input type="checkbox" value={"Hoang-Truc-Photographer-Portfolio"} onClick={(e) => {
-            e.stopPropagation();   // prevent opening folder when clicking checkbox
-            handleAddFolderDirs("Hoang-Truc-Photographer-Portfolio");
-          }} />
-          <div className="folder-left">
-            <FaFolder className="folder-icon" />
-            <span>Hoang-Truc-Photographer-Portfolio</span>
-          </div>
-        </div>
-      {folders.map((folder) => (
+          {loadingDelete ? "Đang xóa..." : <><FaTrash /> Xóa ({selectedDirs.length})</>}
+        </button>
+      </div>
+
+      {/* Search + Sort */}
+      <div className="folder-section-header">
+        <TextField
+          label="Tìm kiếm"
+          value={folderParams.search}
+          onChange={(e) => updateParams("search", e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="primary" />
+              </InputAdornment>
+            ),
+            endAdornment: folderParams.search && (
+              <IconButton onClick={() => updateParams("search", "")}>
+                <ClearIcon />
+              </IconButton>
+            ),
+          }}
+          sx={{ width: 350, bgcolor: "white", borderRadius: 2 }}
+        />
+
+        <Autocomplete
+          disablePortal
+          value={sortFileds.find((x) => x.id === folderParams.sortFolders) || null}
+          onChange={(e, v) => updateParams("sortFolders", v?.id || "")}
+          options={sortFileds}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Sắp xếp theo"
+              InputProps={{
+                ...params.InputProps,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SortIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+          sx={{ width: 250, bgcolor: "white", borderRadius: 2 }}
+        />
+      </div>
+
+      {/* Folder Items */}
+      {loading ? (
+        Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="folder-skeleton"></div>
+        ))
+      ) : (
+        folders.map((f) => (
           <div
-            key={folder}
-            className={`folder-item ${selectedFolder === folder ? "active-folder" : ""}`}
-            onClick={() => onSelectFolder(folder)}
+            key={f._id}
+            className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
+            onClick={() => setSelectedFolder(f.path)}
           >
-            <input 
-              type="checkbox" 
-              value={folder}
+            <input
+              type="checkbox"
+              checked={selectedDirs.includes(f.path)}
               onClick={(e) => {
                 e.stopPropagation();
-                handleAddFolderDirs(folder);
-              }} 
+                setSelectedDirs((prev) =>
+                  prev.includes(f.path)
+                    ? prev.filter((x) => x !== f.path)
+                    : [...prev, f.path]
+                );
+              }}
             />
 
             <div className="folder-left">
               <FaFolder className="folder-icon" />
-              <span>{folder}</span>
+              <span>{handleGetFolderName(f.path)}</span>
             </div>
           </div>
-        ))}
+        ))
+      )}
 
-      {/* Modals */}
       <CreateFolderModal
+        folders={foldersForCombobox}
+        loadFoldersForCombobox={loadFoldersForCombobox}
         open={openCreate}
-        folders={folders}
-        loadFolders={loadFolders}
         onClose={() => setOpenCreate(false)}
+        loadFolders={loadFolders}
       />
-
     </div>
   );
 }
+
+export default React.memo(FolderList);

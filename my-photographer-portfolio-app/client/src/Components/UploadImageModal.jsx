@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import APIs, { authApi, endpoints } from "../config/APIs";
 import "../Assets/CSS/UploadImageModal.css"
 import "../Assets/CSS/modal.css";
 import { useNotification } from "../Context/NotificationContext";
 
-const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
+const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadImages }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
@@ -77,7 +77,7 @@ const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
   };
 
 
-  const handleUpload = async () => {
+const handleUpload = async () => {
   if (!files.length) return showNotification("Please select images first!", "info");
   if (!selectedFolder) return showNotification("Please select a folder!", "info");
   if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
@@ -85,10 +85,11 @@ const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
 
   try {
     setLoadingUpload(true);
+
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
     formData.append("folder", selectedFolder);
-    formData.append("password", password)
+    formData.append("password", password);
 
     const res = await authApi.post(endpoints.upload, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -96,37 +97,44 @@ const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
 
     if (res.status === 201) {
       showNotification(res.data.message, "success");
-      await loadImages()
-    }  
-  } catch (err) {
-    showNotification(err.response.data.message, "error");
-    console.error(err);
 
-    // Reset component state
-    setFiles([]);
-    setPreviews([]);
-    setSelectedFolder("");
-    setPassword("");
-    setTotalSize(0);
-    setDragActive(false);
-    setShowPassword(false);
+      // Reset UI
+      resetUploadState();
+
+      // ⬅️ ONLY HERE: Load images ONCE
+      await loadImages();
+    }
+    
+
+  } catch (err) {
+    showNotification(err.response?.data?.message, "error");
+
   } finally {
     setLoadingUpload(false);
-    setFiles([]);
-    setPreviews([]);
-    setSelectedFolder("");
-    setPassword("");
-    setTotalSize(0);
-    setDragActive(false);
-    setShowPassword(false);
-    onClose()
-    await loadImages()
+    onClose(); // đóng modal
   }
-
-  
-
 };
-  if (!open) return null
+
+const resetUploadState = () => {
+  setFiles([]);
+  setPreviews([]);
+  setSelectedFolder("");
+  setPassword("");
+  setTotalSize(0);
+  setDragActive(false);
+  setShowPassword(false);
+};
+
+
+useEffect(() => {
+  if (open) {
+    loadFoldersForCombobox();
+  }
+}, [open]);
+
+    
+
+if (!open) return null
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
@@ -137,7 +145,8 @@ const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
 
       {/* Select Folder */}
       <label className="label">Chọn Đường Dẫn</label>
-        <select
+       
+          <select
           className="select"
           value={selectedFolder}
           onChange={(e) => setSelectedFolder(e.target.value)}
@@ -145,11 +154,13 @@ const UploadImageModal = ({open, folders, loadImages ,onClose }) => {
           <option value="" disabled={true}>-- Chọn Đường Dẫn --</option>
           <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
           {folders.map((folder) => (
-            <option key={folder} value={folder}>
-              {folder}
+            <option key={folder._id} value={folder.path}>
+              {folder.path}
             </option>
           ))}
         </select>
+       
+        
       {/* Drag & Drop Area */}
       <div
         className={`dropzone ${dragActive ? "active" : ""}`}

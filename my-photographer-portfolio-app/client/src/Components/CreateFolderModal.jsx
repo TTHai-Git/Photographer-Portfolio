@@ -1,43 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../Assets/CSS/modal.css";
-import APIs, { authApi, endpoints } from "../config/APIs";
+import{ authApi, endpoints } from "../config/APIs";
 import { useNotification } from "../Context/NotificationContext";
 
-export default function CreateFolderModal({ folders,
-  open,
-  onClose,
-  loadFolders }) {
+
+export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders}) {
   const [folderName, setFolderName] = useState("");
   const [selectedRootDir, setSelectedRootDir] = useState("")
   const {showNotification} = useNotification()
   const [loadingCreate, setLoadingCreate] = useState(false) 
 
+
   const handleCreateFolder = async () => {
+    if (!folderName || !selectedRootDir)
+      return showNotification("Vui lòng chọn đường dẫn và nhập tên", "error");
+
     try {
-      setLoadingCreate(true)
-      // const res = await APIs.post(endpoints.createFolder, {
-      //   rootDir: selectedRootDir,
-      //   folderName
-      // });
+      setLoadingCreate(true);
+
       const res = await authApi.post(endpoints.createFolder, {
         rootDir: selectedRootDir,
-        folderName
+        folderName,
       });
+
       if (res.status === 201) {
+        showNotification(res.data.message, "success");
         await loadFolders();
-        showNotification (res.data.message, "success")
-      } 
-      console.log(res)
-    } catch (error) {
-      console.log(error);
+        
+        onClose();
+      }
+
       
-      showNotification (error.response.data.message, "error")
+    } catch (error) {
+      showNotification(error.response?.data?.message, "error");
     } finally {
-      await loadFolders();
-      setLoadingCreate(false)
-      onClose();
+      setLoadingCreate(false);
     }
   };
+
+
+  useEffect(() => {
+  if (open) {
+    setFolderName("");
+    setSelectedRootDir("");
+    loadFoldersForCombobox();
+  }
+  }, [open]);
 
 
   if (!open) return null;
@@ -50,6 +58,7 @@ export default function CreateFolderModal({ folders,
       {/* Select Folder */}
       <label className="label">Chọn Đường Dẫn</label>
       
+       
         <select
           className="select"
           value={selectedRootDir}
@@ -58,11 +67,12 @@ export default function CreateFolderModal({ folders,
           <option value="" disabled={true}>-- Chọn Đường Dẫn Gốc --</option>
           <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
           {folders.map((folder) => (
-            <option key={folder} value={folder}>
-              {folder}
+            <option key={folder._id} value={folder.path}>
+              {folder.path}
             </option>
           ))}
         </select>
+        
       
         <label className="label">Đặt Tên Thư Mục</label>
         <input

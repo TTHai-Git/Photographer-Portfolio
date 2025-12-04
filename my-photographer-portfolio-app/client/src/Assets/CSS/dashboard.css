@@ -2,14 +2,23 @@
 
 .dashboard {
   display: flex;
+  justify-content: space-evenly;
   min-height: 100vh;
   background: #f5f6fa;
   font-family: Arial, sans-serif;
 }
 
 /* Sidebar trên desktop */
-.sidebar {
-  width: 28%;
+.sidebar-left {
+  width: 30%;
+  background: white;
+  border-right: 1px solid #ddd;
+  padding-bottom: 20px;
+  overflow-y: auto;
+}
+
+.sidebar-right {
+  width: 70%;
   background: white;
   border-right: 1px solid #ddd;
   padding-bottom: 20px;
@@ -78,8 +87,11 @@
 
 /* Tablet: Sidebar thu nhỏ */
 @media (max-width: 1024px) {
-  .sidebar {
+  .sidebar-left {
     width: 35%;
+  }
+  .sidebar-right {
+    width: 75%;
   }
 }
 
@@ -89,7 +101,13 @@
     flex-direction: column;
   }
 
-  .sidebar {
+  .sidebar-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+   .sidebar-right {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #ddd;

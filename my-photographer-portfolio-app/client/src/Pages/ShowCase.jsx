@@ -2,14 +2,14 @@
 import {useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 import LightBox from "../utils/LightBox";
-import { useCloudinaryImages } from "../hooks/loadImagesOnCloudinary";
 import { scrollToElement } from "../Helpers/ScrollToElement";
 import { mainPhotoList } from "../Data/mainPhotoList";
 import ShowCaseItem from "../Components/ShowCaseItem";
+import { useImages } from "../hooks/loadImages";
 
 export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
-  const { images, loading } = useCloudinaryImages(folder);
+  const { images, loading } = useImages(1,500,folder, "oldest");
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
 
