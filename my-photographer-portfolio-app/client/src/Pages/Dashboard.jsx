@@ -15,13 +15,13 @@ export default function Dashboard() {
   const [folderParams, setFolderParams] = useState({
     page: 1,
     search: "",
-    sortFolders: "",
+    sort: "",
   });
 
   // Image params (tách riêng)
   const [imageParams, setImageParams] = useState({
     page: 1,
-    sortImages: "",
+    sort: "",
   });
 
   const [folders, setFolders] = useState([]);
@@ -39,9 +39,9 @@ export default function Dashboard() {
   const sortFileds = [
     { label: "Latest", id: "latest" },
     { label: "Oldest", id: "oldest" },
-    { label: "A-Z", id: "az" },
-    { label: "Z-A", id: "za" },
-    { label: "None", id: "none" },
+    { label: "A -> Z", id: "az" },
+    { label: "Z -> A", id: "za" },
+    // { label: "None", id: "none" },
   ];
 
   /** Load folders */
@@ -49,7 +49,7 @@ export default function Dashboard() {
     try {
       setLoadingFolders(true);
       const res = await APIs.get(
-        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sortFolders=${folderParams.sortFolders}`
+        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sort=${folderParams.sort}`
       );
       setFolders(res.data.folders);
       setTotalPagesOfFolders(res.data.totalPages);
@@ -73,7 +73,7 @@ export default function Dashboard() {
     try {
       setLoadingImages(true);
       const res = await authApi.get(
-        `${endpoints.getImagesFromDB}?path=${selectedFolder}&page=${imageParams.page}&limit=10&sortImages=${imageParams.sortImages}`
+        `${endpoints.getImagesFromDB}?page=${imageParams.page}&limit=10&sort=${imageParams.sort}&path=${selectedFolder}`
       );
       setImages(res.data.images);
       setTotalPagesOfImages(res.data.totalPages);
@@ -89,7 +89,7 @@ export default function Dashboard() {
   }, 1500);
 
   return () => clearTimeout(delayDebounce);
-}, [folderParams.search, folderParams.sortFolders, folderParams.page]);
+}, [folderParams.search, folderParams.sort, folderParams.page]);
 
 
   /** Load image list when selectedFolder OR imageParams changed */
@@ -99,7 +99,7 @@ export default function Dashboard() {
   }, 500);
 
   return () => clearTimeout(delayDebounce);
-  }, [selectedFolder, imageParams.sortImages, imageParams.page]);
+  }, [selectedFolder, imageParams.sort, imageParams.page]);
 
   return (
     <div className="dashboard">

@@ -2,6 +2,69 @@ import FolderOfCloudinary from "../models/folderModel.js";
 import ImageOfCloudinary from "../models/imageModel.js";
 import { getOrSetCachedData } from "./redisCloudControllers.js";
 
+export const getEachImageOfEachFolder = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 50; // limit folder per page
+  const sort = req.query.sort || "latest";
+  const path = req.query.path || "";
+
+  try {
+    const cachedKey = `GET:/v1/images/get-each-image-of-each-folder?page=${page}&limit=${limit}&sort=${sort}&path=${path}`;
+    const sortOption = {
+      latest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      az: { path: 1 },
+      za: { path: -1 },
+    }[sort] || { createdAt: -1 };
+
+    const cachedData = await getOrSetCachedData(cachedKey, async () => {
+      // ==========================
+      // ĐẾM TẤT CẢ FOLDER
+      // ==========================
+      const totalFolders = await FolderOfCloudinary.countDocuments({
+        path: { $regex: `^${path}` },
+      });
+
+      // ==========================
+      // LẤY FOLDER THEO TRANG
+      // ==========================
+      const folders = await FolderOfCloudinary.find({
+        path: { $regex: `^${path}` },
+      })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort(sortOption)
+        .select("_id");
+      const result = [];
+
+      // ==========================
+      // LẤY ẢNH ĐẠI DIỆN CHO MỖI FOLDER
+      // ==========================
+      for (const folder of folders) {
+        const image = await ImageOfCloudinary.findOne({
+          folderOfCloudinary: folder._id,
+        })
+          .sort(sortOption)
+          .populate("folderOfCloudinary");
+
+        result.push(image);
+      }
+
+      return { result, totalFolders };
+    });
+
+    return res.status(200).json({
+      images: cachedData.result,
+      current: page,
+      totalPages: Math.ceil(cachedData.totalFolders / limit),
+      totalItems: cachedData.totalFolders,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export const createImages = async (data, folder) => {
   try {
     // Get folder ID
@@ -44,13 +107,13 @@ export const getImages = async (req, res) => {
     const path = req.query.path;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 500;
-    const sortKey = req.query.sortImages || "latest";
+    const sortKey = req.query.sort || "latest";
 
     if (!path) {
       return res.status(400).json({ message: "Missing folder path" });
     }
 
-    const cacheKey = `GET:/v1/images?path=${path}&page=${page}&limit=${limit}&sort=${sortKey}`;
+    const cacheKey = `GET:/v1/images?page=${page}&limit=${limit}&sort=${sortKey}&path=${path}`;
 
     const data = await getOrSetCachedData(cacheKey, async () => {
       const folder = await FolderOfCloudinary.findOne({ path }).select("_id");

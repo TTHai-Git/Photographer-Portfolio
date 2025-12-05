@@ -86,8 +86,8 @@ export default function ImageList({
           <Autocomplete
             disablePortal
             options={sortFileds}
-            value={sortFileds.find((o) => o.id === imageParams.sortImages) || null}
-            onChange={(e, v) => updateParams("sortImages", v?.id || "")}
+            value={sortFileds.find((o) => o.id === imageParams.sort) || null}
+            onChange={(e, v) => updateParams("sort", v?.id || "")}
             renderInput={(params) => (
               <TextField
                 {...params}

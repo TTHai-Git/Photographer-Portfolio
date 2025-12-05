@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import APIs, { endpoints } from "../config/APIs";
 
-export const useFolders = (page, limit, sort) => {
+const useFolders = (page, limit, sort) => {
   const [folders, setFolders] = useState([]);
   const [loadingFolders, setLoadingFolders] = useState(false);
   const [currentPageOfFolders, setCurrentPageOfFolders] = useState(0);
@@ -42,3 +42,4 @@ export const useFolders = (page, limit, sort) => {
     loadFolders,
   };
 };
+export default useFolders;

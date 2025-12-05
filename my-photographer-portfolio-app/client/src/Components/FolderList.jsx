@@ -105,8 +105,8 @@ const FolderList = ({
 
         <Autocomplete
           disablePortal
-          value={sortFileds.find((x) => x.id === folderParams.sortFolders) || null}
-          onChange={(e, v) => updateParams("sortFolders", v?.id || "")}
+          value={sortFileds.find((x) => x.id === folderParams.sort) || null}
+          onChange={(e, v) => updateParams("sort", v?.id || "")}
           options={sortFileds}
           renderInput={(params) => (
             <TextField

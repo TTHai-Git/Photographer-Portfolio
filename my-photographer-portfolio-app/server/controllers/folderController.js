@@ -43,7 +43,7 @@ export const getFolders = async (req, res) => {
     const limit = parseInt(req.query.limit) || 500;
 
     const search = req.query.search || "";
-    const sortKey = req.query.sortFolders || "latest";
+    const sortKey = req.query.sort || "latest";
 
     const cacheKey = `GET:/v1/folders?page=${page}&limit=${limit}&search=${search}&sort=${sortKey}`;
 

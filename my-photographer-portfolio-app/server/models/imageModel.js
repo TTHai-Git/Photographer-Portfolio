@@ -11,7 +11,7 @@ const ImageOfCloudinarySchema = new Schema(
     },
     folderOfCloudinary: {
       type: Schema.Types.ObjectId,
-      ref: "FolderOfCloudinary",
+      ref: "Folder",
       require: true,
     },
   },

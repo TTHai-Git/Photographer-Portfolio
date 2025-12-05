@@ -2,23 +2,22 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import LazyImage from "../Components/LazyImage";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
 import { useImages } from "../hooks/loadImages";
+import SortBar from "../Components/SortBar";
+import Pagination from "../Components/Pagination";
 
 export const Home = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = Number(searchParams.get("page")) || 1;
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("latest");
   const { images, totalPages, loading } = useImages(
   page,
   6,
   "Hoang-Truc-Photographer-Portfolio/HOME",
-  "oldest"
+  sort,
 );
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
@@ -35,11 +34,10 @@ export const Home = () => {
     setIsOpen(true);
   };
 
-  const changePage = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setSearchParams({ page: newPage.toString() });
-    }
-  };
+  useEffect(() => {
+    if (!loading) return;
+  }, [loading, sort, page]);
+
   return (
     <Box className="home-container">
       <Typography
@@ -51,6 +49,8 @@ export const Home = () => {
       >
         Welcome to My Photography Portfolio
       </Typography>
+
+      <SortBar sort={sort} onSortChange={setSort} />
 
       {/* --- Loading Overlay --- */}
       {loading && (
@@ -79,29 +79,12 @@ export const Home = () => {
           </ImageListItem>
         ))}
       </ImageList>
-       {/* Pagination */}
-      <Stack direction="row" spacing={2} justifyContent="center" mt={4}>
-        <Button onClick={() => changePage(1)} disabled={page === 1}>
-          First
-        </Button>
-
-        <Button onClick={() => changePage(page - 1)} disabled={page === 1}>
-          Previous
-        </Button>
-
-        <Typography variant="body1">
-          Page {page} of {totalPages}
-        </Typography>
-
-        <Button onClick={() => changePage(page + 1)} disabled={page === totalPages}>
-          Next
-        </Button>
-
-        <Button onClick={() => changePage(totalPages)} disabled={page === totalPages}>
-          Last
-        </Button>
-      </Stack>
-
+       
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages || 1}
+        onPageChange={(page) => setPage(page)}
+      />
 
       {/* --- LightBox --- */}
       {!loading && isOpen && (

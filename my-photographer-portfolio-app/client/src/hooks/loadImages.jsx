@@ -22,7 +22,7 @@ export const useImages = (page, limit, directory, sort) => {
       setLoading(true);
 
       const response = await APIs.get(
-        `${endpoints.getImagesFromDB}?path=${directory}&page=${page}&limit=${limit}&sort=${sort}`
+        `${endpoints.getImagesFromDB}?page=${page}&limit=${limit}&sort=${sort}&path=${directory}`
       );
 
       if (response.status === 200) {
