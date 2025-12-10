@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import APIs, { authApi, endpoints } from "../config/APIs";
+import { authApi, endpoints } from "../config/APIs";
 import "../Assets/CSS/UploadImageModal.css"
 import "../Assets/CSS/modal.css";
 import { useNotification } from "../Context/NotificationContext";
@@ -9,8 +9,6 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
   const [previews, setPreviews] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [dragActive, setDragActive] = useState(false);
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false);
   const [totalSize, setTotalSize] = useState(0); // tổng dung lượng bytes
   const MAX_FILES = 20;      // số lượng ảnh tối đa
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
@@ -78,8 +76,8 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
 
 
 const handleUpload = async () => {
-  if (!files.length) return showNotification("Please select images first!", "info");
-  if (!selectedFolder) return showNotification("Please select a folder!", "info");
+  if (!files.length) return showNotification("Vui lòng chọn các ảnh để tải lên!", "warning");
+  if (!selectedFolder) return showNotification("Vui lòng chọn thư mục để lưu các ảnh tải lên!", "warning");
   if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
   if (totalSize > MAX_TOTAL_SIZE) return showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
 
@@ -89,7 +87,6 @@ const handleUpload = async () => {
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
     formData.append("folder", selectedFolder);
-    formData.append("password", password);
 
     const res = await authApi.post(endpoints.upload, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -119,16 +116,15 @@ const resetUploadState = () => {
   setFiles([]);
   setPreviews([]);
   setSelectedFolder("");
-  setPassword("");
   setTotalSize(0);
   setDragActive(false);
-  setShowPassword(false);
 };
 
 
 useEffect(() => {
   if (open) {
     loadFoldersForCombobox();
+    resetUploadState()
   }
 }, [open]);
 
@@ -214,25 +210,6 @@ if (!open) return null
           <p>Đang tải ảnh lên...</p>
         </div>
       )}
-      <label htmlFor="" className="label">Mật Khẩu Xác Thực: </label>
-      <div className="password-wrapper">
-        <input
-          type={showPassword ? "text" : "password"}
-          className="password-input"
-          value={password}
-          placeholder="Hãy nhập mật khẩu quản trị viên..."
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <span
-          className="toggle-password"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? "🙈" : "👁️"}
-        </span>
-      </div>
-
-
       {/* Upload Button */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
         <button className="cancel-btn" onClick={onClose}>Hủy</button>

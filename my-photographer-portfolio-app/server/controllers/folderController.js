@@ -13,6 +13,19 @@ export const createFolders = async (req, res) => {
   }
 };
 
+export const createFolder = async (path) => {
+  try {
+    if (!path) return;
+    // create Folder into DB
+    const newFolder = await FolderOfCloudinary.create({ path: path });
+
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error };
+  }
+};
+
 export const deleteFolders = async (folderDirs) => {
   try {
     for (const folderDir of folderDirs) {

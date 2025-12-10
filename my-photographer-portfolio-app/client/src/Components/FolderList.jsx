@@ -42,8 +42,11 @@ const FolderList = ({
   };
 
   const handleDeleteFolders = async () => {
-    if (!selectedDirs.length) return;
-    if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không?")) return;
+    if (!selectedDirs.length) {
+      showNotification("Vui lòng chọn thư mục để xóa!", "warning");
+      return;
+    }
+    if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)")) return;
 
     try {
       setLoadingDelete(true);

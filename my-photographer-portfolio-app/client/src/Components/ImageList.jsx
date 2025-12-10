@@ -34,7 +34,10 @@ export default function ImageList({
   };
 
   const handleDelete = async () => {
-    if (!oldPublicIds.length) return;
+    if (!oldPublicIds.length) {
+      showNotification("Vui lòng chọn ảnh để xóa!", "warning");
+      return;
+    }
     if (!window.confirm("Bạn có muốn xóa các ảnh không?")) return;
 
     try {
@@ -67,7 +70,14 @@ export default function ImageList({
             + Tải ảnh lên
           </button>
 
-          <button className="btn btn-primary" onClick={() => setOpenMove(true)}>
+          <button className="btn btn-primary" onClick={() => {
+            if (oldPublicIds.length === 0) {
+              showNotification("Vui lòng chọn ảnh để di chuyển!", "warning");
+              setOpenMove(false);
+            } else {
+              setOpenMove(true);
+            }
+          }}>
             + Di chuyển ảnh ({oldPublicIds.length})
           </button>
 

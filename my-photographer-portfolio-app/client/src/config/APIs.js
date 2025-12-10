@@ -1,11 +1,11 @@
 import axios from "axios";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 export const endpoints = {
-  getImages: "/cloudinaries",
+  // getImages: "/cloudinaries",
   getImagesFromDB: "/images",
   getEachImageOfEachFolder: "/images/get-each-image-of-each-folder",
   getFoldersFromDB: "/folders",
-  getFolders: "/cloudinaries/get-folders",
+  // getFolders: "/cloudinaries/get-folders",
   createFolder: "/cloudinaries/folders/cre",
   deleteFolders: "/cloudinaries/folders/del",
   upload: "/cloudinaries/upload",

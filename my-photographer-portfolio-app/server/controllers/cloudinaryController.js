@@ -1,10 +1,9 @@
 import cloudinary from "../config/cloudinary.config.js";
 import getRedisClient from "../config/redisCloud.config.js";
-import { checkAdminPassword } from "../helpers/HandlePasswordOfAdmin.js";
 import { compressToWebp } from "../helpers/imageCompression.js";
 import FolderOfCloudinary from "../models/folderModel.js";
 import ImageOfCloudinary from "../models/imageModel.js";
-import { deleteFolders } from "./folderController.js";
+import { createFolder, deleteFolders } from "./folderController.js";
 import { createImages, deletedImages } from "./imageController.js";
 import {
   clearCacheByKeyword,
@@ -12,103 +11,94 @@ import {
 } from "./redisCloudControllers.js";
 import streamifier from "streamifier";
 
-export const getImagesOnCloudinary = async (req, res) => {
-  try {
-    const { folder } = req.query;
-    if (!folder) {
-      return res.status(400).json({ error: "Folder is required" });
-    } else {
-      const cacheKey = `GET:/v1/cloudinaries?folder=${folder}`;
-      const cachedData = await getOrSetCachedData(
-        cacheKey,
-        async () => {
-          const result = await cloudinary.api.resources({
-            type: "upload",
-            prefix: `${folder}/`,
-            max_results: 500,
-          });
+// export const getImagesOnCloudinary = async (req, res) => {
+//   try {
+//     const { folder } = req.query;
+//     if (!folder) {
+//       return res.status(400).json({ error: "Folder is required" });
+//     } else {
+//       const cacheKey = `GET:/v1/cloudinaries?folder=${folder}`;
+//       const cachedData = await getOrSetCachedData(
+//         cacheKey,
+//         async () => {
+//           const result = await cloudinary.api.resources({
+//             type: "upload",
+//             prefix: `${folder}/`,
+//             max_results: 500,
+//           });
 
-          const images = result.resources.map((img) => {
-            const optimizedUrl = cloudinary.url(img.public_id, {
-              secure: true,
-              fetch_format: "auto",
-              quality: "auto",
-              transformation: [
-                { width: "auto", crop: "limit" },
-                { dpr: "auto" },
-              ],
-            });
+//           const images = result.resources.map((img) => {
+//             const optimizedUrl = cloudinary.url(img.public_id, {
+//               secure: true,
+//               fetch_format: "auto",
+//               quality: "auto",
+//               transformation: [
+//                 { width: "auto", crop: "limit" },
+//                 { dpr: "auto" },
+//               ],
+//             });
 
-            return {
-              public_id: img.public_id,
-              optimized_url: optimizedUrl,
-            };
-          });
+//             return {
+//               public_id: img.public_id,
+//               optimized_url: optimizedUrl,
+//             };
+//           });
 
-          return { images };
-        },
-        3600
-      );
+//           return { images };
+//         },
+//         3600
+//       );
 
-      return res.status(200).json(cachedData);
-    }
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message });
-  }
-};
+//       return res.status(200).json(cachedData);
+//     }
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({ message: "Server Error", error: error.message });
+//   }
+// };
 
-// 🟩 Hàm recursive để lấy toàn bộ thư mục
-async function getAllFoldersOnCloudinary(path = "") {
-  const folders = await cloudinary.api.sub_folders(path);
-  let results = folders.folders.map((f) => f.path);
+// // 🟩 Hàm recursive để lấy toàn bộ thư mục
+// async function getAllFoldersOnCloudinary(path = "") {
+//   const folders = await cloudinary.api.sub_folders(path);
+//   let results = folders.folders.map((f) => f.path);
 
-  for (const folder of folders.folders) {
-    const subfolders = await getAllFoldersOnCloudinary(folder.path);
-    results = [...results, ...subfolders];
-  }
+//   for (const folder of folders.folders) {
+//     const subfolders = await getAllFoldersOnCloudinary(folder.path);
+//     results = [...results, ...subfolders];
+//   }
 
-  return results;
-}
+//   return results;
+// }
 
-// 🟩 Controller API
-export const getAllFolders = async (req, res) => {
-  try {
-    const cacheKey = "GET:/v1/cloudinaries/get-folders";
-    const root = "Hoang-Truc-Photographer-Portfolio";
+// export const getFoldersOnCloudinary = async (req, res) => {
+//   try {
+//     const cacheKey = "GET:/v1/cloudinaries/get-folders";
+//     const root = "Hoang-Truc-Photographer-Portfolio";
 
-    const cachedData = await getOrSetCachedData(
-      cacheKey,
-      async () => {
-        const folders = await getAllFoldersOnCloudinary(root);
-        return { folders };
-      },
-      3600
-    );
+//     const cachedData = await getOrSetCachedData(
+//       cacheKey,
+//       async () => {
+//         const folders = await getAllFoldersOnCloudinary(root);
+//         return { folders };
+//       },
+//       3600
+//     );
 
-    return res.status(200).json(cachedData);
-  } catch (err) {
-    console.error("Error loading Cloudinary folders:", err);
-    return res
-      .status(500)
-      .json({ message: "Không thể tải danh sách các thư mục!" });
-  }
-};
+//     return res.status(200).json(cachedData);
+//   } catch (err) {
+//     console.error("Error loading Cloudinary folders:", err);
+//     return res
+//       .status(500)
+//       .json({ message: "Không thể tải danh sách các thư mục!" });
+//   }
+// };
 
 export const uploadImagesOnToCloudinary = async (req, res) => {
   try {
     const folder = req.body.folder || "uploads";
-    const password = req.body.password;
-
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "Missing images to upload!" });
-    }
-
-    // check admin
-    const isValidPassword = await checkAdminPassword(password);
-    if (!isValidPassword) {
-      return res.status(403).json({ message: "You are not Admin!" });
     }
 
     const uploadedData = [];
@@ -141,12 +131,16 @@ export const uploadImagesOnToCloudinary = async (req, res) => {
     }
 
     // save to DB
-    await createImages(uploadedData, folder);
+    const resultsOfDB = await createImages(uploadedData, folder);
+
+    if (!resultsOfDB.success)
+      return resultsOfDB
+        .status(500)
+        .json({ message: "Lưu ảnh vào DB thất bại!" });
 
     // clear cache
     // clearCacheByKeyword(`GET:/v1/images?path=${folder}`);
     // clearCacheByKeyword(`GET:/v1/folders?`);
-
     await getRedisClient.flushAll();
 
     return res.status(201).json({
@@ -163,7 +157,6 @@ export const handleDeleteImages = async (req, res) => {
   try {
     // console.log("req.body", req.body);
     const public_ids = req.body.public_ids;
-    const selectedFolder = req.body.selectedFolder;
 
     if (!public_ids || public_ids.length === 0) {
       return res
@@ -175,7 +168,13 @@ export const handleDeleteImages = async (req, res) => {
     const result = await cloudinary.api.delete_resources(public_ids);
 
     // Delete Images Into DB
-    await deletedImages(public_ids);
+    const resultsOfDB = await deletedImages(public_ids);
+
+    if (!resultsOfDB.success)
+      return resultsOfDB
+        .status(500)
+        .json({ message: "Xóa ảnh trong DB thất bại!" });
+
     // clearCacheByKeyword(`GET:/v1/images?path=${selectedFolder}`);
     await getRedisClient.flushAll();
 
@@ -200,8 +199,6 @@ export const handleDeleteFolders = async (req, res) => {
       });
     }
 
-    const results = [];
-
     // delete folders onto Cloudinary
     for (const folderPrefix of folderDirs) {
       const deleteRes = await cloudinary.api.delete_resources_by_prefix(
@@ -210,19 +207,21 @@ export const handleDeleteFolders = async (req, res) => {
 
       // Optionally delete folder metadata:
       await cloudinary.api.delete_folder(folderPrefix).catch(() => {});
-
-      results.push({ folderPrefix, deleteRes });
     }
 
     // handle delete folders into DB
-    await deleteFolders(folderDirs);
+    const resultsOfDB = await deleteFolders(folderDirs);
+
+    if (!resultsOfDB.success)
+      return resultsOfDB
+        .status(500)
+        .json({ message: "Xóa thư mục trong DB thất bại!" });
 
     // clearCacheByKeyword("GET:/v1/folders?");
     await getRedisClient.flushAll();
 
     return res.status(200).json({
       message: "Xóa thư mục thành công.",
-      results,
     });
   } catch (error) {
     console.log(error);
@@ -236,20 +235,40 @@ export const handleCreateFolder = async (req, res) => {
 
     if (!rootDir || !folderName) {
       return res.status(400).json({
-        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục! ",
+        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục!",
       });
     }
 
     const folderPath = `${rootDir}/${folderName}`;
 
-    // create Folder onto Cloudinary
+    // ======= CHECK FOLDER EXISTS ==========
+    const parentDir = rootDir; // thư mục cha
+
+    // Lấy danh sách subfolders
+    const existing = await cloudinary.api.sub_folders(parentDir);
+
+    const isExist = existing.folders.some(
+      (f) => f.name.toLowerCase() === folderName.toLowerCase()
+    );
+
+    if (isExist) {
+      return res.status(409).json({
+        message: "Thư mục đã tồn tại trên Cloudinary!",
+        folderPath,
+      });
+    }
+    // =======================================
+
+    // Tạo folder trên Cloudinary
     const result = await cloudinary.api.create_folder(folderPath);
 
-    // create Folder into DB
-    const newFolder = await FolderOfCloudinary.create({ path: folderPath });
-
-    // clearCacheByKeyword("GET:/v1/folders?");
-    // clearCacheByKeyword(`GET:/v1/folders?page=1&limit=500&sort=oldest`);
+    // Tạo folder trong DB
+    const resultOfDB = await createFolder(folderPath);
+    if (!resultOfDB.success) {
+      return res
+        .status(500)
+        .json({ message: "Tạo thư mục trong DB thất bại!" });
+    }
 
     await getRedisClient.flushAll();
 

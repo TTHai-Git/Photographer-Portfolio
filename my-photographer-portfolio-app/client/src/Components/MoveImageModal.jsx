@@ -11,6 +11,10 @@ export const MoveImageModal = ({folders, loadFoldersForCombobox, open , oldPubli
   
 
 const handleMoveImagesToAnotherFolder = async () => {
+  if (!oldPublicIds.length) {
+    showNotification("Vui lòng chọn ảnh để di chuyển!", "warning");
+    return
+  }
   try {
     setLoadingMove(true);
 
@@ -20,7 +24,7 @@ const handleMoveImagesToAnotherFolder = async () => {
     });
 
     showNotification(res.data.message, "success");
-
+    resetMoveState();
     // ⬅️ Load images ONCE only
     await loadImages();
 
@@ -34,10 +38,15 @@ const handleMoveImagesToAnotherFolder = async () => {
   }
 };
 
+const resetMoveState = () => {
+  setNewFolder("");
+};
+
 
 useEffect(() => {
   if (open) {
     loadFoldersForCombobox();
+    resetMoveState();
   }
 }, [open]);
 

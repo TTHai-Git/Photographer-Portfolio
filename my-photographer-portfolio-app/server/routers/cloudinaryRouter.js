@@ -1,7 +1,7 @@
 import express from "express";
 import {
-  getAllFolders,
-  getImagesOnCloudinary,
+  // getFoldersOnCloudinary,
+  // getImagesOnCloudinary,
   handleCreateFolder,
   handleDeleteFolders,
   handleDeleteImages,
@@ -10,30 +10,30 @@ import {
 } from "../controllers/cloudinaryController.js";
 import { upload } from "../middlewares/multerHandle.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { isAdmin } from "../middlewares/authMiddleware.js";
 const cloudinaryRouters = express.Router();
 
-cloudinaryRouters.get(
-  "/",
-  ipRateCheck({
-    maxAttempts: 60,
-    windowSeconds: 60,
-    blockSeconds: 300,
-  }),
-  getImagesOnCloudinary
-);
-cloudinaryRouters.get(
-  "/get-folders",
-  ipRateCheck({
-    maxAttempts: 60,
-    windowSeconds: 60,
-    blockSeconds: 300,
-  }),
-  getAllFolders
-);
+// cloudinaryRouters.get(
+//   "/",
+//   ipRateCheck({
+//     maxAttempts: 60,
+//     windowSeconds: 60,
+//     blockSeconds: 300,
+//   }),
+//   getImagesOnCloudinary
+// );
+// cloudinaryRouters.get(
+//   "/get-folders",
+//   ipRateCheck({
+//     maxAttempts: 60,
+//     windowSeconds: 60,
+//     blockSeconds: 300,
+//   }),
+//   getFoldersOnCloudinary
+// );
 cloudinaryRouters.post(
   "/upload",
-  authMiddleware,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -44,7 +44,7 @@ cloudinaryRouters.post(
 );
 cloudinaryRouters.delete(
   "/images/del",
-  authMiddleware,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -54,7 +54,7 @@ cloudinaryRouters.delete(
 );
 cloudinaryRouters.post(
   "/images/mov",
-  authMiddleware,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -64,7 +64,7 @@ cloudinaryRouters.post(
 );
 cloudinaryRouters.post(
   "/folders/cre",
-  authMiddleware,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -74,7 +74,7 @@ cloudinaryRouters.post(
 );
 cloudinaryRouters.delete(
   "/folders/del",
-  authMiddleware,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,

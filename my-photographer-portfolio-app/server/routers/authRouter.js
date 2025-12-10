@@ -1,9 +1,25 @@
 import express from "express";
-import { getMe, login, logout, refreshToken } from "../controllers/auth.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {
+  createAcount,
+  getMe,
+  login,
+  logout,
+  refreshToken,
+} from "../controllers/authController.js";
+import { authMiddleware, isAdmin } from "../middlewares/authMiddleware.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
 
 const authRouters = express.Router();
+authRouters.post(
+  "/register",
+  ipRateCheck({
+    maxAttempts: 5,
+    windowSeconds: 60,
+    blockSeconds: 300,
+  }),
+  isAdmin,
+  createAcount
+);
 authRouters.post(
   "/login",
   ipRateCheck({

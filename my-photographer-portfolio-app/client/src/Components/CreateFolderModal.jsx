@@ -12,8 +12,10 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
 
 
   const handleCreateFolder = async () => {
-    if (!folderName || !selectedRootDir)
-      return showNotification("Vui lòng chọn đường dẫn và nhập tên", "error");
+    if (!folderName || !selectedRootDir) {
+      showNotification("Vui lòng chọn đường dẫn và nhập tên", "warning");
+      return 
+    }
 
     try {
       setLoadingCreate(true);
@@ -26,7 +28,7 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
       if (res.status === 201) {
         showNotification(res.data.message, "success");
         await loadFolders();
-        
+        resetCreateState();
         onClose();
       }
 
@@ -39,11 +41,15 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
   };
 
 
+  const resetCreateState = () => {
+  setFolderName("");
+  setSelectedRootDir("");
+  };
+
   useEffect(() => {
   if (open) {
-    setFolderName("");
-    setSelectedRootDir("");
     loadFoldersForCombobox();
+    resetCreateState();
   }
   }, [open]);
 

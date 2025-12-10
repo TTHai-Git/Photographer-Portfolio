@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  createImages,
+  // createImages,
   getEachImageOfEachFolder,
   getImages,
 } from "../controllers/imageController.js";
