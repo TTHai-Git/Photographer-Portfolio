@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  # --- FRONTEND DEV ---
+  client:
+    image: haiou2003/my-photographer-portfolio-app-client
+    env_file:
+      - ./client/.env
+    ports:
+      - "3000:3000"
+    
+  # --- BACKEND ---
+  server:
+    image: haiou2003/my-photographer-portfolio-app-server
+    env_file:
+      - ./server/.env
+    ports:
+      - "5000:5000"
+    
+
+  # --- RUN COMMAND FOR DEV ----
+  # docker compose --profile dev up -d
+
+  # --- RUN COMMAND FOR PROD ----
+  # docker compose --profile prod up -d
