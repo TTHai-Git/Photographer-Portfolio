@@ -71,30 +71,50 @@ jobs:
   # ================================================================
   # 3️⃣ DEPLOY JOB (optional)
   # ================================================================
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-push     # <-- Deploy only after images are pushed
-  #   steps:
-  #     - name: SSH to VM & deploy
-  #       uses: appleboy/ssh-action@v1.1.0
-  #       with:
-  #         host: ${{ secrets.VM_HOST }}
-  #         username: ${{ secrets.VM_USER }}
-  #         key: ${{ secrets.VM_SSH_KEY }}
-  #         script: |
-  #           cd /home/${{ secrets.VM_USER }}
-  #           if [ ! -d "Photographer-Portfolio" ]; then
-  #             git clone https://github.com/TTHai-Git/Photographer-Portfolio
-  #           fi
-  #           cd Photographer-Portfolio/my-photographer-portfolio-app
-  #           git reset --hard
-  #           git pull origin main
-  #           echo "${{ secrets.CLIENT_ENV }}" > client/.env
-  #           echo "${{ secrets.SERVER_ENV }}" > server/.env
-  #           docker compose -f docker-compose.yml
-  #           docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:lastest || true
-  #           docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:lastest || true
-  #           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:lastest
-  #           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:lastest
-  #           docker compose -f docker-compose.yml up -d
-  #           docker image prune -f
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push     # <-- Deploy only after images are pushed
+    steps:
+      # 1️⃣ Checkout (không bắt buộc nhưng nên có)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Connect GitHub Actions runner vào Tailscale
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+
+      # 3️⃣ Test Tailscale connection
+      - name: Test Tailscale status
+        run: |
+          tailscale status
+          ping -c 3 ${{ secrets.VM_HOST }}
+
+      # 4️⃣ SSH vào VM và triển khai    
+      - name: SSH to VM & deploy
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+
+            cd /home/${{ secrets.VM_USER }}
+
+            if [ ! -d "Photographer-Portfolio" ]; then
+              git clone https://github.com/TTHai-Git/Photographer-Portfolio
+            fi
+
+            cd Photographer-Portfolio/my-photographer-portfolio-app
+            git reset --hard
+            git pull origin main
+
+            echo "${{ secrets.CLIENT_ENV }}" > client/.env
+            echo "${{ secrets.SERVER_ENV }}" > server/.env
+            
+            docker compose pull
+            docker compose up -d
+
+            docker image prune -f
