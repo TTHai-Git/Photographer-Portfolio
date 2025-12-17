@@ -3,7 +3,7 @@ version: "3.8"
 services:
   # --- FRONTEND DEV ---
   client:
-    image: haiou2003/my-photographer-portfolio-app-client
+    image: haiou2003/my-photographer-portfolio-app-client:lastest
     env_file:
       - ./client/.env
     ports:
@@ -11,7 +11,7 @@ services:
     
   # --- BACKEND ---
   server:
-    image: haiou2003/my-photographer-portfolio-app-server
+    image: haiou2003/my-photographer-portfolio-app-server:lastest
     env_file:
       - ./server/.env
     ports:
