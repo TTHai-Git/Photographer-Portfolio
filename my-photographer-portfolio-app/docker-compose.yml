@@ -1,6 +1,8 @@
 services:
   client:
     image: haiou2003/my-photographer-portfolio-app-client:latest
+    env_file:
+      - ./client/.env
     ports:
       - "3000:80"
     restart: unless-stopped
