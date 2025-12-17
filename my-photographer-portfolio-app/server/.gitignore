@@ -10,6 +10,7 @@ yarn-error.log*
 # Environment variables
 .env
 .env.production
+.env.piProduction
 
 # Local build artifacts
 /build

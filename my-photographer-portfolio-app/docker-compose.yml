@@ -2,7 +2,7 @@ services:
   client:
     image: haiou2003/my-photographer-portfolio-app-client:latest
     env_file:
-      - ./client/.env
+      - ./client/.env.production
     ports:
       - "3000:80"
     restart: unless-stopped
@@ -10,7 +10,7 @@ services:
   server:
     image: haiou2003/my-photographer-portfolio-app-server:latest
     env_file:
-      - ./server/.env
+      - ./server/.env.production
     ports:
       - "5000:5000"
     restart: unless-stopped

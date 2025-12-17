@@ -41,6 +41,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create client env file (BUILD TIME)
+        run: |
+          echo "${{ secrets.CLIENT_ENV }}" > my-photographer-portfolio-app/client/.env.production
+
       # 🔑 BẮT BUỘC cho ARM
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -116,8 +120,7 @@ jobs:
             git reset --hard
             git pull origin main
 
-            echo "${{ secrets.CLIENT_ENV }}" > client/.env
-            echo "${{ secrets.SERVER_ENV }}" > server/.env
+            echo "${{ secrets.SERVER_ENV }}" > server/.env.production
 
             export COMPOSE_PARALLEL_LIMIT=1
 
