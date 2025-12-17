@@ -121,6 +121,7 @@ jobs:
             git pull origin main
 
             echo "${{ secrets.SERVER_ENV }}" > server/.env.production
+            echo "${{ secrets.CLIENT_ENV }}" > client/.env.production
 
             export COMPOSE_PARALLEL_LIMIT=1
 
