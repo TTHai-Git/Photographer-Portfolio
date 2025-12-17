@@ -7,7 +7,7 @@ on:
 
 jobs:
   # ================================================================
-  # 1️⃣ TEST JOB (run first)
+  # 1️⃣ TEST JOB
   # ================================================================
   test:
     runs-on: ubuntu-latest
@@ -32,14 +32,18 @@ jobs:
         run: npm test -- --watchAll=false --passWithNoTests
 
   # ================================================================
-  # 2️⃣ BUILD & PUSH JOB
+  # 2️⃣ BUILD & PUSH (MULTI-ARCH)
   # ================================================================
   build-and-push:
     runs-on: ubuntu-latest
-    needs: test            # ✅ Only build & push if tests pass
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # 🔑 BẮT BUỘC cho ARM
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -50,48 +54,48 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # --- Build & Push Client ---
-      - name: Build & Push Client Image (Prod)
+      # --- Build & Push Client (amd64 + arm64) ---
+      - name: Build & Push Client Image (Multi-Arch)
         uses: docker/build-push-action@v5
         with:
           context: ./my-photographer-portfolio-app/client
           file: ./my-photographer-portfolio-app/client/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:latest
 
-      # --- Build & Push Server ---
-      - name: Build & Push Server Image (Prod)
+      # --- Build & Push Server (amd64 + arm64) ---
+      - name: Build & Push Server Image (Multi-Arch)
         uses: docker/build-push-action@v5
         with:
           context: ./my-photographer-portfolio-app/server
           file: ./my-photographer-portfolio-app/server/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:latest
 
   # ================================================================
-  # 3️⃣ DEPLOY JOB (optional)
+  # 3️⃣ DEPLOY JOB
   # ================================================================
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push     # <-- Deploy only after images are pushed
+    needs: build-and-push
     steps:
-      # 1️⃣ Checkout (không bắt buộc nhưng nên có)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Connect GitHub Actions runner vào Tailscale
       - name: Connect to Tailscale
         uses: tailscale/github-action@v2
         with:
           authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
 
-      # 3️⃣ Test Tailscale connection
       - name: Test Tailscale status
         run: |
           tailscale status
           ping -c 3 ${{ secrets.VM_HOST }}
 
-      # 4️⃣ SSH vào VM và triển khai    
       - name: SSH to VM & deploy
         uses: appleboy/ssh-action@v1.1.0
         with:
@@ -113,7 +117,7 @@ jobs:
 
             echo "${{ secrets.CLIENT_ENV }}" > client/.env
             echo "${{ secrets.SERVER_ENV }}" > server/.env
-            
+
             docker compose pull
             docker compose up -d
 
