@@ -1,20 +1,16 @@
-# Stage: Development
-FROM node:20
-
-# Set working directory
+# ===== Build stage =====
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Copy only package files to install dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install all deps (không dùng ci vì dev có thể chỉnh sửa package.json)
-RUN npm install
-
-# Copy toàn bộ source
 COPY . .
+RUN npm run build
 
-# Expose port cho React dev server
-EXPOSE 3001
+# ===== Run stage =====
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Run React development server
-CMD ["npm", "start"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
