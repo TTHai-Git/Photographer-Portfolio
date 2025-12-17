@@ -118,7 +118,11 @@ jobs:
             echo "${{ secrets.CLIENT_ENV }}" > client/.env
             echo "${{ secrets.SERVER_ENV }}" > server/.env
 
-            docker compose pull
+            export COMPOSE_PARALLEL_LIMIT=1
+
+            docker pull haiou2003/my-photographer-portfolio-app-client:latest
+            docker pull haiou2003/my-photographer-portfolio-app-server:latest
+
             docker compose up -d
 
             docker image prune -f
