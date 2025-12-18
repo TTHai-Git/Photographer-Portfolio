@@ -1,16 +1,23 @@
+version: "3.8"
+
+networks:
+  webproxy:
+    external: true
+    name: npm_default   # dùng network của NPM
+
 services:
   client:
     image: haiou2003/my-photographer-portfolio-app-client:latest
     env_file:
       - ./client/.env.production
-    expose:
-      - "80"
     restart: unless-stopped
+    networks:
+      - webproxy
 
   server:
     image: haiou2003/my-photographer-portfolio-app-server:latest
     env_file:
       - ./server/.env.production
-    expose:
-      - "5000"
     restart: unless-stopped
+    networks:
+      - webproxy

@@ -9,6 +9,7 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=256
+ENV PORT=5000
 
 EXPOSE 5000
 CMD ["node", "index.js"]
