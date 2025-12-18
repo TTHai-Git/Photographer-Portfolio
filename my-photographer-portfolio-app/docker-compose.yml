@@ -21,3 +21,5 @@ services:
     restart: unless-stopped
     networks:
       - webproxy
+  # docker compose up -d 
+  # docker rm -f <container_id_or_name>
