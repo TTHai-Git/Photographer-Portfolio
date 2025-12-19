@@ -20,27 +20,34 @@ export const ShowCase = () => {
   const { images, loading } = useImages(1,500,folder, "oldest");
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
+  const [slides, setSlides] = useState([])
+  const [pendingOpen, setPendingOpen] = useState(false);
 
   const handleImageClick = (folderDir, index) => {
     setFolder(folderDir);
     setStartIndex(index);
+    setPendingOpen(true); // đánh dấu chờ load ảnh
+    
   };
 
-  const slides = images.map(img => {
-    const parts = img.public_id.split("/"); 
-    const folderName = parts[parts.length - 2];
-
-    return {
-      src: img.optimized_url,
-      title: folderName,
-    };
-});
-
-
   useEffect(() => {
-    if (!loading && folder) setIsOpen(true);        // mở LightBox
+  if (!loading && pendingOpen && images.length > 0) {
+    const slidesData = images.map(img => {
+      const parts = img.public_id.split("/");
+      const folderName = parts[parts.length - 2];
 
-  }, [loading, folder, sort, page]);
+      return {
+        src: img.optimized_url,
+        title: folderName,
+      };
+    });
+
+    setSlides(slidesData);
+    setIsOpen(true);
+    setPendingOpen(false);
+  }
+}, [loading, images, pendingOpen]);
+
 
 
   return (
@@ -101,7 +108,7 @@ export const ShowCase = () => {
         onPageChange={(page) => setPage(page)}
       />
 
-      {loading && (
+      {loading || loadingEachImageOfEachFolder  || pendingOpen && (
         <div className="loading-overlay">
           <div className="spinner"></div>
         </div>
@@ -113,7 +120,11 @@ export const ShowCase = () => {
           isOpen={isOpen}
           slides={slides}
           startIndex={startIndex}
-          onClose={() => setIsOpen(false)}
+          onClose={() => {
+            setIsOpen(false)
+            setFolder(null)
+            setSlides([])
+          }}
         />
       )}
     </div>

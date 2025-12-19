@@ -59,45 +59,49 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
-        <div className="modal-header">Biểu Mẫu Tạo Thư Mục</div>
+        <div className="modal-header">Biểu Mẫu Tạo Thư Mục
 
-      {/* Select Folder */}
-      <label className="label">Chọn Đường Dẫn</label>
-      
-       
-        <select
-          className="select"
-          value={selectedRootDir}
-          onChange={(e) => setSelectedRootDir(e.target.value)}
-        >
-          <option value="" disabled={true}>-- Chọn Đường Dẫn Gốc --</option>
-          <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
-          {folders.map((folder) => (
-            <option key={folder._id} value={folder.path}>
-              {folder.path}
-            </option>
-          ))}
-        </select>
+        </div>
+
+        <div className='modal-content'>
+            {/* Select Folder */}
+          <label className="label">Chọn Đường Dẫn</label>
         
-      
-        <label className="label">Đặt Tên Thư Mục</label>
-        <input
-          className="modal-input"
-          placeholder="Tên thư mục..."
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
-        />
+        
+          <select
+            className="select"
+            value={selectedRootDir}
+            onChange={(e) => setSelectedRootDir(e.target.value)}
+          >
+            <option value="" disabled={true}>-- Chọn Đường Dẫn Gốc --</option>
+            <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
+            {folders.map((folder) => (
+              <option key={folder._id} value={folder.path}>
+                {folder.path}
+              </option>
+            ))}
+          </select>
+          
+        
+          <label className="label">Đặt Tên Thư Mục</label>
+          <input
+            className="modal-input"
+            placeholder="Tên thư mục..."
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+          />
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-          <button className="btn" onClick={onClose}>Hủy</button>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+            <button className="btn" onClick={onClose}>Hủy</button>
 
-          <button className="btn btn-primary" onClick={handleCreateFolder} disabled={loadingCreate}>
-            {loadingCreate ? <>
-              <span>Đang tạo thư mục...</span>
-              <span className="spinner-btn"></span> 
-            </> : ( <span>Tạo</span>)}
-          </button>
+            <button className="btn btn-primary" onClick={handleCreateFolder} disabled={loadingCreate}>
+              {loadingCreate ? <>
+                <span>Đang tạo thư mục...</span>
+                <span className="spinner-btn"></span> 
+              </> : ( <span>Tạo</span>)}
+            </button>
 
+          </div>
         </div>
       </div>
     </div>

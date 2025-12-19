@@ -125,9 +125,15 @@ jobs:
 
             export COMPOSE_PARALLEL_LIMIT=1
 
+            # ⛔ Dừng & xóa container cũ
+            docker compose down
+
+            # ⬇️ Pull image mới
             docker pull haiou2003/my-photographer-portfolio-app-client:latest
             docker pull haiou2003/my-photographer-portfolio-app-server:latest
 
-            docker compose up -d
+            # ▶️ Chạy container từ image mới
+            docker compose up -d --force-recreate
 
+            # 🧹 Xóa image không còn dùng
             docker image prune -f

@@ -1,5 +1,7 @@
 .upload-container {
   max-width: 700px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 40px auto;
   padding: 25px;
   background: #fff;
@@ -77,6 +79,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
+  overflow-x: auto;
 }
 
 .preview-img {

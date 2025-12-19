@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "../Assets/CSS/folders.css"
+import "../Assets/CSS/modal.css";
 import { authApi, endpoints } from '../config/APIs';
 import { useNotification } from '../Context/NotificationContext';
 
@@ -56,36 +57,33 @@ return (
   <div className="modal-backdrop">
     <div className="modal-box">
       <div className="modal-header">Biểu Mẫu Di Chuyển Ảnh Sang Thư Mục Khác</div>
-
-    {/* Select Folder */}
-    <label className="label">Chọn Đường Dẫn</label>
-    
+      <div className='modal-content'>
+        <label className="label">Chọn Đường Dẫn</label>
+         {/* Select Folder */}
         <select
-        className="select"
-        value={newFolder}
-        onChange={(e) => setNewFolder(e.target.value)}
-      >
-        <option value="" disabled={true}>-- Chọn Đường Dẫn Muốn Ảnh Di Chuyển Qua --</option>
-        <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
-        {folders.map((folder) => (
-          <option key={folder._id} value={folder.path}>
-            {folder.path}
-          </option>
-        ))}
-      </select>
-      
-      
+          className="select"
+          value={newFolder}
+          onChange={(e) => setNewFolder(e.target.value)}
+        >
+          <option value="" disabled={true}>-- Chọn Đường Dẫn Muốn Ảnh Di Chuyển Qua --</option>
+          <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
+          {folders.map((folder) => (
+            <option key={folder._id} value={folder.path}>
+              {folder.path}
+            </option>
+          ))}
+        </select>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-        <button className="btn" onClick={onClose}>Hủy</button>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <button className="btn" onClick={onClose}>Hủy</button>
 
-        <button className="btn btn-primary" onClick={() => handleMoveImagesToAnotherFolder()} disabled={loadingMove}>
-          {loadingMove ? <>
-            <span>Đang di chuyển ảnh sang thư mục khác...</span>
-            <span className="spinner-btn"></span> 
-          </> : ( <span>Di chuyển</span>)}
-        </button>
-
+          <button className="btn btn-primary" onClick={() => handleMoveImagesToAnotherFolder()} disabled={loadingMove}>
+            {loadingMove ? <>
+              <span>Đang di chuyển ảnh sang thư mục khác...</span>
+              <span className="spinner-btn"></span> 
+            </> : ( <span>Di chuyển</span>)}
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -13,11 +13,32 @@
   padding: 20px;
   min-width: 320px;
   border-radius: 8px;
+
+  min-width: 320px;
+
+  /* ⭐ GIỚI HẠN KÍCH THƯỚC */
+  max-width: 90vw;
+  max-height: 90vh;
+
+  /* ⭐ CHO PHÉP CUỘN */
+  overflow: auto;
+
+  border-radius: 12px;
 }
 
 .modal-header {
+  flex-shrink: 0;
   font-size: 18px;
-  margin-bottom: 15px;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-right: 6px;
 }
 
 .modal-input {
@@ -26,4 +47,19 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 15px;
+}
+
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
 }

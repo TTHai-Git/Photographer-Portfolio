@@ -135,89 +135,91 @@ if (!open) return null
     <div className="modal-backdrop">
       <div className="modal-box">
         <div className="modal-header">Biểu Mẫu Tải Ảnh Lên</div>
-        <div className="upload-container">
+        <div className="modal-content">
+          <div className="upload-container">
 
-      {/* <h2>Tải ảnh lên trên Cloudinary</h2> */}
+            {/* <h2>Tải ảnh lên trên Cloudinary</h2> */}
 
-      {/* Select Folder */}
-      <label className="label">Chọn Đường Dẫn</label>
-       
-          <select
-          className="select"
-          value={selectedFolder}
-          onChange={(e) => setSelectedFolder(e.target.value)}
-        >
-          <option value="" disabled={true}>-- Chọn Đường Dẫn --</option>
-          <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
-          {folders.map((folder) => (
-            <option key={folder._id} value={folder.path}>
-              {folder.path}
-            </option>
-          ))}
-        </select>
-       
-        
-      {/* Drag & Drop Area */}
-      <div
-        className={`dropzone ${dragActive ? "active" : ""}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB và tổng số lượng ảnh tối đa là 20 ảnh cho một lần tải lên)</p>
-        <label className="file-label">
-          Chọn ảnh
-          <input type="file" multiple accept="image/*" onChange={handleChange} />
-        </label>
-      </div>
-
-      {files.length > 0 && (
-        <div className="upload-info">
-          <p>Số lượng ảnh: {files.length} / {MAX_FILES}</p>
-          <p>
-            Tổng dung lượng: {(totalSize / (1024 * 1024)).toFixed(2)} MB / {(MAX_TOTAL_SIZE / (1024 * 1024))} MB
-          </p>
-        </div>
-      )}
-
-      {/* Preview images */}
-      {previews.length > 0 && (
-        <div className="preview-grid">
-          {previews.map((src, idx) => (
-            <div key={idx} className="preview-wrapper">
-              <img src={src} className="preview-img" alt="preview" />
-              <div className="preview-info">
-                <span className="file-name">{files[idx].name}</span>
-                <span className="file-size">
-                  {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
-                </span>
-              </div>
-              <button
-                type="button"
-                className="remove-btn"
-                onClick={() => handleRemoveImage(idx)}
+            {/* Select Folder */}
+            <label className="label">Chọn Đường Dẫn</label>
+            
+                <select
+                className="select"
+                value={selectedFolder}
+                onChange={(e) => setSelectedFolder(e.target.value)}
               >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+                <option value="" disabled={true}>-- Chọn Đường Dẫn --</option>
+                <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
+                {folders.map((folder) => (
+                  <option key={folder._id} value={folder.path}>
+                    {folder.path}
+                  </option>
+                ))}
+              </select>
+            
+              
+              {/* Drag & Drop Area */}
+              <div
+                className={`dropzone ${dragActive ? "active" : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB và tổng số lượng ảnh tối đa là 20 ảnh cho một lần tải lên)</p>
+                <label className="file-label">
+                  Chọn ảnh
+                  <input type="file" multiple accept="image/*" onChange={handleChange} />
+                </label>
+              </div>
 
-      {loadingUpload && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-          <p>Đang tải ảnh lên...</p>
+              {files.length > 0 && (
+                <div className="upload-info">
+                  <p>Số lượng ảnh: {files.length} / {MAX_FILES}</p>
+                  <p>
+                    Tổng dung lượng: {(totalSize / (1024 * 1024)).toFixed(2)} MB / {(MAX_TOTAL_SIZE / (1024 * 1024))} MB
+                  </p>
+                </div>
+              )}
+
+              {/* Preview images */}
+              {previews.length > 0 && (
+                <div className="preview-grid">
+                  {previews.map((src, idx) => (
+                    <div key={idx} className="preview-wrapper">
+                      <img src={src} className="preview-img" alt="preview" />
+                      <div className="preview-info">
+                        <span className="file-name">{files[idx].name}</span>
+                        <span className="file-size">
+                          {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="remove-btn"
+                        onClick={() => handleRemoveImage(idx)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {loadingUpload && (
+                <div className="loading-overlay">
+                  <div className="spinner"></div>
+                  <p>Đang tải ảnh lên...</p>
+                </div>
+              )}
+              {/* Upload Button */}
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button className="cancel-btn" onClick={onClose}>Hủy</button>
+                  <button className="upload-btn" onClick={handleUpload} disabled={loadingUpload}>
+                  {loadingUpload ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
+                  </button>
+                </div>
+            </div>
         </div>
-      )}
-      {/* Upload Button */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-        <button className="cancel-btn" onClick={onClose}>Hủy</button>
-        <button className="upload-btn" onClick={handleUpload} disabled={loadingUpload}>
-        {loadingUpload ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
-        </button>
-      </div>
-    </div>
       </div>
     </div>
     
