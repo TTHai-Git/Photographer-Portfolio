@@ -29,7 +29,7 @@ authRouters.post(
   }),
   login
 );
-authRouters.post("/logout", authMiddleware, logout);
+authRouters.post("/logout", isAdmin, logout);
 authRouters.get(
   "/me",
   ipRateCheck({
