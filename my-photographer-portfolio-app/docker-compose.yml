@@ -1,25 +1,20 @@
-version: "3.8"
-
-networks:
-  webproxy:
-    external: true
-    name: npm_default   # dùng network của NPM
+# version: "3.8"
 
 services:
-  client:
+  portfolio-client:
     image: haiou2003/my-photographer-portfolio-app-client:latest
+    container_name: portfolio-client
     env_file:
       - ./client/.env.production
     restart: unless-stopped
-    networks:
-      - webproxy
+    ports:
+      - "3000:80"
 
-  server:
+  portfolio-server:
     image: haiou2003/my-photographer-portfolio-app-server:latest
+    container_name: portfolio-server
     env_file:
       - ./server/.env.production
     restart: unless-stopped
-    networks:
-      - webproxy
-  # docker compose up -d 
-  # docker rm -f <container_id_or_name>
+    ports:
+      - "5000:5000"
