@@ -21,3 +21,8 @@ services:
 # To run the docker compose, use the following commands:
 # docker compose down --remove-orphans
 # docker compose up -d 
+# Lưu ý: 
+# + Phải mở port forwarding 80 và 443 trên modem/router về máy chủ chạy Docker
+# + Cấu hình Nginx Proxy Manager để trỏ domain về port 3000 của portfolio-client và port 5000 của portfolio-server
+# + Cấu hình SSL Let's Encrypt trong Nginx Proxy Manager để website được https
+# + Cấu hình biến môi trường trong file .env.production cho phù hợp với domain và môi trường production
