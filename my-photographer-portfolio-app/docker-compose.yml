@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     ports:
       - "3000:80"
+    mem_limit: 256m
+    cpus: "0.50"
 
   portfolio-server:
     image: haiou2003/my-photographer-portfolio-app-server:latest
@@ -18,6 +20,8 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    mem_limit: 512m
+    cpus: "1.0"
 # To run the docker compose, use the following commands:
 # docker compose down --remove-orphans
 # docker compose up -d 
