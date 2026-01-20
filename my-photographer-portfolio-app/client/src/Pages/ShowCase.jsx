@@ -16,7 +16,7 @@ export const ShowCase = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
   // const {folders, loadingFolders} = useFolders(1, 500, "oldest")
-  const {mainPhotoList, totalPages, loadingEachImageOfEachFolder} = useEachImageOfEachFolder(page, 5, sort, "Hoang-Truc-Photographer-Portfolio/SHOW CASE/");
+  const {mainPhotoList, totalPages, loadingEachImageOfEachFolder} = useEachImageOfEachFolder(page, 8, sort, "Hoang-Truc-Photographer-Portfolio/SHOW CASE/");
   const { images, loading } = useImages(1,500,folder, "oldest");
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -86,12 +86,13 @@ export const ShowCase = () => {
           <>
             {mainPhotoList?.map((image) => {
               return (
-                <div key={image._id} id={image.folderOfCloudinary._id} className="showcase-item fade-in" >
+                <div key={image._id} id={image.folderOfCloudinary._id} className="showcase-card fade-in" >
                   {/* <p className="showcase-caption">{image.caption}</p> */}
                   <ShowCaseItem
                     key={image._id}
                     src={image.optimized_url}
                     alt={image.public_id}
+                    folderName={handleGetFolderName(image.folderOfCloudinary.path)}
                     className="showcase-image"
                     onClick={() => handleImageClick(image.folderOfCloudinary.path,0)}
                   />

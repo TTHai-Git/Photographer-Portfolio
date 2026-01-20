@@ -1,32 +1,26 @@
 import { useRef } from "react";
 
-const ShowCaseItem = ({ src, alt, onClick, className }) => {
+const ShowCaseItem = ({ src, alt, folderName, onClick }) => {
   const imgRef = useRef();
 
   return (
-    <div
-      ref={imgRef}
-      style={{
-        width: "100%",
-        position: "relative",
-        overflow: "hidden",
-        paddingBottom: "50%", // <-- aspect ratio (3:2 example)
-      }}
-    >
-      <img
-        src={src}
-        alt={alt}
+    <div className="showcase-card">
+      {/* Thumbnail */}
+      <div
+        ref={imgRef}
+        className="showcase-thumb"
         onClick={onClick}
-        className={className}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-      />
+      >
+        <img src={src} alt={alt} />
+      </div>
+
+      {/* Meta */}
+      <div className="showcase-meta">
+        {/* <p className="showcase-title">{folderName}</p> */}
+        <span className="showcase-owner">{folderName}</span>
+      </div>
     </div>
   );
 };
-export default ShowCaseItem
+
+export default ShowCaseItem;
