@@ -52,10 +52,10 @@ export const ShowCase = () => {
 
   return (
     <div className="showcase-container">
-      <h1 className="showcase-title">Show Case</h1>
+      {/* <h1 className="showcase-title">Show Case</h1> */}
 
       {/* --- Navigation Bar --- */}
-      <nav>
+      {/* <nav>
         <ul className="showcase-nav">
           {loadingEachImageOfEachFolder ? (
             <li>Loading Folders...</li>
@@ -74,7 +74,7 @@ export const ShowCase = () => {
             </>
           )}
         </ul>
-      </nav>
+      </nav> */}
 
       <SortBar sort={sort} onSortChange={setSort} />
 
