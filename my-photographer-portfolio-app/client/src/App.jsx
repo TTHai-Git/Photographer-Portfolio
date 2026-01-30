@@ -25,7 +25,7 @@ function App() {
           element: <Dashboard/>
         },
         {
-          path: "show-case",
+          path: "my-project",
           element: <ShowCase />,      
         },
       ],
