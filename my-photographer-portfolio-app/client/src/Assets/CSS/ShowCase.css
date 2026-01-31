@@ -82,12 +82,13 @@
   display: block;
   max-height: fit-content;
   object-fit: cover;
-  transition: transform 0.35s ease;
+  transition: transform 0.5s ease, filter 0.5s ease;
 }
 
 /* Hover zoom */
 .showcase-card:hover img {
-  transform: scale(1.04);
+  transform: scale(1.02);
+  filter: brightness(0.9);
 }
 
 /* ===== Overlay (Behance-like) ===== */
@@ -143,16 +144,20 @@
 }
 
 @keyframes spin {
-  to {
+  100% {
     transform: rotate(360deg);
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
 /* ===== Subtle Fade-in ===== */
 .fade-in {
   opacity: 0;
-  transform: translateY(12px);
-  animation: fadeInUp 0.4s ease forwards;
+  transform: translateY(30px);
+  animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fadeInUp {

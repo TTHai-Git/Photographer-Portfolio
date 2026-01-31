@@ -15,7 +15,7 @@ export const Home = () => {
   const [sort, setSort] = useState("latest");
   const { images, totalPages, loading } = useImages(
   page,
-  6,
+  500,
   "Hoang-Truc-Photographer-Portfolio/HOME",
   sort,
 );

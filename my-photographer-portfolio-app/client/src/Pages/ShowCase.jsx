@@ -2,7 +2,7 @@
 import {useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 import LightBox from "../utils/LightBox";
-import { scrollToElement } from "../Helpers/ScrollToElement";
+// import { scrollToElement } from "../Helpers/ScrollToElement";
 import ShowCaseItem from "../Components/ShowCaseItem";
 import { useImages } from "../hooks/loadImages";
 // import useFolders from "../hooks/loadFolders";
@@ -105,11 +105,11 @@ export const ShowCase = () => {
 
       <Pagination
         currentPage={page}
-        totalPages={totalPages || 1}
+        totalPages={totalPages}
         onPageChange={(page) => setPage(page)}
       />
 
-      {loading || loadingEachImageOfEachFolder  || pendingOpen && (
+      {loading && loadingEachImageOfEachFolder  && pendingOpen && (
         <div className="loading-overlay">
           <div className="spinner"></div>
         </div>
