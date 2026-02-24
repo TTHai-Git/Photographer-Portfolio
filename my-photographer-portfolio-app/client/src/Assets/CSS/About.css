@@ -1,0 +1,592 @@
+/* About page styles - Two column layout */
+.about-container {
+  width: 100%;
+  margin: 0;
+  font-family: "Akatab", "Inter", sans-serif;
+  color: #000;
+  padding-top: 0;
+}
+
+.about-title {
+  font-family: "Akatab", sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  text-align: center;
+  margin: 32px 0 32px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 50;
+  padding: 8px 0;
+}
+
+/* Main content area with two columns */
+.about-main-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px 48px;
+}
+
+/* LEFT COLUMN */
+.about-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.about-hero-wrapper {
+  width: 100%;
+}
+
+.about-hero {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.about-intro-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-subtitle {
+  font-family: "Akatab", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: #1e3a8a;
+}
+
+.about-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  margin: 0;
+}
+
+/* EXPERIENCE SECTION */
+.experience-section {
+  width: 100%;
+}
+
+.experience-title {
+  font-family: "Akatab", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  color: #1a2e5e;
+}
+
+.experience-item {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.experience-item:last-child {
+  border-bottom: none;
+}
+
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.experience-role {
+  font-family: "Akatab", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #1e3a8a;
+  flex: 1;
+}
+
+.experience-date {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.experience-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.experience-list li {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #555;
+  margin-bottom: 6px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.experience-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #1e3a8a;
+}
+
+/* RIGHT COLUMN */
+.about-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* EDUCATION SECTION */
+.education-section {
+  width: 100%;
+}
+
+.education-title {
+  font-family: "Akatab", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 20px;
+  color: #1a2e5e;
+}
+
+.education-item {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.education-item:last-child {
+  border-bottom: none;
+}
+
+.education-degree {
+  font-family: "Akatab", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #1e3a8a;
+}
+
+.education-date {
+  display: block;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.education-school {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+/* CONTENT SECTION */
+.content-section {
+  width: 100%;
+}
+
+.content-title {
+  font-family: "Akatab", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  color: #1a2e5e;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.content-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  gap: 12px;
+}
+
+.content-number {
+  font-family: "Akatab", sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.content-label {
+  font-family: "Akatab", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2e5e;
+  text-transform: uppercase;
+}
+
+.content-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* CONTENT SECTION - Full width at bottom */
+.content-section-full {
+  width: 100%;
+  padding: 48px 40px;
+  text-align: center;
+}
+
+.content-section-full .content-title {
+  font-family: "Akatab", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 32px;
+  color: #1a2e5e;
+}
+
+/* Horizontal scroller for content items */
+.content-scroller {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  --speed: 25s;
+}
+
+/* Track that contains and animates the content items */
+.content-track {
+  display: flex;
+  gap: 24px;
+  animation: scrollContent var(--speed) linear infinite;
+  white-space: nowrap;
+  padding: 12px 0;
+}
+
+/* Content item styling for scroller */
+.content-track .content-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  gap: 12px;
+  flex: 0 0 240px;
+  min-width: 240px;
+  min-height: 220px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  justify-content: flex-start;
+}
+
+.content-track .content-number {
+  font-family: "Akatab", sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e3a8a;
+  flex-shrink: 0;
+}
+
+.content-track .content-label {
+  font-family: "Akatab", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a2e5e;
+  text-transform: uppercase;
+  width: 100%;
+  max-width: 208px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.content-track .content-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+  width: 100%;
+  max-width: 208px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Pause animation on hover */
+.content-scroller:hover .content-track {
+  animation-play-state: paused;
+}
+
+/* Smooth horizontal scroll animation for content */
+@keyframes scrollContent {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-1 * (240px + 24px) * 5));
+  }
+  50.01% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* CLIENT BOX */
+.client-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 48px;
+  padding: 40px;
+  width: 100%;
+}
+
+.about-sub {
+  font-family: "Akatab", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  color: #1a2e5e;
+}
+
+/* Horizontal scroller container */
+.client-scroller {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  --speed: 20s;
+}
+
+/* The track that contains and animates the circles */
+.client-track {
+  display: flex;
+  gap: 24px;
+  animation: scrollX var(--speed) linear infinite;
+  white-space: nowrap;
+  padding: 12px 0;
+}
+
+/* Individual circle styling */
+.client-track .client-circle {
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  flex: 0 0 134px;
+}
+
+/* Pause animation on hover */
+.client-scroller:hover .client-track {
+  animation-play-state: paused;
+}
+
+/* Smooth horizontal scroll animation */
+@keyframes scrollX {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-1 * (134px + 24px) * 6));
+  }
+  50.01% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Footer styles if needed */
+.about-footer {
+  background: #2b2b2b;
+  color: #fff;
+  margin-top: 32px;
+  padding: 32px 0;
+}
+
+.footer-inner {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.footer-contact .footer-line {
+  font-family: "Inter", sans-serif;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .about-main-content {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 0 24px 48px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-title {
+    font-size: 32px;
+    margin: 16px 0;
+  }
+
+  .about-main-content {
+    gap: 24px;
+    padding: 0 16px 32px;
+  }
+
+  .about-subtitle {
+    font-size: 20px;
+  }
+
+  .experience-title,
+  .education-title,
+  .content-title {
+    font-size: 24px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-item {
+    padding: 12px;
+  }
+
+  .content-number {
+    font-size: 28px;
+  }
+}
+
+
+.client-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* Horizontal scroller container */
+.client-scroller {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  --speed: 20s;
+}
+
+/* The track that contains and animates the circles */
+.client-track {
+  display: flex;
+  gap: 24px;
+  animation: scrollX var(--speed) linear infinite;
+  white-space: nowrap;
+  padding: 12px 0;
+}
+
+/* Individual circle styling */
+.client-track .client-circle {
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  flex: 0 0 134px;
+}
+
+/* Pause animation on hover */
+.client-scroller:hover .client-track {
+  animation-play-state: paused;
+}
+
+/* Smooth horizontal scroll animation */
+@keyframes scrollX {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-1 * (134px + 24px) * 6));
+  }
+  50.01% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.about-footer {
+  background: #2b2b2b;
+  color: #fff;
+  margin-top: 32px;
+  padding: 32px 0;
+}
+
+.footer-inner {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.footer-contact .footer-line {
+  font-family: "Inter", sans-serif;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-frame {
+    flex-direction: column;
+  }
+
+  .about-left {
+    width: 100%;
+  }
+
+  .about-desc {
+    max-width: 100%;
+    font-size: 20px;
+  }
+
+  .footer-contact .footer-line {
+    font-size: 20px;
+  }
+}

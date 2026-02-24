@@ -4,6 +4,7 @@ import Home from "./Pages/Home";
 import ShowCase from "./Pages/ShowCase";
 import Dashboard from "./Pages/Dashboard";
 import Login from "./Pages/Login";
+import About from "./Pages/About";
 
 
 function App() {
@@ -28,6 +29,10 @@ function App() {
           path: "show-case",
           element: <ShowCase />,      
         },
+        {
+          path: "about",
+          element: <About />
+        }
       ],
     },
   ]);
