@@ -13,10 +13,10 @@
   font-weight: 700;
   text-align: center;
   margin: 32px 0 32px;
-  position: sticky;
+  /* position: sticky; */
   top: 0;
   background: #fff;
-  z-index: 50;
+  /* z-index: 50; */
   padding: 8px 0;
 }
 
