@@ -30,12 +30,8 @@ export const Navbar = () => {
         {/* Menu */}
         <nav className={`navbar-menu ${isOpen ? "active" : ""}`}>
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
-<<<<<<< HEAD
           <NavLink to="/show-case" onClick={closeMenu}>Show Case</NavLink>
           <NavLink to="/about" onClick={closeMenu}>About</NavLink>
-=======
-          <NavLink to="/my-project" onClick={closeMenu}>My Project</NavLink>
->>>>>>> 33305993958fd997502683fa3b9aa33b1d88cf0f
           {/* <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink> */}
           {user ? (
             <div className="nav-user-dropdown">
