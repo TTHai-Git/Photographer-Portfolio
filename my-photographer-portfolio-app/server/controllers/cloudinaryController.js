@@ -94,62 +94,82 @@ import streamifier from "streamifier";
 //   }
 // };
 
-export const uploadImagesOnToCloudinary = async (req, res) => {
+// export const uploadImagesOnToCloudinary = async (req, res) => {
+//   try {
+//     const folder = req.body.folder || "uploads";
+//     if (!req.files || req.files.length === 0) {
+//       return res.status(400).json({ message: "Missing images to upload!" });
+//     }
+
+//     const uploadedData = [];
+
+//     for (const file of req.files) {
+//       // compress to webp
+//       const compressed = await compressToWebp(file.buffer);
+
+//       // upload
+//       const uploaded = await new Promise((resolve, reject) => {
+//         const uploadStream = cloudinary.uploader.upload_stream(
+//           {
+//             folder,
+//             resource_type: "image",
+//             format: "webp",
+//             quality: "auto",
+//             transformation: [{ width: "auto", crop: "limit" }, { dpr: "auto" }],
+//             // fetch_format: "auto",
+//           },
+//           (err, result) => (err ? reject(err) : resolve(result)),
+//         );
+
+//         streamifier.createReadStream(compressed).pipe(uploadStream);
+//       });
+
+//       uploadedData.push({
+//         public_id: uploaded.public_id,
+//         url: uploaded.secure_url,
+//       });
+//     }
+
+//     // save to DB
+//     const resultsOfDB = await createImages(uploadedData, folder);
+
+//     if (!resultsOfDB.success)
+//       return resultsOfDB
+//         .status(500)
+//         .json({ message: "Lưu ảnh vào DB thất bại!" });
+
+//     return res.status(201).json({
+//       message: "Tải ảnh lên thành công!",
+//       images: uploadedData,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: "Tải ảnh thất bại" });
+//   } finally {
+//     await getRedisClient.flushAll();
+//   }
+// };
+
+export const saveImages = async (req, res) => {
   try {
-    const folder = req.body.folder || "uploads";
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "Missing images to upload!" });
+    const { images, folder } = req.body;
+
+    if (!images || !images.length) {
+      return res.status(400).json({ message: "No images!" });
     }
 
-    const uploadedData = [];
-
-    for (const file of req.files) {
-      // compress to webp
-      const compressed = await compressToWebp(file.buffer);
-
-      // upload
-      const uploaded = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder,
-            resource_type: "image",
-            format: "webp",
-            quality: "auto",
-            transformation: [{ width: "auto", crop: "limit" }, { dpr: "auto" }],
-            // fetch_format: "auto",
-          },
-          (err, result) => (err ? reject(err) : resolve(result))
-        );
-
-        streamifier.createReadStream(compressed).pipe(uploadStream);
-      });
-
-      uploadedData.push({
-        public_id: uploaded.public_id,
-        url: uploaded.secure_url,
-      });
-    }
-
-    // save to DB
-    const resultsOfDB = await createImages(uploadedData, folder);
-
-    if (!resultsOfDB.success)
-      return resultsOfDB
-        .status(500)
-        .json({ message: "Lưu ảnh vào DB thất bại!" });
-
-    // clear cache
-    // clearCacheByKeyword(`GET:/v1/images?path=${folder}`);
-    // clearCacheByKeyword(`GET:/v1/folders?`);
-    await getRedisClient.flushAll();
+    const result = await createImages(images, folder);
 
     return res.status(201).json({
-      message: "Tải ảnh lên thành công!",
-      images: uploadedData,
+      success: true,
+      message: "Lưu DB thành công",
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Tải ảnh thất bại" });
+    return res.status(500).json({
+      message: "Lỗi lưu DB",
+    });
+  } finally {
+    await getRedisClient.flushAll();
   }
 };
 
@@ -201,9 +221,8 @@ export const handleDeleteFolders = async (req, res) => {
 
     // delete folders onto Cloudinary
     for (const folderPrefix of folderDirs) {
-      const deleteRes = await cloudinary.api.delete_resources_by_prefix(
-        folderPrefix
-      );
+      const deleteRes =
+        await cloudinary.api.delete_resources_by_prefix(folderPrefix);
 
       // Optionally delete folder metadata:
       await cloudinary.api.delete_folder(folderPrefix).catch(() => {});
@@ -248,7 +267,7 @@ export const handleCreateFolder = async (req, res) => {
     const existing = await cloudinary.api.sub_folders(parentDir);
 
     const isExist = existing.folders.some(
-      (f) => f.name.toLowerCase() === folderName.toLowerCase()
+      (f) => f.name.toLowerCase() === folderName.toLowerCase(),
     );
 
     if (isExist) {
@@ -311,7 +330,7 @@ export const handleMoveImages = async (req, res) => {
 
     // Move on Cloudinary
     const moveResults = await Promise.all(
-      oldPublicIds.map((id) => handleMoveImage(id, newFolder))
+      oldPublicIds.map((id) => handleMoveImage(id, newFolder)),
     );
 
     // Update Database
@@ -333,14 +352,14 @@ export const handleMoveImages = async (req, res) => {
           public_id: item.newPublicId,
           optimized_url: item.secure_url,
           folderOfCloudinary: newFolderDoc._id,
-        }
+        },
       );
     }
 
     // Clear redis
     const oldDir = oldPublicIds[0].substring(
       0,
-      oldPublicIds[0].lastIndexOf("/")
+      oldPublicIds[0].lastIndexOf("/"),
     );
 
     // clearCacheByKeyword(`GET:/v1/images?path=${oldDir}`);

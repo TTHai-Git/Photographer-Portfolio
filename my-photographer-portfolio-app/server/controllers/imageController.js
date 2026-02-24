@@ -69,7 +69,7 @@ export const createImages = async (data, folder) => {
   try {
     // Get folder ID
     const folderDoc = await FolderOfCloudinary.findOne({ path: folder }).select(
-      "_id"
+      "_id",
     );
 
     if (!folderDoc) {
@@ -80,7 +80,8 @@ export const createImages = async (data, folder) => {
     for (const item of data) {
       await ImageOfCloudinary.create({
         public_id: item.public_id,
-        optimized_url: item.url,
+        optimized_url: item.secure_url,
+        // optimized_url: item.url,
         folderOfCloudinary: folderDoc._id,
       });
     }

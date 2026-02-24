@@ -8,13 +8,14 @@ export const endpoints = {
   // getFolders: "/cloudinaries/get-folders",
   createFolder: "/cloudinaries/folders/cre",
   deleteFolders: "/cloudinaries/folders/del",
-  upload: "/cloudinaries/upload",
+  // upload: "/cloudinaries/upload",
   deleteImages: "/cloudinaries/images/del",
   moveImages: "/cloudinaries/images/mov",
   login: "/auth/login",
   logout: "/auth/logout",
   getMe: "/auth/me",
   refreshToken: "/auth/refresh-token",
+  saveImagesToDB: "/cloudinaries/save",
 };
 
 export const authApi = axios.create({
@@ -46,7 +47,7 @@ authApi.interceptors.response.use(
           {
             baseURL: BASE_URL,
             withCredentials: true,
-          }
+          },
         );
 
         if (refreshResponse.status === 200) {
@@ -60,7 +61,7 @@ authApi.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axios.create({

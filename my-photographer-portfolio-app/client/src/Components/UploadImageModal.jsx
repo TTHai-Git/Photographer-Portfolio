@@ -3,6 +3,8 @@ import { authApi, endpoints } from "../config/APIs";
 import "../Assets/CSS/UploadImageModal.css"
 import "../Assets/CSS/modal.css";
 import { useNotification } from "../Context/NotificationContext";
+import { useImageCompressor } from "../hooks/useImageCompressor";
+import pLimit from "p-limit";
 
 const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadImages }) => {
   const [files, setFiles] = useState([]);
@@ -10,10 +12,11 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
   const [selectedFolder, setSelectedFolder] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [totalSize, setTotalSize] = useState(0); // tổng dung lượng bytes
-  const MAX_FILES = 20;      // số lượng ảnh tối đa
-  const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
+  const MAX_FILES = 10  // số lượng ảnh tối đa
+  const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // tối đa 100 MB
   const [loadingUpload, setLoadingUpload] = useState(false)
   const {showNotification} = useNotification()
+  const { compressImage } = useImageCompressor();
 
   const handleFiles = (fileList) => {
     const arr = Array.from(fileList);
@@ -81,34 +84,93 @@ const handleUpload = async () => {
   if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
   if (totalSize > MAX_TOTAL_SIZE) return showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
 
+  // try {
+  //   setLoadingUpload(true);
+
+  //   const formData = new FormData();
+  //   files.forEach((file) => formData.append("images", file));
+  //   formData.append("folder", selectedFolder);
+
+  //   const res = await authApi.post(endpoints.upload, formData, {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   });
+
+  //   if (res.status === 201) {
+  //     showNotification(res.data.message, "success");
+
+  //     // Reset UI
+  //     resetUploadState();
+
+  //     // ⬅️ ONLY HERE: Load images ONCE
+  //     await loadImages();
+  //   }
+    
+
+  // } catch (err) {
+  //   showNotification(err.response?.data?.message, "error");
+
+  // } finally {
+  //   setLoadingUpload(false);
+  //   onClose(); // đóng modal
+  // }
+
+  const CLOUD_NAME = process.env.REACT_APP_CLOUD_NAME;
+  const UPLOAD_PRESET = process.env.REACT_APP_UPLOAD_PRESET;
+
   try {
     setLoadingUpload(true);
 
-    const formData = new FormData();
-    files.forEach((file) => formData.append("images", file));
-    formData.append("folder", selectedFolder);
+    const limit = pLimit(3); // chỉ upload 3 ảnh cùng lúc
+    const uploadedImages = [];
 
-    const res = await authApi.post(endpoints.upload, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const tasks = files.map((file) =>
+      limit(async () => {
+        // 🔥 Compress in Worker
+        const compressed = await compressImage(file, {
+          maxBytes: 10 * 1024 * 1024,
+          maxWidthOrHeight: 2560,
+        });
+
+        const formData = new FormData();
+        formData.append("file", compressed);
+        formData.append("upload_preset", UPLOAD_PRESET);
+        formData.append("folder", selectedFolder);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message);
+
+        uploadedImages.push({
+          public_id: data.public_id,
+          secure_url: data.secure_url,
+          folder: selectedFolder,
+        });
+      })
+    );
+
+    await Promise.all(tasks);
+
+    // 3️⃣ Gửi về backend chỉ metadata
+    await authApi.post(endpoints.saveImagesToDB, {
+      images: uploadedImages,
+      folder: selectedFolder,
     });
 
-    if (res.status === 201) {
-      showNotification(res.data.message, "success");
-
-      // Reset UI
-      resetUploadState();
-
-      // ⬅️ ONLY HERE: Load images ONCE
-      await loadImages();
-    }
-    
-
+    showNotification("Tải ảnh lên thành công!", "success");
+    resetUploadState();
+    await loadImages();
   } catch (err) {
-    showNotification(err.response?.data?.message, "error");
-
+    showNotification("Upload thất bại!", "error");
   } finally {
     setLoadingUpload(false);
-    onClose(); // đóng modal
+    onClose();
   }
 };
 
@@ -165,7 +227,7 @@ if (!open) return null
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB và tổng số lượng ảnh tối đa là 20 ảnh cho một lần tải lên)</p>
+                <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB (sau khi nén ảnh) và tổng số lượng ảnh tối đa là 10 ảnh cho một lần tải lên)</p>
                 <label className="file-label">
                   Chọn ảnh
                   <input type="file" multiple accept="image/*" onChange={handleChange} />

@@ -6,9 +6,10 @@ import {
   handleDeleteFolders,
   handleDeleteImages,
   handleMoveImages,
-  uploadImagesOnToCloudinary,
+  saveImages,
+  // uploadImagesOnToCloudinary,
 } from "../controllers/cloudinaryController.js";
-import { upload } from "../middlewares/multerHandle.js";
+// import { upload } from "../middlewares/multerHandle.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
 import { isAdmin } from "../middlewares/authMiddleware.js";
 const cloudinaryRouters = express.Router();
@@ -31,17 +32,30 @@ const cloudinaryRouters = express.Router();
 //   }),
 //   getFoldersOnCloudinary
 // );
+// cloudinaryRouters.post(
+//   "/upload",
+//   isAdmin,
+//   ipRateCheck({
+//     maxAttempts: 10,
+//     windowSeconds: 60,
+//     blockSeconds: 600,
+//   }),
+//   upload.array("images", 20),
+//   uploadImagesOnToCloudinary,
+// );
+
 cloudinaryRouters.post(
-  "/upload",
+  "/save",
   isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
     blockSeconds: 600,
   }),
-  upload.array("images", 20),
-  uploadImagesOnToCloudinary
+  // upload.array("images", 20),
+  saveImages,
 );
+
 cloudinaryRouters.delete(
   "/images/del",
   isAdmin,
@@ -50,7 +64,7 @@ cloudinaryRouters.delete(
     windowSeconds: 60,
     blockSeconds: 600,
   }),
-  handleDeleteImages
+  handleDeleteImages,
 );
 cloudinaryRouters.post(
   "/images/mov",
@@ -60,7 +74,7 @@ cloudinaryRouters.post(
     windowSeconds: 60,
     blockSeconds: 600,
   }),
-  handleMoveImages
+  handleMoveImages,
 );
 cloudinaryRouters.post(
   "/folders/cre",
@@ -70,7 +84,7 @@ cloudinaryRouters.post(
     windowSeconds: 60,
     blockSeconds: 600,
   }),
-  handleCreateFolder
+  handleCreateFolder,
 );
 cloudinaryRouters.delete(
   "/folders/del",
@@ -80,7 +94,7 @@ cloudinaryRouters.delete(
     windowSeconds: 60,
     blockSeconds: 600,
   }),
-  handleDeleteFolders
+  handleDeleteFolders,
 );
 
 export default cloudinaryRouters;
