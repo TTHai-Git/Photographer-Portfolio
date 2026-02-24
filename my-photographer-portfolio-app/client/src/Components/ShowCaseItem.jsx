@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import "../Assets/CSS/ShowCase.css";
 
 const ShowCaseItem = ({ src, alt, folderName, onClick }) => {
   const imgRef = useRef();

@@ -1,16 +1,23 @@
-# version: "3.8"
+#version: "3.8"
 
 services:
   portfolio-client:
     image: haiou2003/my-photographer-portfolio-app-client:latest
     container_name: portfolio-client
-    env_file:
-      - ./client/.env.production
     restart: unless-stopped
     ports:
       - "3000:80"
-    mem_limit: 256m
-    cpus: "0.50"
+
+    # ===== Resource limits =====
+    mem_limit: 64m          # nginx chỉ cần vậy là dư
+    memswap_limit: 64m      # KHÔNG cho swap
+    cpus: "0.20"            # 20% CPU là đủ
+
+    # Security & stability
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
 
   portfolio-server:
     image: haiou2003/my-photographer-portfolio-app-server:latest
@@ -20,13 +27,48 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
-    mem_limit: 512m
-    cpus: "1.0"
-# To run the docker compose, use the following commands:
-# docker compose down --remove-orphans
-# docker compose up -d 
-# Lưu ý: 
-# + Phải mở port forwarding 80 và 443 trên modem/router về máy chủ chạy Docker
-# + Cấu hình Nginx Proxy Manager để trỏ domain về port 3000 của portfolio-client và port 5000 của portfolio-server
-# + Cấu hình SSL Let's Encrypt trong Nginx Proxy Manager để website được https
-# + Cấu hình biến môi trường trong file .env.production cho phù hợp với domain và môi trường production
+
+    # ===== Resource limits =====
+    mem_limit: 256m         # NodeJS production ổn định
+    memswap_limit: 256m     # KHÔNG cho swap
+    cpus: "0.70"            # ~70% CPU
+
+    # Kill nếu vượt RAM (tránh treo Pi)
+    oom_kill_disable: false
+
+
+
+
+# old version of docker-compose.yml
+# # version: "3.8"
+
+# services:
+#   portfolio-client:
+#     image: haiou2003/my-photographer-portfolio-app-client:latest
+#     container_name: portfolio-client
+#     env_file:
+#       - ./client/.env.production
+#     restart: unless-stopped
+#     ports:
+#       - "3000:80"
+#     mem_limit: 256m
+#     cpus: "0.50"
+
+#   portfolio-server:
+#     image: haiou2003/my-photographer-portfolio-app-server:latest
+#     container_name: portfolio-server
+#     env_file:
+#       - ./server/.env.production
+#     restart: unless-stopped
+#     ports:
+#       - "5000:5000"
+#     mem_limit: 512m
+#     cpus: "1.0"
+# # To run the docker compose, use the following commands:
+# # docker compose down --remove-orphans
+# # docker compose up -d 
+# # Lưu ý: 
+# # + Phải mở port forwarding 80 và 443 trên modem/router về máy chủ chạy Docker
+# # + Cấu hình Nginx Proxy Manager để trỏ domain về port 3000 của portfolio-client và port 5000 của portfolio-server
+# # + Cấu hình SSL Let's Encrypt trong Nginx Proxy Manager để website được https
+# # + Cấu hình biến môi trường trong file .env.production cho phù hợp với domain và môi trường production

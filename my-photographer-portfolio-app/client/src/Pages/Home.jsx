@@ -15,7 +15,7 @@ export const Home = () => {
   const [sort, setSort] = useState("latest");
   const { images, totalPages, loading } = useImages(
   page,
-  6,
+  500,
   "Hoang-Truc-Photographer-Portfolio/HOME",
   sort,
 );
@@ -50,6 +50,10 @@ export const Home = () => {
         Welcome to My Photography Portfolio
       </Typography>
 
+      {/* <Typography className="home-subtitle">
+        Photography & Visual Storytelling
+      </Typography> */}
+
       <SortBar sort={sort} onSortChange={setSort} />
 
       {/* --- Loading Overlay --- */}
@@ -60,7 +64,12 @@ export const Home = () => {
       )}
 
       {/* --- Masonry Image Grid --- */}
-      <ImageList variant="masonry" cols={3} gap={12}>
+      <ImageList
+        variant="masonry"
+        cols={3}
+        gap={24}
+        className="gallery-grid"
+      >
         {images.map((image, index) => (
           <ImageListItem key={image._id}>
             {/* <img
