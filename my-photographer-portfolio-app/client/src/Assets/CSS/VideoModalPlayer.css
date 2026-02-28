@@ -1,0 +1,84 @@
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+
+  /* 👇 Quan trọng nhất */
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  position: relative;   /* QUAN TRỌNG để close-btn định vị đúng */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  animation: scaleIn 0.25s ease;
+}
+
+.modal-video {
+  max-width: 70%;
+  max-height: 70%;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.modal-overlay {
+  position: fixed;   /* QUAN TRỌNG */
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 0px;
+  right: 200px;
+
+  font-size: 32px;
+  color: white;
+  background: rgba(0,0,0,0.6);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

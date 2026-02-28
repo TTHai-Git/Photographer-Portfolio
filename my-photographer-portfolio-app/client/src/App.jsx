@@ -5,7 +5,7 @@ import ShowCase from "./Pages/ShowCase";
 import Dashboard from "./Pages/Dashboard";
 import Login from "./Pages/Login";
 import About from "./Pages/About";
-
+import VideoGallery from "./Pages/VideoGallery";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +28,10 @@ function App() {
         {
           path: "my-project",
           element: <ShowCase />,      
+        },
+        {
+          path: "animation",
+          element: <VideoGallery />,      
         },
         {
           path: "about",

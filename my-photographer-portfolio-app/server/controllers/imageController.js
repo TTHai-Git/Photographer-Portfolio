@@ -82,6 +82,7 @@ export const createImages = async (data, folder) => {
         public_id: item.public_id,
         optimized_url: item.secure_url,
         // optimized_url: item.url,
+        resource_type: item.resource_type || "image",
         folderOfCloudinary: folderDoc._id,
       });
     }
@@ -156,3 +157,32 @@ export const getImages = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+// export const AddFieldsToImage = async (req, res) => {
+//   try {
+//     const result = await ImageOfCloudinary.updateMany(
+//       {},
+//       [
+//         {
+//           $set: {
+//             resource_type: {
+//               $cond: {
+//                 if: { $regexMatch: { input: "$optimized_url", regex: /\.mp4$/i } },
+//                 then: "video",
+//                 else: "image",
+//               },
+//             },
+//           },
+//         },
+//       ],
+//       { updatePipeline: true }, // 👈 QUAN TRỌNG
+//     );
+
+//     return res.status(200).json({
+//       message: "resource_type updated successfully",
+//       modifiedCount: result.modifiedCount,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };

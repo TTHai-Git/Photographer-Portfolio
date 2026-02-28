@@ -3,42 +3,42 @@ import { authApi, endpoints } from "../config/APIs";
 import "../Assets/CSS/UploadImageModal.css"
 import "../Assets/CSS/modal.css";
 import { useNotification } from "../Context/NotificationContext";
-import { useImageCompressor } from "../hooks/useImageCompressor";
 import pLimit from "p-limit";
 
-const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadImages }) => {
+const UploadVideoModal = ({folders, loadFoldersForCombobox, open, onClose, loadVideos }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [totalSize, setTotalSize] = useState(0); // tổng dung lượng bytes
-  const MAX_FILES = 10  // số lượng ảnh tối đa
+  const MAX_FILES = 3  // số lượng video tối đa
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // tối đa 100 MB
   const [loadingUpload, setLoadingUpload] = useState(false)
-  const {showNotification} = useNotification()
-  const { compressImage } = useImageCompressor();
+  const [compressionProgress, setCompressionProgress] = useState(0) // 0-100%
+  const [currentCompressionFile, setCurrentCompressionFile] = useState("")
+  const {showNotification} = useNotification();
 
   const handleFiles = (fileList) => {
     const arr = Array.from(fileList);
 
-    // Tính tổng dung lượng ảnh mới
+    // Tính tổng dung lượng video mới
     const newTotalSize = arr.reduce((sum, file) => sum + file.size, 0);
 
     // Kiểm tra giới hạn
     if (arr.length > MAX_FILES) {
-      showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
+      showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} video!`, "warning");
       return;
     }
 
-    if (newTotalSize > MAX_TOTAL_SIZE) {
-      showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
-      return;
-    }
+    // if (newTotalSize > MAX_TOTAL_SIZE) {
+    //   showNotification("Tổng dung lượng video vượt quá 100 MB!", "warning");
+    //   return;
+    // }
 
     setFiles(arr);
     setTotalSize(newTotalSize);
 
-    // Preview images
+    // Preview videos
     const previewUrls = arr.map((file) => URL.createObjectURL(file));
     setPreviews(previewUrls);
   };
@@ -62,7 +62,7 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
     handleFiles(e.dataTransfer.files);
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveVideo = (index) => {
     const newFiles = [...files];
     const newPreviews = [...previews];
 
@@ -79,65 +79,40 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
 
 
 const handleUpload = async () => {
-  if (!files.length) return showNotification("Vui lòng chọn các ảnh để tải lên!", "warning");
-  if (!selectedFolder) return showNotification("Vui lòng chọn thư mục để lưu các ảnh tải lên!", "warning");
-  if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
-  if (totalSize > MAX_TOTAL_SIZE) return showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
+  if (!files.length)
+    return showNotification("Vui lòng chọn các video để tải lên!", "warning");
 
-  // try {
-  //   setLoadingUpload(true);
+  if (!selectedFolder)
+    return showNotification("Vui lòng chọn thư mục để lưu các video tải lên!", "warning");
 
-  //   const formData = new FormData();
-  //   files.forEach((file) => formData.append("images", file));
-  //   formData.append("folder", selectedFolder);
-
-  //   const res = await authApi.post(endpoints.upload, formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-
-  //   if (res.status === 201) {
-  //     showNotification(res.data.message, "success");
-
-  //     // Reset UI
-  //     resetUploadState();
-
-  //     // ⬅️ ONLY HERE: Load images ONCE
-  //     await loadImages();
-  //   }
-    
-
-  // } catch (err) {
-  //   showNotification(err.response?.data?.message, "error");
-
-  // } finally {
-  //   setLoadingUpload(false);
-  //   onClose(); // đóng modal
-  // }
+  if (files.length > MAX_FILES)
+    return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} video!`, "warning");
 
   const CLOUD_NAME = process.env.REACT_APP_CLOUD_NAME;
   const UPLOAD_PRESET = process.env.REACT_APP_UPLOAD_PRESET;
 
   try {
     setLoadingUpload(true);
+    setCompressionProgress(0);
 
-    const limit = pLimit(3); // chỉ upload 3 ảnh cùng lúc
-    const uploadedImages = [];
+    const limit = pLimit(2); // upload tối đa 2 file cùng lúc
+    const uploadedVideos = [];
 
-    const tasks = files.map((file) =>
+    const totalFiles = files.length;
+
+    const tasks = files.map((file, index) =>
       limit(async () => {
-        // 🔥 Compress in Worker
-        const compressed = await compressImage(file, {
-          maxBytes: 10 * 1024 * 1024,
-          maxWidthOrHeight: 2560,
-        });
+        setCurrentCompressionFile(`Đang tải: ${file.name}`);
+        setCompressionProgress((index / totalFiles) * 100);
 
         const formData = new FormData();
-        formData.append("file", compressed);
+        formData.append("file", file);
         formData.append("upload_preset", UPLOAD_PRESET);
         formData.append("folder", selectedFolder);
+        // formData.append("resource_type", "video");
 
         const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
           {
             method: "POST",
             body: formData,
@@ -147,10 +122,10 @@ const handleUpload = async () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error?.message);
 
-        uploadedImages.push({
+        uploadedVideos.push({
           public_id: data.public_id,
           secure_url: data.secure_url,
-          resource_type: "image",
+          resource_type: "video",
         });
       })
     );
@@ -159,17 +134,24 @@ const handleUpload = async () => {
 
     // 3️⃣ Gửi về backend chỉ metadata
     await authApi.post(endpoints.saveImagesToDB, {
-      images: uploadedImages,
+      images: uploadedVideos,
       folder: selectedFolder,
     });
 
-    showNotification("Tải ảnh lên thành công!", "success");
+    console.log("✅ Upload thành công:", uploadedVideos);
+
+    setCompressionProgress(100);
+    showNotification("Tải video lên thành công!", "success");
+
     resetUploadState();
-    await loadImages();
+    await loadVideos();
   } catch (err) {
-    showNotification("Upload thất bại!", "error");
+    showNotification("Upload video thất bại: " + err.message, "error");
+    console.log("❌ Upload thất bại:", err.message);
   } finally {
     setLoadingUpload(false);
+    setCompressionProgress(0);
+    setCurrentCompressionFile("");
     onClose();
   }
 };
@@ -196,11 +178,11 @@ if (!open) return null
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
-        <div className="modal-header">Biểu Mẫu Tải Ảnh Lên</div>
+        <div className="modal-header">Biểu Mẫu Tải Video Lên</div>
         <div className="modal-content">
           <div className="upload-container">
 
-            {/* <h2>Tải ảnh lên trên Cloudinary</h2> */}
+            {/* <h2>Tải video lên trên Cloudinary</h2> */}
 
             {/* Select Folder */}
             <label className="label">Chọn Đường Dẫn</label>
@@ -227,28 +209,28 @@ if (!open) return null
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB (sau khi nén ảnh) và tổng số lượng ảnh tối đa là 10 ảnh cho một lần tải lên)</p>
+                <p>Kéo thả video vào đây hoặc nhấn nút chọn video để tải video lên (Lưu ý: Tổng dung lượng tối đa là 100 MB và tổng số lượng video tối đa là 3 video cho một lần tải lên)</p>
                 <label className="file-label">
-                  Chọn ảnh
-                  <input type="file" multiple accept="image/*" onChange={handleChange} />
+                  Chọn video
+                  <input type="file" multiple accept="video/*" onChange={handleChange} />
                 </label>
               </div>
 
               {files.length > 0 && (
                 <div className="upload-info">
-                  <p>Số lượng ảnh: {files.length} / {MAX_FILES}</p>
+                  <p>Số lượng video: {files.length} / {MAX_FILES}</p>
                   <p>
-                    Tổng dung lượng: {(totalSize / (1024 * 1024)).toFixed(2)} MB / {(MAX_TOTAL_SIZE / (1024 * 1024))} MB
+                    Tổng dung lượng: {(totalSize / (1024 * 1024)).toFixed(2)} MB / {(MAX_TOTAL_SIZE / (1024 * 1024)).toFixed(0)} MB
                   </p>
                 </div>
               )}
 
-              {/* Preview images */}
+              {/* Preview videos */}
               {previews.length > 0 && (
                 <div className="preview-grid">
                   {previews.map((src, idx) => (
                     <div key={idx} className="preview-wrapper">
-                      <img src={src} className="preview-img" alt="preview" />
+                      <video src={src} className="preview-img" controls />
                       <div className="preview-info">
                         <span className="file-name">{files[idx].name}</span>
                         <span className="file-size">
@@ -258,7 +240,7 @@ if (!open) return null
                       <button
                         type="button"
                         className="remove-btn"
-                        onClick={() => handleRemoveImage(idx)}
+                        onClick={() => handleRemoveVideo(idx)}
                       >
                         ×
                       </button>
@@ -270,14 +252,29 @@ if (!open) return null
               {loadingUpload && (
                 <div className="loading-overlay">
                   <div className="spinner"></div>
-                  <p>Đang tải ảnh lên...</p>
+                  <p>
+                    {compressionProgress < 50
+                      ? `Đang nén video: ${currentCompressionFile}`
+                      : `Đang tải video lên: ${currentCompressionFile}`}
+                  </p>
+                  <div style={{ marginTop: "10px", backgroundColor: "#e0e0e0", borderRadius: "5px", overflow: "hidden", width: "200px", height: "10px" }}>
+                    <div
+                      style={{
+                        backgroundColor: "#4CAF50",
+                        height: "100%",
+                        width: `${compressionProgress}%`,
+                        transition: "width 0.3s ease",
+                      }}
+                    ></div>
+                  </div>
+                  <p style={{ marginTop: "5px", fontSize: "12px" }}>{Math.round(compressionProgress)}%</p>
                 </div>
               )}
               {/* Upload Button */}
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
                   <button className="cancel-btn" onClick={onClose}>Hủy</button>
                   <button className="upload-btn" onClick={handleUpload} disabled={loadingUpload}>
-                  {loadingUpload ? "Đang tải ảnh lên..." : "Tải ảnh lên"}
+                  {loadingUpload ? "Đang tải video lên..." : "Tải video lên"}
                   </button>
                 </div>
             </div>
@@ -288,4 +285,4 @@ if (!open) return null
   );
 };
 
-export default UploadImageModal;
+export default UploadVideoModal;

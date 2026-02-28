@@ -32,7 +32,7 @@ export const ShowCase = () => {
 
   useEffect(() => {
   if (!loading && pendingOpen && images.length > 0) {
-    const slidesData = images.map(img => {
+    const slidesData = images.filter(img => img.resource_type === "image").map(img => {
       const parts = img.public_id.split("/");
       const folderName = parts[parts.length - 2];
 

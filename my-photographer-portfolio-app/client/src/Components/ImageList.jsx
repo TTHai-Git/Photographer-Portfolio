@@ -4,9 +4,13 @@ import { useState } from "react";
 import UploadImageModal from "./UploadImageModal";
 import { useNotification } from "../Context/NotificationContext";
 import { MoveImageModal } from "./MoveImageModal";
-import { Autocomplete, InputAdornment, TextField } from "@mui/material";
+import { Autocomplete, ImageListItem, InputAdornment, TextField } from "@mui/material";
 import SortIcon from "@mui/icons-material/Sort";
 import { authApi, endpoints } from "../config/APIs";
+import UploadVideoModal from "./UploadVideoModel";
+import VideoCard from "./VideoCard";
+import LightBox from "../utils/LightBox";
+import LazyImage from "./LazyImage";
 
 export default function ImageList({
   foldersForCombobox,
@@ -21,9 +25,13 @@ export default function ImageList({
 }) {
   const [oldPublicIds, setOldPublicIds] = useState([]);
   const [openUpload, setOpenUpload] = useState(false);
+  const [openUploadVideo, setOpenUploadVideo] = useState(false);
   const [openMove, setOpenMove] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const { showNotification } = useNotification();
+  const [isOpen, setIsOpen] = useState(false);
+  const [slides, setSlides] = useState([]);
+  const [startIndex, setStartIndex] = useState(0);
 
   const updateParams = (key, val) => {
     setImageParams((prev) => ({
@@ -31,6 +39,22 @@ export default function ImageList({
       page: 1,
       [key]: val,
     }));
+  };
+
+  const handleImageClick = (index) => {
+    const slideList = images.filter((image) => image.resource_type === "image").map((image) => {
+      const parts = image.public_id.split("/");
+      const folderName = parts[parts.length - 2];
+      
+      return {
+        src: image.optimized_url,
+        title: folderName,
+      };
+    });
+
+    setSlides(slideList);
+    setStartIndex(index);
+    setIsOpen(true);
   };
 
   const handleDelete = async () => {
@@ -68,6 +92,10 @@ export default function ImageList({
         <div className="image-section-header-left">
           <button className="btn btn-green" onClick={() => setOpenUpload(true)}>
             + Tải ảnh lên
+          </button>
+
+          <button className="btn btn-green" onClick={() => setOpenUploadVideo(true)}>
+            + Tải video lên
           </button>
 
           <button className="btn btn-primary" onClick={() => {
@@ -124,7 +152,7 @@ export default function ImageList({
       </div>
       ) : (
         <div className="images-grid">
-        {images.map((img) => (
+        {images.map((img, index) => (
           <div key={img.public_id} className="image-item">
             <input
               type="checkbox"
@@ -137,19 +165,51 @@ export default function ImageList({
                 )
               }
             />
-
-            <img src={img.optimized_url} alt="" />
+            {img.resource_type === "video" ? (
+              <VideoCard key={img.public_id} video={img} />
+            ) : (
+              // <img src={img.optimized_url} alt="" />
+              <ImageListItem key={img.public_id}>
+                 <LazyImage
+                    src={img.optimized_url}
+                    alt={img.file_name}
+                    className="fade-in"
+                    onClick={() => handleImageClick(index)}
+                  />
+              </ImageListItem>
+             
+            )
+          }
+            
           </div>
         ))}
       </div>
       )}
       
+      {/* --- LightBox --- */}
+      {!loading && isOpen && (
+        <LightBox
+          isOpen={isOpen}
+          slides={slides}
+          startIndex={startIndex}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
 
       <UploadImageModal
         open={openUpload}
         onClose={() => setOpenUpload(false)}
         selectedFolder={selectedFolder}
         loadImages={loadImages}
+        folders={foldersForCombobox}
+        loadFoldersForCombobox={loadFoldersForCombobox}
+      />
+
+      <UploadVideoModal
+        open={openUploadVideo}
+        onClose={() => setOpenUploadVideo(false)}
+        selectedFolder={selectedFolder}
+        loadVideos={loadImages}
         folders={foldersForCombobox}
         loadFoldersForCombobox={loadFoldersForCombobox}
       />
@@ -165,5 +225,6 @@ export default function ImageList({
         loadImages={loadImages}
       />
     </div>
+    
   );
 }

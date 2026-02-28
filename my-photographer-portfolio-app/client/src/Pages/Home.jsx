@@ -24,7 +24,7 @@ export const Home = () => {
   const [startIndex, setStartIndex] = useState(0);
 
   const handleImageClick = (index) => {
-    const slideList = images.map((image) => ({
+    const slideList = images.filter((image) => image.resource_type === "image").map((image) => ({
       src: image.optimized_url,
       title: "HOME"
     }));

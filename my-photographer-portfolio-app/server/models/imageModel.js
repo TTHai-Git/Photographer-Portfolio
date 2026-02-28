@@ -9,6 +9,11 @@ const ImageOfCloudinarySchema = new Schema(
       type: String,
       require: true,
     },
+    resource_type: {
+      type: String,
+      enum: ["image", "video"],
+      default: "image",
+    },
     folderOfCloudinary: {
       type: Schema.Types.ObjectId,
       ref: "Folder",
@@ -17,7 +22,7 @@ const ImageOfCloudinarySchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 ImageOfCloudinarySchema.index({ folderOfCloudinary: 1, created_at: -1 });
 ImageOfCloudinarySchema.index({ folderOfCloudinary: 1, public_id: 1 });
