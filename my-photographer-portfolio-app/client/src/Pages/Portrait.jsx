@@ -25,7 +25,7 @@ export const Portrait = () => {
 
   const handleImageClick = (index) => {
     const slideList = images.filter((image) => image.resource_type === "image").map((image) => ({
-      src: image.optimized_url,
+      src: image.secure_url,
       title: "Portrait",
     }));
 
@@ -73,14 +73,14 @@ export const Portrait = () => {
         {images.map((image, index) => (
           <ImageListItem key={image._id}>
             {/* <img
-              src={`${image.optimized_url}?w=auto&fit=crop&auto=format`}
+              src={`${image.secure_url}?w=auto&fit=crop&auto=format`}
               alt={image.file_name}
               onClick={() => handleImageClick(index)}
               loading="lazy"
               className="fade-in"
             /> */}
             <LazyImage
-              src={image.optimized_url}
+              src={image.secure_url}
               alt={image.file_name}
               className="fade-in"
               onClick={() => handleImageClick(index)}

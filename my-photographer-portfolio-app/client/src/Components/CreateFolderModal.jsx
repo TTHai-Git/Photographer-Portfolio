@@ -91,7 +91,7 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
             onChange={(e) => setFolderName(e.target.value)}
           />
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <div className="modal-actions">
             <button className="btn" onClick={onClose}>Hủy</button>
 
             <button className="btn btn-primary" onClick={handleCreateFolder} disabled={loadingCreate}>

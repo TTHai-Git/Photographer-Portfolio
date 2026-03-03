@@ -1,11 +1,11 @@
-import FolderOfCloudinary from "../models/folderModel.js";
-import ImageOfCloudinary from "../models/imageModel.js";
+import Folder from "../models/folderModel.js";
+import Asset from "../models/assetModel.js";
 import { getOrSetCachedData } from "./redisCloudControllers.js";
 
 export const createFolders = async (req, res) => {
   try {
     for (const folder of req.body.folders) {
-      await FolderOfCloudinary.create(folder);
+      await Folder.create(folder);
     }
     return res.status(200).json({ message: "Create Folders Successful" });
   } catch (error) {
@@ -17,7 +17,7 @@ export const createFolder = async (path) => {
   try {
     if (!path) return;
     // create Folder into DB
-    const newFolder = await FolderOfCloudinary.create({ path: path });
+    const newFolder = await Folder.create({ path: path });
 
     return { success: true };
   } catch (error) {
@@ -30,17 +30,17 @@ export const deleteFolders = async (folderDirs) => {
   try {
     for (const folderDir of folderDirs) {
       // 1. Lấy folder cần xoá
-      const folder = await FolderOfCloudinary.findOne({ path: folderDir });
+      const folder = await Folder.findOne({ path: folderDir });
 
       if (!folder) continue;
 
       // 2. Xoá toàn bộ ảnh thuộc folder
-      await ImageOfCloudinary.deleteMany({
-        folderOfCloudinary: folder._id,
+      await Asset.deleteMany({
+        folder: folder._id,
       });
 
       // 3. Xoá folder
-      await FolderOfCloudinary.findByIdAndDelete(folder._id);
+      await Folder.findByIdAndDelete(folder._id);
     }
 
     return { success: true };
@@ -74,12 +74,12 @@ export const getFolders = async (req, res) => {
         za: { path: -1 },
       }[sortKey] || { createdAt: -1 };
 
-      const folders = await FolderOfCloudinary.find(filter)
+      const folders = await Folder.find(filter)
         .sort(sortOption)
         .skip((page - 1) * limit)
         .limit(limit);
 
-      const totalItems = await FolderOfCloudinary.countDocuments(filter);
+      const totalItems = await Folder.countDocuments(filter);
 
       return {
         folders,

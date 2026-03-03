@@ -1,10 +1,10 @@
 import cloudinary from "../config/cloudinary.config.js";
 import getRedisClient from "../config/redisCloud.config.js";
 import { compressToWebp } from "../helpers/imageCompression.js";
-import FolderOfCloudinary from "../models/folderModel.js";
-import ImageOfCloudinary from "../models/imageModel.js";
+import Folder from "../models/folderModel.js";
+import Asset from "../models/assetModel.js";
 import { createFolder, deleteFolders } from "./folderController.js";
-import { createImages, deletedImages } from "./imageController.js";
+import { deletedImages } from "./imageController.js";
 import {
   clearCacheByKeyword,
   getOrSetCachedData,
@@ -40,7 +40,7 @@ import streamifier from "streamifier";
 
 //             return {
 //               public_id: img.public_id,
-//               optimized_url: optimizedUrl,
+//               secure_url: optimizedUrl,
 //             };
 //           });
 
@@ -150,23 +150,48 @@ import streamifier from "streamifier";
 //   }
 // };
 
-export const saveImages = async (req, res) => {
-  try {
-    const { images, folder } = req.body;
+export const saveAssets = async (req, res) => {
+  const { assets, folder } = req.body;
 
-    if (!images || !images.length) {
-      return res.status(400).json({ message: "No images!" });
+  if (!assets || !assets.length) {
+    return res.status(400).json({ message: "No assets!" });
+  }
+
+  try {
+    // Get folder ID
+    const folderDoc = await Folder.findOne({ path: folder }).select("_id");
+
+    if (!folderDoc) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Folder not found in DB" });
     }
 
-    const result = await createImages(images, folder);
+    // Insert images
+    for (const item of assets) {
+      await Asset.create({
+        public_id: item.public_id,
+        original_filename: item.original_filename,
+        secure_url: item.secure_url,
+        // secure_url: item.url,
+        resource_type: item.resource_type || "image",
+        bytes: item.bytes,
+        format: item.format,
+        folder: folderDoc._id,
+        videoMeta: item.videoMeta || null,
+      });
+    }
 
     return res.status(201).json({
       success: true,
       message: "Lưu DB thành công",
     });
-  } catch (err) {
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({
-      message: "Lỗi lưu DB",
+      success: false,
+      message: "Lưu DB thất bại",
+      error: error.message,
     });
   } finally {
     await getRedisClient.flushAll();
@@ -175,36 +200,64 @@ export const saveImages = async (req, res) => {
 
 export const handleDeleteImages = async (req, res) => {
   try {
-    // console.log("req.body", req.body);
-    const public_ids = req.body.public_ids;
+    const { public_ids } = req.body;
 
     if (!public_ids || public_ids.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Chưa cung cấp public_ids của các ảnh để xóa!" });
+      return res.status(400).json({
+        message: "Chưa cung cấp public_ids của các assets để xóa!",
+      });
     }
 
-    // Delete Images Onto Cloudinary
-    const result = await cloudinary.api.delete_resources(public_ids);
+    // 1️⃣ Lấy toàn bộ asset 1 lần
+    const assets = await Asset.find({
+      public_id: { $in: public_ids },
+    }).select("public_id resource_type");
 
-    // Delete Images Into DB
+    if (!assets.length) {
+      return res.status(404).json({
+        message: "Không tìm thấy asset nào!",
+      });
+    }
+
+    // 2️⃣ Group theo resource_type
+    const grouped = assets.reduce((acc, asset) => {
+      if (!acc[asset.resource_type]) {
+        acc[asset.resource_type] = [];
+      }
+      acc[asset.resource_type].push(asset.public_id);
+      return acc;
+    }, {});
+
+    const cloudinaryResults = {};
+
+    // 3️⃣ Delete theo từng resource_type
+    for (const [resource_type, ids] of Object.entries(grouped)) {
+      const result = await cloudinary.api.delete_resources(ids, {
+        resource_type,
+      });
+      cloudinaryResults[resource_type] = result;
+    }
+
+    // 4️⃣ Delete DB
     const resultsOfDB = await deletedImages(public_ids);
 
-    if (!resultsOfDB.success)
-      return resultsOfDB
-        .status(500)
-        .json({ message: "Xóa ảnh trong DB thất bại!" });
-
-    // clearCacheByKeyword(`GET:/v1/images?path=${selectedFolder}`);
-    await getRedisClient.flushAll();
+    if (!resultsOfDB.success) {
+      return res.status(500).json({
+        message: "Xóa assets trong DB thất bại!",
+      });
+    }
 
     return res.status(200).json({
-      message: "Xóa ảnh thành công.",
-      result,
+      message: "Xóa assets thành công.",
+      cloudinaryResults,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Xóa ảnh thất bại!" });
+    console.error(error);
+    return res.status(500).json({
+      message: "Xóa assets thất bại!",
+    });
+  } finally {
+    await getRedisClient.flushAll();
   }
 };
 
@@ -221,10 +274,18 @@ export const handleDeleteFolders = async (req, res) => {
 
     // delete folders onto Cloudinary
     for (const folderPrefix of folderDirs) {
-      const deleteRes =
-        await cloudinary.api.delete_resources_by_prefix(folderPrefix);
+      await Promise.all([
+        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
+          resource_type: "image",
+        }),
+        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
+          resource_type: "video",
+        }),
+        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
+          resource_type: "raw",
+        }),
+      ]);
 
-      // Optionally delete folder metadata:
       await cloudinary.api.delete_folder(folderPrefix).catch(() => {});
     }
 
@@ -237,7 +298,6 @@ export const handleDeleteFolders = async (req, res) => {
         .json({ message: "Xóa thư mục trong DB thất bại!" });
 
     // clearCacheByKeyword("GET:/v1/folders?");
-    await getRedisClient.flushAll();
 
     return res.status(200).json({
       message: "Xóa thư mục thành công.",
@@ -245,6 +305,8 @@ export const handleDeleteFolders = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Xóa thư mục thất bại!" });
+  } finally {
+    await getRedisClient.flushAll();
   }
 };
 
@@ -302,25 +364,6 @@ export const handleCreateFolder = async (req, res) => {
   }
 };
 
-export const handleMoveImage = async (oldPublicId, newFolder) => {
-  const fileName = oldPublicId.split("/").pop();
-  const newPublicId = `${newFolder}/${fileName}`;
-
-  try {
-    // 1. Move on Cloudinary
-    const result = await cloudinary.uploader.rename(oldPublicId, newPublicId);
-
-    return {
-      success: true,
-      oldPublicId,
-      newPublicId,
-      secure_url: result.secure_url,
-    };
-  } catch (err) {
-    return { success: false, oldPublicId, error: err.message };
-  }
-};
-
 export const handleMoveImages = async (req, res) => {
   try {
     const { oldPublicIds, newFolder } = req.body;
@@ -328,13 +371,26 @@ export const handleMoveImages = async (req, res) => {
     if (!oldPublicIds || !newFolder)
       return res.status(400).json({ message: "Bad request" });
 
-    // Move on Cloudinary
+    // 1️⃣ Lấy toàn bộ asset 1 lần
+    const assets = await Asset.find({
+      public_id: { $in: oldPublicIds },
+    }).select("public_id resource_type");
+
+    if (!assets.length) {
+      return res.status(404).json({
+        message: "Assets not found",
+      });
+    }
+
+    // 2️⃣ Move trên Cloudinary (song song)
     const moveResults = await Promise.all(
-      oldPublicIds.map((id) => handleMoveImage(id, newFolder)),
+      assets.map((asset) =>
+        handleMoveAsset(asset.public_id, newFolder, asset.resource_type),
+      ),
     );
 
-    // Update Database
-    const newFolderDoc = await FolderOfCloudinary.findOne({ path: newFolder });
+    // 3️⃣ Lấy folder mới
+    const newFolderDoc = await Folder.findOne({ path: newFolder });
 
     if (!newFolderDoc) {
       return res.status(404).json({
@@ -342,41 +398,62 @@ export const handleMoveImages = async (req, res) => {
       });
     }
 
-    // Loop through results and update DB
-    for (const item of moveResults) {
-      if (!item.success) continue;
-
-      await ImageOfCloudinary.findOneAndUpdate(
-        { public_id: item.oldPublicId },
-        {
-          public_id: item.newPublicId,
-          optimized_url: item.secure_url,
-          folderOfCloudinary: newFolderDoc._id,
+    // 4️⃣ Bulk update DB (tối ưu hơn loop)
+    const bulkOps = moveResults
+      .filter((item) => item.success)
+      .map((item) => ({
+        updateOne: {
+          filter: { public_id: item.oldPublicId },
+          update: {
+            public_id: item.newPublicId,
+            secure_url: item.secure_url,
+            folder: newFolderDoc._id,
+          },
         },
-      );
+      }));
+
+    if (bulkOps.length > 0) {
+      await Asset.bulkWrite(bulkOps);
     }
-
-    // Clear redis
-    const oldDir = oldPublicIds[0].substring(
-      0,
-      oldPublicIds[0].lastIndexOf("/"),
-    );
-
-    // clearCacheByKeyword(`GET:/v1/images?path=${oldDir}`);
-    // clearCacheByKeyword(`GET:/v1/images?path=${newFolder}`);
-
-    await getRedisClient.flushAll();
 
     const hasError = moveResults.some((r) => !r.success);
 
     return res.status(hasError ? 207 : 200).json({
       message: hasError
-        ? "Một số ảnh không thể di chuyển!"
-        : `Di chuyển toàn bộ ảnh sang thư mục ${newFolder} thành công!`,
+        ? "Một số file không thể di chuyển!"
+        : `Di chuyển toàn bộ file sang thư mục ${newFolder} thành công!`,
       results: moveResults,
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server has error" });
+  } finally {
+    await getRedisClient.flushAll();
+  }
+};
+
+const handleMoveAsset = async (oldPublicId, newFolder, resource_type) => {
+  const fileName = oldPublicId.split("/").pop();
+  const newPublicId = `${newFolder}/${fileName}`;
+
+  try {
+    const result = await cloudinary.uploader.rename(oldPublicId, newPublicId, {
+      resource_type, // 🔥 QUAN TRỌNG
+    });
+
+    return {
+      success: true,
+      oldPublicId,
+      newPublicId,
+      secure_url: result.secure_url,
+      resource_type,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      oldPublicId,
+      resource_type,
+      error: err.message,
+    };
   }
 };

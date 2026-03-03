@@ -14,8 +14,8 @@ const UploadVideoModal = ({folders, loadFoldersForCombobox, open, onClose, loadV
   const MAX_FILES = 3  // số lượng video tối đa
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // tối đa 100 MB
   const [loadingUpload, setLoadingUpload] = useState(false)
-  const [compressionProgress, setCompressionProgress] = useState(0) // 0-100%
-  const [currentCompressionFile, setCurrentCompressionFile] = useState("")
+  const [uploadProgress, setUploadProgress] = useState(0) // 0-100%
+  const [currentUploadFile, setCurrentUploadFile] = useState("")
   const {showNotification} = useNotification();
 
   const handleFiles = (fileList) => {
@@ -93,17 +93,17 @@ const handleUpload = async () => {
 
   try {
     setLoadingUpload(true);
-    setCompressionProgress(0);
+    setUploadProgress(0);
 
     const limit = pLimit(2); // upload tối đa 2 file cùng lúc
-    const uploadedVideos = [];
+    const uploadedAssets = [];
 
     const totalFiles = files.length;
 
     const tasks = files.map((file, index) =>
       limit(async () => {
-        setCurrentCompressionFile(`Đang tải: ${file.name}`);
-        setCompressionProgress((index / totalFiles) * 100);
+        setCurrentUploadFile(`Đang tải: ${file.name}`);
+        setUploadProgress((index / totalFiles) * 100);
 
         const formData = new FormData();
         formData.append("file", file);
@@ -120,12 +120,25 @@ const handleUpload = async () => {
         );
 
         const data = await res.json();
+        // console.log("data", data)
         if (!res.ok) throw new Error(data.error?.message);
 
-        uploadedVideos.push({
+        uploadedAssets.push({
           public_id: data.public_id,
+          original_filename: data.original_filename,
           secure_url: data.secure_url,
           resource_type: "video",
+          bytes: data.bytes,
+          format: data.format,
+          videoMeta: {
+            codec: data.video?.codec,
+            bit_rate: data.video?.bit_rate,
+            duration: data.video?.duration,
+            frame_rate: data.video?.frame_rate,
+            resolution: data.video?.width && data.video?.height ? `${data.video.width}x${data.video.height}` : undefined,
+            posterUrl: data.video?.poster_url,
+            playback_url: data.video?.playback_url,
+          }
         });
       })
     );
@@ -133,25 +146,25 @@ const handleUpload = async () => {
     await Promise.all(tasks);
 
     // 3️⃣ Gửi về backend chỉ metadata
-    await authApi.post(endpoints.saveImagesToDB, {
-      images: uploadedVideos,
+    await authApi.post(endpoints.saveAssetToDB, {
+      assets: uploadedAssets,
       folder: selectedFolder,
     });
 
-    console.log("✅ Upload thành công:", uploadedVideos);
+    console.log("✅ Upload thành công:", uploadedAssets);
 
-    setCompressionProgress(100);
+    setUploadProgress(100);
     showNotification("Tải video lên thành công!", "success");
 
     resetUploadState();
     await loadVideos();
   } catch (err) {
-    showNotification("Upload video thất bại: " + err.message, "error");
-    console.log("❌ Upload thất bại:", err.message);
+    showNotification(`Upload thất bại! ${err}`, "error");
+    console.log(err)
   } finally {
     setLoadingUpload(false);
-    setCompressionProgress(0);
-    setCurrentCompressionFile("");
+    setUploadProgress(0);
+    setCurrentUploadFile("");
     onClose();
   }
 };
@@ -253,21 +266,21 @@ if (!open) return null
                 <div className="loading-overlay">
                   <div className="spinner"></div>
                   <p>
-                    {compressionProgress < 50
-                      ? `Đang nén video: ${currentCompressionFile}`
-                      : `Đang tải video lên: ${currentCompressionFile}`}
+                    {uploadProgress < 50
+                      ? `Đang nén video: ${currentUploadFile}`
+                      : `Đang tải video lên: ${currentUploadFile}`}
                   </p>
                   <div style={{ marginTop: "10px", backgroundColor: "#e0e0e0", borderRadius: "5px", overflow: "hidden", width: "200px", height: "10px" }}>
                     <div
                       style={{
                         backgroundColor: "#4CAF50",
                         height: "100%",
-                        width: `${compressionProgress}%`,
+                        width: `${uploadProgress}%`,
                         transition: "width 0.3s ease",
                       }}
                     ></div>
                   </div>
-                  <p style={{ marginTop: "5px", fontSize: "12px" }}>{Math.round(compressionProgress)}%</p>
+                  <p style={{ marginTop: "5px", fontSize: "12px" }}>{Math.round(uploadProgress)}%</p>
                 </div>
               )}
               {/* Upload Button */}

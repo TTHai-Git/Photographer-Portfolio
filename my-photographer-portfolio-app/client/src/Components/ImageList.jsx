@@ -47,7 +47,7 @@ export default function ImageList({
       const folderName = parts[parts.length - 2];
       
       return {
-        src: image.optimized_url,
+        src: image.secure_url,
         title: folderName,
       };
     });
@@ -168,10 +168,10 @@ export default function ImageList({
             {img.resource_type === "video" ? (
               <VideoCard key={img.public_id} video={img} />
             ) : (
-              // <img src={img.optimized_url} alt="" />
+              // <img src={img.secure_url} alt="" />
               <ImageListItem key={img.public_id}>
                  <LazyImage
-                    src={img.optimized_url}
+                    src={img.secure_url}
                     alt={img.file_name}
                     className="fade-in"
                     onClick={() => handleImageClick(index)}

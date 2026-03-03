@@ -15,6 +15,8 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
   const MAX_FILES = 10  // số lượng ảnh tối đa
   const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // tối đa 100 MB
   const [loadingUpload, setLoadingUpload] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0) // 0-100%
+  const [currentUploadFile, setCurrentUploadFile] = useState("")
   const {showNotification} = useNotification()
   const { compressImage } = useImageCompressor();
 
@@ -119,12 +121,17 @@ const handleUpload = async () => {
 
   try {
     setLoadingUpload(true);
+    setUploadProgress(0);
 
     const limit = pLimit(3); // chỉ upload 3 ảnh cùng lúc
-    const uploadedImages = [];
+    const uploadedAssets = [];
 
-    const tasks = files.map((file) =>
+    const tasks = files.map((file, index) =>
       limit(async () => {
+
+        setCurrentUploadFile(`Đang tải: ${file.name}`);
+        setUploadProgress((index / files.length) * 100);
+
         // 🔥 Compress in Worker
         const compressed = await compressImage(file, {
           maxBytes: 10 * 1024 * 1024,
@@ -145,12 +152,17 @@ const handleUpload = async () => {
         );
 
         const data = await res.json();
+        // console.log("data", data)
         if (!res.ok) throw new Error(data.error?.message);
 
-        uploadedImages.push({
+        uploadedAssets.push({
           public_id: data.public_id,
+          original_filename: data.original_filename,
           secure_url: data.secure_url,
           resource_type: "image",
+          bytes: data.bytes,
+          format: data.format,
+          videoMeta: null,
         });
       })
     );
@@ -158,8 +170,8 @@ const handleUpload = async () => {
     await Promise.all(tasks);
 
     // 3️⃣ Gửi về backend chỉ metadata
-    await authApi.post(endpoints.saveImagesToDB, {
-      images: uploadedImages,
+    await authApi.post(endpoints.saveAssetToDB, {
+      assets: uploadedAssets,
       folder: selectedFolder,
     });
 
@@ -167,9 +179,12 @@ const handleUpload = async () => {
     resetUploadState();
     await loadImages();
   } catch (err) {
-    showNotification("Upload thất bại!", "error");
+    showNotification(`Upload thất bại! ${err}`, "error");
+    console.log(err)
   } finally {
     setLoadingUpload(false);
+    setUploadProgress(0);
+    setCurrentUploadFile("");
     onClose();
   }
 };
@@ -270,7 +285,22 @@ if (!open) return null
               {loadingUpload && (
                 <div className="loading-overlay">
                   <div className="spinner"></div>
-                  <p>Đang tải ảnh lên...</p>
+                  <p>
+                    {uploadProgress < 50
+                      ? `Đang nén ảnh: ${currentUploadFile}`
+                      : `Đang tải ảnh lên: ${currentUploadFile}`}
+                  </p>
+                  <div style={{ marginTop: "10px", backgroundColor: "#e0e0e0", borderRadius: "5px", overflow: "hidden", width: "200px", height: "10px" }}>
+                    <div
+                      style={{
+                        backgroundColor: "#4CAF50",
+                        height: "100%",
+                        width: `${uploadProgress}%`,
+                        transition: "width 0.3s ease",
+                      }}
+                    ></div>
+                  </div>
+                  <p style={{ marginTop: "5px", fontSize: "12px" }}>{Math.round(uploadProgress)}%</p>
                 </div>
               )}
               {/* Upload Button */}

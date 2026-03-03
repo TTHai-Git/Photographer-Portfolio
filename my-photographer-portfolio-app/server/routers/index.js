@@ -6,6 +6,7 @@ import authRouters from "./authRouter.js";
 import folderRouters from "./folderRouter.js";
 import imageRouters from "./imageRouter.js";
 import roleRouters from "./roleRouter.js";
+import testRouters from "./testRouter.js";
 const routers = express.Router();
 
 routers.use("/", baseRoutes);
@@ -15,5 +16,6 @@ routers.use("/v1/auth", authRouters);
 routers.use("/v1/folders", folderRouters);
 routers.use("/v1/images", imageRouters);
 routers.use("/v1/roles", roleRouters);
+routers.use("/v1/tests", testRouters);
 
 export default routers;

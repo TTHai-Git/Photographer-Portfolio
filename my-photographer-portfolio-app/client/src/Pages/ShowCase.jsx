@@ -37,7 +37,7 @@ export const ShowCase = () => {
       const folderName = parts[parts.length - 2];
 
       return {
-        src: img.optimized_url,
+        src: img.secure_url,
         title: folderName,
       };
     });
@@ -62,13 +62,13 @@ export const ShowCase = () => {
           ) : (
             <>
               {mainPhotoList.filter(f =>
-                f.folderOfCloudinary.path.startsWith("Hoang-Truc-Photographer-Portfolio/SHOW CASE/")
+                f.Folder.path.startsWith("Hoang-Truc-Photographer-Portfolio/SHOW CASE/")
               ).map(folder => (
                 <li
-                  key={folder.folderOfCloudinary._id}
-                  onClick={() => scrollToElement(folder.folderOfCloudinary._id)}
+                  key={folder.Folder._id}
+                  onClick={() => scrollToElement(folder.Folder._id)}
                 >
-                  <span>{handleGetFolderName(folder.folderOfCloudinary.path)}</span>
+                  <span>{handleGetFolderName(folder.Folder.path)}</span>
                 </li>
               ))}
             </>
@@ -86,15 +86,15 @@ export const ShowCase = () => {
           <>
             {mainPhotoList?.map((image) => {
               return (
-                <div key={image._id} id={image.folderOfCloudinary._id} className="showcase-card fade-in" >
+                <div key={image._id} id={image.folder._id} className="showcase-card fade-in" >
                   {/* <p className="showcase-caption">{image.caption}</p> */}
                   <ShowCaseItem
                     key={image._id}
-                    src={image.optimized_url}
+                    src={image.secure_url}
                     alt={image.public_id}
-                    folderName={handleGetFolderName(image.folderOfCloudinary.path)}
+                    folderName={handleGetFolderName(image.folder.path)}
                     className="showcase-image"
-                    onClick={() => handleImageClick(image.folderOfCloudinary.path,0)}
+                    onClick={() => handleImageClick(image.folder.path,0)}
                   />
                 </div>
               )

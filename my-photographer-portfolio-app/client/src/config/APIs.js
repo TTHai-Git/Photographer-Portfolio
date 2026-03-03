@@ -15,7 +15,7 @@ export const endpoints = {
   logout: "/auth/logout",
   getMe: "/auth/me",
   refreshToken: "/auth/refresh-token",
-  saveImagesToDB: "/cloudinaries/save",
+  saveAssetToDB: "/cloudinaries/save",
 };
 
 export const authApi = axios.create({

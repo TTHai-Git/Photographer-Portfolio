@@ -6,7 +6,7 @@ import {
   handleDeleteFolders,
   handleDeleteImages,
   handleMoveImages,
-  saveImages,
+  saveAssets,
   // uploadImagesOnToCloudinary,
 } from "../controllers/cloudinaryController.js";
 // import { upload } from "../middlewares/multerHandle.js";
@@ -53,7 +53,7 @@ cloudinaryRouters.post(
     blockSeconds: 600,
   }),
   // upload.array("images", 20),
-  saveImages,
+  saveAssets,
 );
 
 cloudinaryRouters.delete(

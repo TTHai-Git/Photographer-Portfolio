@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-const FolderOfCloudinarySchema = new Schema(
+const FolderSchema = new Schema(
   {
     path: {
       type: String,
@@ -8,7 +8,7 @@ const FolderOfCloudinarySchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
-const FolderOfCloudinary = model("Folder", FolderOfCloudinarySchema);
-export default FolderOfCloudinary;
+const Folder = model("Folder", FolderSchema);
+export default Folder;

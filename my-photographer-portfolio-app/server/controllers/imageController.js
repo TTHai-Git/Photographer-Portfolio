@@ -1,5 +1,5 @@
-import FolderOfCloudinary from "../models/folderModel.js";
-import ImageOfCloudinary from "../models/imageModel.js";
+import Folder from "../models/folderModel.js";
+import Asset from "../models/assetModel.js";
 import { getOrSetCachedData } from "./redisCloudControllers.js";
 
 export const getEachImageOfEachFolder = async (req, res) => {
@@ -21,14 +21,14 @@ export const getEachImageOfEachFolder = async (req, res) => {
       // ==========================
       // ĐẾM TẤT CẢ FOLDER
       // ==========================
-      const totalFolders = await FolderOfCloudinary.countDocuments({
+      const totalFolders = await Folder.countDocuments({
         path: { $regex: `^${path}` },
       });
 
       // ==========================
       // LẤY FOLDER THEO TRANG
       // ==========================
-      const folders = await FolderOfCloudinary.find({
+      const folders = await Folder.find({
         path: { $regex: `^${path}` },
       })
         .skip((page - 1) * limit)
@@ -41,11 +41,11 @@ export const getEachImageOfEachFolder = async (req, res) => {
       // LẤY ẢNH ĐẠI DIỆN CHO MỖI FOLDER
       // ==========================
       for (const folder of folders) {
-        const image = await ImageOfCloudinary.findOne({
-          folderOfCloudinary: folder._id,
+        const image = await Asset.findOne({
+          folder: folder._id,
         })
           .sort(sortOption)
-          .populate("folderOfCloudinary");
+          .populate("folder");
 
         result.push(image);
       }
@@ -65,38 +65,9 @@ export const getEachImageOfEachFolder = async (req, res) => {
   }
 };
 
-export const createImages = async (data, folder) => {
-  try {
-    // Get folder ID
-    const folderDoc = await FolderOfCloudinary.findOne({ path: folder }).select(
-      "_id",
-    );
-
-    if (!folderDoc) {
-      return { success: false, message: "Folder not found in DB" };
-    }
-
-    // Insert images
-    for (const item of data) {
-      await ImageOfCloudinary.create({
-        public_id: item.public_id,
-        optimized_url: item.secure_url,
-        // optimized_url: item.url,
-        resource_type: item.resource_type || "image",
-        folderOfCloudinary: folderDoc._id,
-      });
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.log(error);
-    return { success: false, error };
-  }
-};
-
 export const deletedImages = async (public_ids) => {
   try {
-    await ImageOfCloudinary.deleteMany({ public_id: { $in: public_ids } });
+    await Asset.deleteMany({ public_id: { $in: public_ids } });
     return { success: true };
   } catch (error) {
     console.log(error);
@@ -118,7 +89,7 @@ export const getImages = async (req, res) => {
     const cacheKey = `GET:/v1/images?page=${page}&limit=${limit}&sort=${sortKey}&path=${path}`;
 
     const data = await getOrSetCachedData(cacheKey, async () => {
-      const folder = await FolderOfCloudinary.findOne({ path }).select("_id");
+      const folder = await Folder.findOne({ path }).select("_id");
       if (!folder) return null; // không return res.json() ở đây
 
       const sortOption = {
@@ -128,15 +99,15 @@ export const getImages = async (req, res) => {
         za: { public_id: -1 },
       }[sortKey] || { createdAt: -1 };
 
-      const images = await ImageOfCloudinary.find({
-        folderOfCloudinary: folder._id,
+      const images = await Asset.find({
+        folder: folder._id,
       })
         .sort(sortOption)
         .skip((page - 1) * limit)
         .limit(limit);
 
-      const totalItems = await ImageOfCloudinary.countDocuments({
-        folderOfCloudinary: folder._id,
+      const totalItems = await Asset.countDocuments({
+        folder: folder._id,
       });
 
       return {
@@ -157,32 +128,3 @@ export const getImages = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-// export const AddFieldsToImage = async (req, res) => {
-//   try {
-//     const result = await ImageOfCloudinary.updateMany(
-//       {},
-//       [
-//         {
-//           $set: {
-//             resource_type: {
-//               $cond: {
-//                 if: { $regexMatch: { input: "$optimized_url", regex: /\.mp4$/i } },
-//                 then: "video",
-//                 else: "image",
-//               },
-//             },
-//           },
-//         },
-//       ],
-//       { updatePipeline: true }, // 👈 QUAN TRỌNG
-//     );
-
-//     return res.status(200).json({
-//       message: "resource_type updated successfully",
-//       modifiedCount: result.modifiedCount,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
