@@ -106,7 +106,7 @@ export default function ImageList({
               setOpenMove(true);
             }
           }}>
-            + Di chuyển ảnh ({oldPublicIds.length})
+            + Di chuyển ảnh/video ({oldPublicIds.length})
           </button>
 
           {images.length > 0 && (

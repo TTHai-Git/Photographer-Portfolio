@@ -16,7 +16,7 @@ export const useImageCompressor = () => {
     workerRef.current.onmessage = (e) => {
       const { requestId, success, blob, error } = e.data;
 
-      console.log("Got response from worker:", requestId);
+      // console.log("Got response from worker:", requestId);
 
       const callback = callbacks.current[requestId];
       if (!callback) return;
@@ -32,7 +32,7 @@ export const useImageCompressor = () => {
 
     // 🔥 CLEANUP — khi component unmount
     return () => {
-      console.log("Terminating worker...");
+      // console.log("Terminating worker...");
       workerRef.current?.terminate();
       workerRef.current = null;
       callbacks.current = {};
@@ -42,7 +42,7 @@ export const useImageCompressor = () => {
   const compressImage = (file, options = {}) => {
     return new Promise((resolve, reject) => {
       const requestId = requestCounter++;
-      console.log("Posting to worker:", requestId);
+      // console.log("Posting to worker:", requestId);
 
       callbacks.current[requestId] = { resolve, reject };
 

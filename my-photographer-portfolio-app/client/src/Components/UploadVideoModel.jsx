@@ -129,15 +129,17 @@ const handleUpload = async () => {
           secure_url: data.secure_url,
           resource_type: "video",
           bytes: data.bytes,
+          width: data.width,
+          height: data.height,
           format: data.format,
           videoMeta: {
             codec: data.video?.codec,
-            bit_rate: data.video?.bit_rate,
-            duration: data.video?.duration,
-            frame_rate: data.video?.frame_rate,
-            resolution: data.video?.width && data.video?.height ? `${data.video.width}x${data.video.height}` : undefined,
-            posterUrl: data.video?.poster_url,
-            playback_url: data.video?.playback_url,
+            bit_rate: data?.bit_rate,
+            duration: data?.duration,
+            frame_rate: data?.frame_rate,
+            resolution: data?.width && data?.height ? `${data.width}x${data.height}` : "1920x1080",
+            // posterUrl: data?.poster_url,
+            playback_url: data?.playback_url,
           }
         });
       })
@@ -151,7 +153,7 @@ const handleUpload = async () => {
       folder: selectedFolder,
     });
 
-    console.log("✅ Upload thành công:", uploadedAssets);
+    // console.log("✅ Upload thành công:", uploadedAssets);
 
     setUploadProgress(100);
     showNotification("Tải video lên thành công!", "success");

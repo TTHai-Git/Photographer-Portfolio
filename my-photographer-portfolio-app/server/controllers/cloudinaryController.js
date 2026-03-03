@@ -153,6 +153,8 @@ import streamifier from "streamifier";
 export const saveAssets = async (req, res) => {
   const { assets, folder } = req.body;
 
+  console.log("Received assets to save:", assets);
+
   if (!assets || !assets.length) {
     return res.status(400).json({ message: "No assets!" });
   }
@@ -177,6 +179,7 @@ export const saveAssets = async (req, res) => {
         resource_type: item.resource_type || "image",
         bytes: item.bytes,
         format: item.format,
+        resolution: item.resolution || "1920x1080",
         folder: folderDoc._id,
         videoMeta: item.videoMeta || null,
       });

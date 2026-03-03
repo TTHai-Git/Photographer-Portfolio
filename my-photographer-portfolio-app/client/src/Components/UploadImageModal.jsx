@@ -161,6 +161,8 @@ const handleUpload = async () => {
           secure_url: data.secure_url,
           resource_type: "image",
           bytes: data.bytes,
+          width: data.width,
+          height: data.height,
           format: data.format,
           videoMeta: null,
         });
@@ -168,7 +170,7 @@ const handleUpload = async () => {
     );
 
     await Promise.all(tasks);
-
+     // console.log("All uploads completed", uploadedAssets);
     // 3️⃣ Gửi về backend chỉ metadata
     await authApi.post(endpoints.saveAssetToDB, {
       assets: uploadedAssets,
