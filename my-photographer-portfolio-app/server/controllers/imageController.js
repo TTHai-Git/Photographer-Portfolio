@@ -118,6 +118,8 @@ export const getImages = async (req, res) => {
       };
     });
 
+    // console.log("❇️ getImages data:", data);
+
     if (!data) {
       return res.status(404).json({ message: "Folder not found" });
     }

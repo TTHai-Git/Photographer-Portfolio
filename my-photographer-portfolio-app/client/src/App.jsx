@@ -34,10 +34,10 @@ function App() {
           path: "portrait",
           element: <Portrait/>
         },
-        // {
-        //   path: "animation",
-        //   element: <VideoGallery />,      
-        // },
+        {
+          path: "animation",
+          element: <VideoGallery />,      
+        },
         {
           path: "about",
           element: <About />

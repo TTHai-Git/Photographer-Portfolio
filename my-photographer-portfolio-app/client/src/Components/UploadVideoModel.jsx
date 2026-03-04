@@ -18,8 +18,44 @@ const UploadVideoModal = ({folders, loadFoldersForCombobox, open, onClose, loadV
   const [currentUploadFile, setCurrentUploadFile] = useState("")
   const {showNotification} = useNotification();
 
+  // Các định dạng video được hỗ trợ
+  const SUPPORTED_FORMATS = {
+    mp4: { ext: '.mp4', mime: 'video/mp4', codec: 'h264', bitrate: 'auto' },
+    webm: { ext: '.webm', mime: 'video/webm', codec: 'vp8/vp9', bitrate: 'auto' },
+    ogv: { ext: '.ogv', mime: 'video/ogg', codec: 'theora', bitrate: 'auto' },
+    mov: { ext: '.mov', mime: 'video/quicktime', codec: 'h264', bitrate: 'auto' },
+    avi: { ext: '.avi', mime: 'video/x-msvideo', codec: 'mpeg4', bitrate: 'auto' },
+    mkv: { ext: '.mkv', mime: 'video/x-matroska', codec: 'h264', bitrate: 'auto' },
+    flv: { ext: '.flv', mime: 'video/x-flv', codec: 'h264', bitrate: 'auto' },
+    wmv: { ext: '.wmv', mime: 'video/x-ms-wmv', codec: 'mpeg4', bitrate: 'auto' },
+    m4v: { ext: '.m4v', mime: 'video/x-m4v', codec: 'h264', bitrate: 'auto' },
+    m3u8: { ext: '.m3u8', mime: 'application/x-mpegURL', codec: 'h264', bitrate: 'auto' },
+    ts: { ext: '.ts', mime: 'video/mp2t', codec: 'h264', bitrate: 'auto' },
+    mts: { ext: '.mts', mime: 'video/mp2t', codec: 'h264', bitrate: 'auto' },
+  };
+
+  // Hàm kiểm tra và lấy thông tin định dạng video
+  const getVideoFormat = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    return SUPPORTED_FORMATS[ext] || null;
+  };
+
+  // Hàm kiểm tra file video hợp lệ
+  const isValidVideoFile = (file) => {
+    const format = getVideoFormat(file.name);
+    return format !== null;
+  };
+
   const handleFiles = (fileList) => {
     const arr = Array.from(fileList);
+
+    // Kiểm tra định dạng video hợp lệ
+    const invalidFiles = arr.filter(file => !isValidVideoFile(file));
+    if (invalidFiles.length > 0) {
+      const invalidNames = invalidFiles.map(f => f.name).join(', ');
+      showNotification(`Định dạng video không được hỗ trợ: ${invalidNames}`, "warning");
+      return;
+    }
 
     // Tính tổng dung lượng video mới
     const newTotalSize = arr.reduce((sum, file) => sum + file.size, 0);
@@ -105,11 +141,17 @@ const handleUpload = async () => {
         setCurrentUploadFile(`Đang tải: ${file.name}`);
         setUploadProgress((index / totalFiles) * 100);
 
+        const videoFormat = getVideoFormat(file.name);
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", UPLOAD_PRESET);
         formData.append("folder", selectedFolder);
-        // formData.append("resource_type", "video");
+        
+        // Tối ưu hóa Cloudinary cho chất lượng tốt nhưng file nhẹ
+        formData.append("quality", "auto"); // Tự động điều chỉnh chất lượng
+        formData.append("bit_rate", "auto"); // Tối ưu hóa bit rate tự động
+        formData.append("video_codec", "h264"); // Sử dụng codec tốt nhất
+        formData.append("audio_codec", "aac"); // Codec âm thanh tối ưu
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
@@ -132,6 +174,7 @@ const handleUpload = async () => {
           width: data.width,
           height: data.height,
           format: data.format,
+          original_format: videoFormat?.ext?.replace('.', ''),
           videoMeta: {
             codec: data.video?.codec,
             bit_rate: data?.bit_rate,
@@ -225,9 +268,10 @@ if (!open) return null
                 onDrop={handleDrop}
               >
                 <p>Kéo thả video vào đây hoặc nhấn nút chọn video để tải video lên (Lưu ý: Tổng dung lượng tối đa là 100 MB và tổng số lượng video tối đa là 3 video cho một lần tải lên)</p>
+                <p style={{ fontSize: '12px', color: '#666' }}>Định dạng hỗ trợ: MP4, WebM, OGV, MOV, AVI, MKV, FLV, WMV, M4V</p>
                 <label className="file-label">
                   Chọn video
-                  <input type="file" multiple accept="video/*" onChange={handleChange} />
+                  <input type="file" multiple accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo,video/x-matroska,video/x-flv,video/x-ms-wmv,video/x-m4v,.mp4,.webm,.ogv,.mov,.avi,.mkv,.flv,.wmv,.m4v" onChange={handleChange} />
                 </label>
               </div>
 
@@ -243,24 +287,32 @@ if (!open) return null
               {/* Preview videos */}
               {previews.length > 0 && (
                 <div className="preview-grid">
-                  {previews.map((src, idx) => (
-                    <div key={idx} className="preview-wrapper">
-                      <video src={src} className="preview-img" controls />
-                      <div className="preview-info">
-                        <span className="file-name">{files[idx].name}</span>
-                        <span className="file-size">
-                          {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
-                        </span>
+                  {previews.map((src, idx) => {
+                    const format = getVideoFormat(files[idx].name);
+                    return (
+                      <div key={idx} className="preview-wrapper">
+                        <video src={src} className="preview-img" controls />
+                        <div className="preview-info">
+                          <span className="file-name">{files[idx].name}</span>
+                          <span className="file-size">
+                            {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
+                          </span>
+                          {format && (
+                            <span style={{ fontSize: '11px', color: '#0066cc', marginTop: '4px', display: 'block' }}>
+                              Định dạng: {format.ext.toUpperCase()} ({format.codec})
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          className="remove-btn"
+                          onClick={() => handleRemoveVideo(idx)}
+                        >
+                          ×
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className="remove-btn"
-                        onClick={() => handleRemoveVideo(idx)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

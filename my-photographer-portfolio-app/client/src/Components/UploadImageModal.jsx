@@ -20,8 +20,42 @@ const UploadImageModal = ({folders, loadFoldersForCombobox, open, onClose, loadI
   const {showNotification} = useNotification()
   const { compressImage } = useImageCompressor();
 
+  // Các định dạng ảnh được hỗ trợ
+  const SUPPORTED_FORMATS = {
+    jpg: { ext: '.jpg', mime: 'image/jpeg', optimized: 'webp', description: 'JPEG - Tương thích tốt' },
+    jpeg: { ext: '.jpeg', mime: 'image/jpeg', optimized: 'webp', description: 'JPEG - Tương thích tốt' },
+    png: { ext: '.png', mime: 'image/png', optimized: 'webp', description: 'PNG - Có alpha channel' },
+    webp: { ext: '.webp', mime: 'image/webp', optimized: 'webp', description: 'WebP - Tối ưu nhất' },
+    avif: { ext: '.avif', mime: 'image/avif', optimized: 'avif', description: 'AVIF - Hiện đại nhất' },
+    gif: { ext: '.gif', mime: 'image/gif', optimized: 'webp', description: 'GIF - Ảnh động' },
+    tiff: { ext: '.tiff', mime: 'image/tiff', optimized: 'webp', description: 'TIFF - Chất lượng cao' },
+    bmp: { ext: '.bmp', mime: 'image/bmp', optimized: 'webp', description: 'BMP - Định dạng cũ' },
+    ico: { ext: '.ico', mime: 'image/x-icon', optimized: 'webp', description: 'ICO - Icon' },
+    svg: { ext: '.svg', mime: 'image/svg+xml', optimized: 'svg', description: 'SVG - Vector' },
+  };
+
+  // Hàm kiểm tra và lấy thông tin định dạng ảnh
+  const getImageFormat = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    return SUPPORTED_FORMATS[ext] || null;
+  };
+
+  // Hàm kiểm tra file ảnh hợp lệ
+  const isValidImageFile = (file) => {
+    const format = getImageFormat(file.name);
+    return format !== null;
+  };
+
   const handleFiles = (fileList) => {
     const arr = Array.from(fileList);
+
+    // Kiểm tra định dạng ảnh hợp lệ
+    const invalidFiles = arr.filter(file => !isValidImageFile(file));
+    if (invalidFiles.length > 0) {
+      const invalidNames = invalidFiles.map(f => f.name).join(', ');
+      showNotification(`Định dạng ảnh không được hỗ trợ: ${invalidNames}`, "warning");
+      return;
+    }
 
     // Tính tổng dung lượng ảnh mới
     const newTotalSize = arr.reduce((sum, file) => sum + file.size, 0);
@@ -86,36 +120,6 @@ const handleUpload = async () => {
   if (files.length > MAX_FILES) return showNotification(`Bạn chỉ được chọn tối đa ${MAX_FILES} ảnh!`, "warning");
   if (totalSize > MAX_TOTAL_SIZE) return showNotification("Tổng dung lượng ảnh vượt quá 100MB!", "warning");
 
-  // try {
-  //   setLoadingUpload(true);
-
-  //   const formData = new FormData();
-  //   files.forEach((file) => formData.append("images", file));
-  //   formData.append("folder", selectedFolder);
-
-  //   const res = await authApi.post(endpoints.upload, formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-
-  //   if (res.status === 201) {
-  //     showNotification(res.data.message, "success");
-
-  //     // Reset UI
-  //     resetUploadState();
-
-  //     // ⬅️ ONLY HERE: Load images ONCE
-  //     await loadImages();
-  //   }
-    
-
-  // } catch (err) {
-  //   showNotification(err.response?.data?.message, "error");
-
-  // } finally {
-  //   setLoadingUpload(false);
-  //   onClose(); // đóng modal
-  // }
-
   const CLOUD_NAME = process.env.REACT_APP_CLOUD_NAME;
   const UPLOAD_PRESET = process.env.REACT_APP_UPLOAD_PRESET;
 
@@ -138,10 +142,15 @@ const handleUpload = async () => {
           maxWidthOrHeight: 2560,
         });
 
+        const imageFormat = getImageFormat(file.name);
         const formData = new FormData();
         formData.append("file", compressed);
         formData.append("upload_preset", UPLOAD_PRESET);
         formData.append("folder", selectedFolder);
+        
+        // Tối ưu hóa Cloudinary cho ảnh - Chất lượng tốt nhưng file nhẹ
+        formData.append("quality", "auto"); // Tự động điều chỉnh chất lượng
+        formData.append("fetch_format", "auto"); // Auto convert to WebP/AVIF nếu browser hỗ trợ
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
@@ -164,6 +173,7 @@ const handleUpload = async () => {
           width: data.width,
           height: data.height,
           format: data.format,
+          original_format: imageFormat?.ext?.replace('.', ''),
           videoMeta: null,
         });
       })
@@ -245,9 +255,10 @@ if (!open) return null
                 onDrop={handleDrop}
               >
                 <p>Kéo thả ảnh vào đây hoặc nhấn nút chọn ảnh để tải ảnh lên (Lưu ý: Tổng dung lượng tối đa là 100 MB (sau khi nén ảnh) và tổng số lượng ảnh tối đa là 10 ảnh cho một lần tải lên)</p>
+                <p style={{ fontSize: '12px', color: '#666' }}>Định dạng hỗ trợ: JPG, PNG, WebP, AVIF, GIF, TIFF, BMP, ICO, SVG</p>
                 <label className="file-label">
                   Chọn ảnh
-                  <input type="file" multiple accept="image/*" onChange={handleChange} />
+                  <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/tiff,image/bmp,image/x-icon,image/svg+xml,.jpg,.jpeg,.png,.webp,.avif,.gif,.tiff,.tif,.bmp,.ico,.svg" onChange={handleChange} />
                 </label>
               </div>
 
@@ -263,24 +274,32 @@ if (!open) return null
               {/* Preview images */}
               {previews.length > 0 && (
                 <div className="preview-grid">
-                  {previews.map((src, idx) => (
-                    <div key={idx} className="preview-wrapper">
-                      <img src={src} className="preview-img" alt="preview" />
-                      <div className="preview-info">
-                        <span className="file-name">{files[idx].name}</span>
-                        <span className="file-size">
-                          {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
-                        </span>
+                  {previews.map((src, idx) => {
+                    const format = getImageFormat(files[idx].name);
+                    return (
+                      <div key={idx} className="preview-wrapper">
+                        <img src={src} className="preview-img" alt="preview" />
+                        <div className="preview-info">
+                          <span className="file-name">{files[idx].name}</span>
+                          <span className="file-size">
+                            {(files[idx].size / (1024 * 1024)).toFixed(2)} MB
+                          </span>
+                          {format && (
+                            <span style={{ fontSize: '11px', color: '#0066cc', marginTop: '4px', display: 'block' }}>
+                              Định dạng: {format.ext.toUpperCase()} → {format.optimized.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          className="remove-btn"
+                          onClick={() => handleRemoveImage(idx)}
+                        >
+                          ×
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className="remove-btn"
-                        onClick={() => handleRemoveImage(idx)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

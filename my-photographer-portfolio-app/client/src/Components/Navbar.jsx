@@ -32,7 +32,7 @@ export const Navbar = () => {
           <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
           <NavLink to="/my-project" onClick={closeMenu}>My Project</NavLink>
           <NavLink to="/portrait" onClick={closeMenu}>Portrait</NavLink>
-          {/* <NavLink to="/animation" onClick={closeMenu}>Animation (Demo)</NavLink> */}
+          <NavLink to="/animation" onClick={closeMenu}>Animation (Demo)</NavLink>
           <NavLink to="/about" onClick={closeMenu}>About</NavLink>
           {/* <NavLink to="/dashboard" onClick={closeMenu}>Dashboard</NavLink> */}
           {user ? (

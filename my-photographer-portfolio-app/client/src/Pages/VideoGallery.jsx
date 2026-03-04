@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import LightGallery from "lightgallery/react";
 
 import lgVideo from "lightgallery/plugins/video";
@@ -13,131 +13,108 @@ import "lightgallery/css/lg-fullscreen.css";
 import "lightgallery/css/lg-pager.css";
 
 import "../Assets/CSS/VideoGallery.css";
+import { useImages } from "../hooks/loadImages";
+import SortBar from "../Components/SortBar";
+import Pagination from "../Components/Pagination";
 
 export default function VideoGallery() {
   const lgRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("latest");
+  const { images, totalPages, loading, } = useImages(
+    page, 
+    4, 
+    "Hoang-Truc-Photographer-Portfolio/Animation",
+    sort, 
+    );
+  const [videos, setVideos] = useState([])
 
-  const videos = [
-  {
-    poster:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
+  const getVideoFormats = (url, format) => {
+    // Map of supported video formats to MIME types
+    const formatMap = {
+      mp4: "video/mp4",
+      webm: "video/webm",
+      ogv: "video/ogg",
+      mov: "video/quicktime",
+      avi: "video/x-msvideo",
+      mkv: "video/x-matroska",
+      flv: "video/x-flv",
+      wmv: "video/x-ms-wmv",
+      m4v: "video/x-m4v",
+    };
 
-    thumb:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
+    // Get the original format from the URL
+    const fileFormat = format?.toLowerCase() || url.split(".").pop().toLowerCase();
+    const mimeType = formatMap[fileFormat] || "video/mp4";
 
-    video: {
-      source: [
-        {
-          src: "https://res.cloudinary.com/dh5jcbzly/video/upload/v1772114756/Hoang-Truc-Photographer-Portfolio/demo/98886-650523191_cwyq0y.mp4",
-          type: "video/mp4",
+    // Return multiple format sources for better browser compatibility
+    const sources = [
+      {
+        src: url,
+        type: mimeType,
+      }
+    ];
+
+    // Add WebM version if available and original is not WebM
+    if (fileFormat !== "webm") {
+      sources.push({
+        src: url.replace(/\.\w+$/, ".webm"),
+        type: "video/webm",
+      });
+    }
+
+    // Add MP4 fallback if original is not MP4
+    if (fileFormat !== "mp4") {
+      sources.push({
+        src: url.replace(/\.\w+$/, ".mp4"),
+        type: "video/mp4",
+      });
+    }
+
+    return sources;
+  };
+
+  const loadVideos = () => {
+    const videosData = images.filter(img => img.resource_type === "video").map(video => {
+      
+      return {
+        poster: video.secure_url.replace(/\.\w+$/, ".webp"),
+        thumb: video.secure_url.replace(/\.\w+$/, ".webp"),
+        video: {
+          source: getVideoFormats(video.secure_url, video.format),
+          attributes: {
+            controls: true,
+            preload: "metadata",
+            playsInline: true,
+          }
         },
-      ],
-      attributes: {
-        controls: true,
-        preload: "metadata",
-        playsInline: true,
-      },
-    },
+        subHtml: "<h4>" + video.original_filename + "</h4>",
+      }
+    });
+    return  videosData;
+  };
 
-    subHtml: "<h4>Portfolio Video</h4>",
-  },
-  {
-    poster:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
+  useEffect(() => {
+    if (!loading && images.length > 0) {
+      const videosData = loadVideos();
+      setVideos(videosData);
+    }
+  }, [loading, images, sort, page]);
 
-    thumb:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    video: {
-      source: [
-        {
-          src: "https://res.cloudinary.com/dh5jcbzly/video/upload/v1772114756/Hoang-Truc-Photographer-Portfolio/demo/98886-650523191_cwyq0y.mp4",
-          type: "video/mp4",
-        },
-      ],
-      attributes: {
-        controls: true,
-        preload: "metadata",
-        playsInline: true,
-      },
-    },
-
-    subHtml: "<h4>Portfolio Video</h4>",
-  },
-  {
-    poster:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    thumb:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    video: {
-      source: [
-        {
-          src: "https://res.cloudinary.com/dh5jcbzly/video/upload/v1772114756/Hoang-Truc-Photographer-Portfolio/demo/98886-650523191_cwyq0y.mp4",
-          type: "video/mp4",
-        },
-      ],
-      attributes: {
-        controls: true,
-        preload: "metadata",
-        playsInline: true,
-      },
-    },
-
-    subHtml: "<h4>Portfolio Video</h4>",
-  },
-  {
-    poster:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    thumb:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    video: {
-      source: [
-        {
-          src: "https://res.cloudinary.com/dh5jcbzly/video/upload/v1772114756/Hoang-Truc-Photographer-Portfolio/demo/98886-650523191_cwyq0y.mp4",
-          type: "video/mp4",
-        },
-      ],
-      attributes: {
-        controls: true,
-        preload: "metadata",
-        playsInline: true,
-      },
-    },
-
-    subHtml: "<h4>Portfolio Video</h4>",
-  },
-  {
-    poster:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    thumb:
-      "https://res.cloudinary.com/dh5jcbzly/image/upload/v1768840324/Hoang-Truc-Photographer-Portfolio/SHOW%20CASE/COCOON_T%E1%BA%A8Y%20T%E1%BA%BE%20B%C3%80O%20CH%E1%BA%BET%20DA%20%C4%90%E1%BA%A6U/xq3hzn64dokvr2lowyyb.webp",
-
-    video: {
-      source: [
-        {
-          src: "https://res.cloudinary.com/dh5jcbzly/video/upload/v1772114756/Hoang-Truc-Photographer-Portfolio/demo/98886-650523191_cwyq0y.mp4",
-          type: "video/mp4",
-        },
-      ],
-      attributes: {
-        controls: true,
-        preload: "metadata",
-        playsInline: true,
-      },
-    },
-
-    subHtml: "<h4>Portfolio Video</h4>",
-  },
-];
 
   return (
     <div className="video-gallery">
+      <SortBar sort={sort} onSortChange={setSort} />
       <div className="video-grid">
+        {loading ? (
+          
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+          </div>
+            
+        ) : videos.length === 0 ? (
+          <div className="no-videos">No videos found (Comming Soon).</div>
+        ) : null}
         {videos.map((item, index) => (
           <div
             key={index}
@@ -154,6 +131,11 @@ export default function VideoGallery() {
           </div>
         ))}
       </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={(page) => setPage(page)}
+      />
 
       <LightGallery
         onInit={(detail) => (lgRef.current = detail.instance)}
