@@ -1,5 +1,4 @@
 import cloudinary from "../config/cloudinary.config.js";
-import getRedisClient from "../config/redisCloud.config.js";
 import { compressToWebp } from "../helpers/imageCompression.js";
 import Folder from "../models/folderModel.js";
 import Asset from "../models/assetModel.js";
@@ -7,9 +6,11 @@ import { createFolder, deleteFolders } from "./folderController.js";
 import { deletedImages } from "./imageController.js";
 import {
   clearCacheByKeyword,
+  clearRelatedCaches,
   getOrSetCachedData,
 } from "./redisCloudControllers.js";
 import streamifier from "streamifier";
+import getRedisClient from "../config/redisCloud.config.js";
 
 // export const getImagesOnCloudinary = async (req, res) => {
 //   try {
@@ -183,6 +184,9 @@ export const saveAssets = async (req, res) => {
       });
     }
 
+    // Clear cache BEFORE sending response
+    await clearRelatedCaches("GET:/v1/images", "GET:/v1/folders");
+
     return res.status(201).json({
       success: true,
       message: "Lưu DB thành công",
@@ -194,8 +198,6 @@ export const saveAssets = async (req, res) => {
       message: "Lưu DB thất bại",
       error: error.message,
     });
-  } finally {
-    await getRedisClient.flushAll();
   }
 };
 
@@ -248,6 +250,9 @@ export const handleDeleteImages = async (req, res) => {
       });
     }
 
+    // Clear cache BEFORE sending response
+    await clearCacheByKeyword("GET:/v1/images", "GET:/v1/folders");
+
     return res.status(200).json({
       message: "Xóa assets thành công.",
       cloudinaryResults,
@@ -257,8 +262,6 @@ export const handleDeleteImages = async (req, res) => {
     return res.status(500).json({
       message: "Xóa assets thất bại!",
     });
-  } finally {
-    await getRedisClient.flushAll();
   }
 };
 
@@ -293,12 +296,14 @@ export const handleDeleteFolders = async (req, res) => {
     // handle delete folders into DB
     const resultsOfDB = await deleteFolders(folderDirs);
 
-    if (!resultsOfDB.success)
-      return resultsOfDB
+    if (!resultsOfDB.success) {
+      return res
         .status(500)
         .json({ message: "Xóa thư mục trong DB thất bại!" });
+    }
 
-    // clearCacheByKeyword("GET:/v1/folders?");
+    // Clear cache BEFORE sending response
+    await clearRelatedCaches("GET:/v1/folders", "GET:/v1/images");
 
     return res.status(200).json({
       message: "Xóa thư mục thành công.",
@@ -306,8 +311,6 @@ export const handleDeleteFolders = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Xóa thư mục thất bại!" });
-  } finally {
-    await getRedisClient.flushAll();
   }
 };
 
@@ -352,6 +355,8 @@ export const handleCreateFolder = async (req, res) => {
         .json({ message: "Tạo thư mục trong DB thất bại!" });
     }
 
+    // Clear cache BEFORE sending response
+    // await clearRelatedCaches("GET:/v1/folders");
     await getRedisClient.flushAll();
 
     return res.status(201).json({
@@ -418,6 +423,12 @@ export const handleMoveImages = async (req, res) => {
     }
 
     const hasError = moveResults.some((r) => !r.success);
+    const hasSuccess = moveResults.some((r) => r.success);
+
+    // Clear cache ONLY if at least one file was moved successfully
+    if (hasSuccess) {
+      await clearRelatedCaches("GET:/v1/images", "GET:/v1/folders");
+    }
 
     return res.status(hasError ? 207 : 200).json({
       message: hasError
@@ -428,8 +439,6 @@ export const handleMoveImages = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server has error" });
-  } finally {
-    await getRedisClient.flushAll();
   }
 };
 

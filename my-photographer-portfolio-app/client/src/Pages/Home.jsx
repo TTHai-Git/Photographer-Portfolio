@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import LazyImage from "../Components/LazyImage";
@@ -33,10 +33,6 @@ export const Home = () => {
     setStartIndex(index);
     setIsOpen(true);
   };
-
-  useEffect(() => {
-    if (!loading) return;
-  }, [loading, sort, page]);
 
   return (
     <Box className="home-container">

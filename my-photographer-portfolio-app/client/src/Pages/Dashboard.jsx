@@ -84,21 +84,11 @@ export default function Dashboard() {
 
   useEffect(() => {
   if (!user) navigate("/login")
-  const delayDebounce = setTimeout(() => {
-    loadFolders(); // chỉ gọi API khi người dùng ngừng gõ 500ms
-  }, 1500);
-
-  return () => clearTimeout(delayDebounce);
+  loadFolders();
 }, [folderParams.search, folderParams.sort, folderParams.page]);
 
-
-  /** Load image list when selectedFolder OR imageParams changed */
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-    loadImages(); // chỉ gọi API khi người dùng ngừng gõ 500ms
-  }, 500);
-
-  return () => clearTimeout(delayDebounce);
+    loadImages(); 
   }, [selectedFolder, imageParams.sort, imageParams.page]);
 
   return (

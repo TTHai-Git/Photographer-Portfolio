@@ -9,7 +9,7 @@ export const useImages = (page, limit, directory, sort) => {
   const [totalItems, setTotalItems] = useState(0);
 
   // Wrap loadImages in useCallback so it's stable and can be called from child components
-  const loadImages = async () => {
+  const loadImages = useCallback(async () => {
     if (!directory) {
       setImages([]);
       setCurrent(0);
@@ -45,12 +45,12 @@ export const useImages = (page, limit, directory, sort) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [directory, page, limit, sort]);
 
   
   useEffect(() => {
     loadImages();
-  }, [directory, page, limit, sort]);
+  }, [loadImages]);
 
   return { images, current, totalPages, totalItems, loading, loadImages };
 };

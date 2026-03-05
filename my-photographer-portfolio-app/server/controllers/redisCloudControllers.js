@@ -49,6 +49,12 @@ export const flushAll = async (req, res) => {
 };
 
 export const clearCacheByKeyword = async (keyword) => {
+  // Validate input
+  if (!keyword || typeof keyword !== "string" || keyword.trim() === "") {
+    console.warn("⚠️  Invalid keyword provided to clearCacheByKeyword");
+    return { success: false, deletedCount: 0, error: "Invalid keyword" };
+  }
+
   try {
     let cursor = "0";
     let deletedCount = 0;
@@ -69,10 +75,34 @@ export const clearCacheByKeyword = async (keyword) => {
     } while (cursor !== "0");
 
     console.log(
-      `🧹 Cleared ${deletedCount} cache keys containing "${keyword}"`
+      `🧹 Cleared ${deletedCount} cache keys containing "${keyword}"`,
     );
+    return { success: true, deletedCount };
   } catch (error) {
     console.error("Error clearing cache:", error);
+    return { success: false, deletedCount: 0, error: error.message };
+  }
+};
+
+// 🟩 Clear all related cached data when mutation happens (folder/image operations)
+export const clearRelatedCaches = async (...keywords) => {
+  try {
+    let totalDeleted = 0;
+    const results = [];
+
+    for (const keyword of keywords) {
+      const result = await clearCacheByKeyword(keyword);
+      if (result.success) {
+        totalDeleted += result.deletedCount;
+        results.push({ keyword, deleted: result.deletedCount });
+      }
+    }
+
+    console.log(`✅ Cache cleared before response for:`, results);
+    return { success: true, totalDeleted, results };
+  } catch (error) {
+    console.error("Error in clearRelatedCaches:", error);
+    return { success: false, error: error.message };
   }
 };
 
@@ -118,7 +148,7 @@ export const ipRateCheck = (opts = {}) => {
       const attempts = await getRedisClient.incr(key);
 
       console.log(
-        `[RateLimit] ${ip} → ${method} ${path} | Attempt ${attempts}/${maxAttempts}`
+        `[RateLimit] ${ip} → ${method} ${path} | Attempt ${attempts}/${maxAttempts}`,
       );
 
       if (attempts === 1) {

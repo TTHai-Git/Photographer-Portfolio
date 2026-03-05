@@ -53,7 +53,7 @@ export const deleteFolders = async (folderDirs) => {
 export const getFolders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 500;
+    const limit = parseInt(req.query.limit) || 10;
 
     const search = req.query.search || "";
     const sortKey = req.query.sort || "latest";

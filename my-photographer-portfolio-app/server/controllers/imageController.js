@@ -1,10 +1,13 @@
 import Folder from "../models/folderModel.js";
 import Asset from "../models/assetModel.js";
-import { getOrSetCachedData } from "./redisCloudControllers.js";
+import {
+  clearCacheByKeyword,
+  getOrSetCachedData,
+} from "./redisCloudControllers.js";
 
 export const getEachImageOfEachFolder = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 50; // limit folder per page
+  const limit = parseInt(req.query.limit) || 10; // limit folder per page
   const sort = req.query.sort || "latest";
   const path = req.query.path || "";
 
@@ -72,6 +75,8 @@ export const deletedImages = async (public_ids) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });
+  } finally {
+    await clearCacheByKeyword("GET:/v1/images");
   }
 };
 
@@ -79,7 +84,7 @@ export const getImages = async (req, res) => {
   try {
     const path = req.query.path;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 500;
+    const limit = parseInt(req.query.limit) || 10;
     const sortKey = req.query.sort || "latest";
 
     if (!path) {

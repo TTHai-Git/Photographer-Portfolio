@@ -4,13 +4,15 @@ import LightGallery from "lightgallery/react";
 import lgVideo from "lightgallery/plugins/video";
 import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgFullscreen from "lightgallery/plugins/fullscreen";
-import lgPager from "lightgallery/plugins/pager";
+import lgAutoplay   from 'lightgallery/plugins/autoplay';
+import lgShare from "lightgallery/plugins/share";
 
 import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-video.css";
 import "lightgallery/css/lg-thumbnail.css";
 import "lightgallery/css/lg-fullscreen.css";
-import "lightgallery/css/lg-pager.css";
+import 'lightgallery/css/lg-autoplay.css';
+import "lightgallery/css/lg-share.css";
 
 import "../Assets/CSS/VideoGallery.css";
 import { useImages } from "../hooks/loadImages";
@@ -89,6 +91,7 @@ export default function VideoGallery() {
           }
         },
         subHtml: "<h4>" + video.original_filename + "</h4>",
+        shareUrl: video.secure_url
       }
     });
     return  videosData;
@@ -139,16 +142,19 @@ export default function VideoGallery() {
 
       <LightGallery
         onInit={(detail) => (lgRef.current = detail.instance)}
-        plugins={[lgVideo, lgThumbnail, lgFullscreen]}
+        plugins={[lgVideo, lgThumbnail, lgFullscreen, lgAutoplay, lgShare]}
         dynamic
         dynamicEl={videos}
+        carousel={true}            // enable carousel navigation
         thumbnail={true}
         fullScreen={true}
-        download={false}
-        pager={false}
+        download={true}
         videoAutoplay={false}
         autoplayFirstVideo={false}
         videojs={false}
+        autoplay={true}          // plugin‑specific options
+        autoplayControls={true}
+        autoplayVideoOnSlide={true}
         addClass="lg-video-custom"
         mode="lg-fade"
         speed={300}

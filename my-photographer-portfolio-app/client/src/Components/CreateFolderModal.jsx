@@ -4,7 +4,7 @@ import{ authApi, endpoints } from "../config/APIs";
 import { useNotification } from "../Context/NotificationContext";
 
 
-export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders}) {
+export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders }) {
   const [folderName, setFolderName] = useState("");
   const [selectedRootDir, setSelectedRootDir] = useState("")
   const {showNotification} = useNotification()
@@ -31,7 +31,6 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
         resetCreateState();
         onClose();
       }
-
       
     } catch (error) {
       showNotification(error.response?.data?.message, "error");
@@ -47,10 +46,10 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
   };
 
   useEffect(() => {
-  if (open) {
-    loadFoldersForCombobox();
-    resetCreateState();
-  }
+    if (open) {
+      loadFoldersForCombobox();
+      resetCreateState();
+    }
   }, [open]);
 
 
