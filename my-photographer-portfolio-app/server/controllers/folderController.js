@@ -1,6 +1,9 @@
 import Folder from "../models/folderModel.js";
 import Asset from "../models/assetModel.js";
-import { getOrSetCachedData } from "./redisCloudControllers.js";
+import {
+  clearRelatedCaches,
+  getOrSetCachedData,
+} from "./redisCloudControllers.js";
 
 export const createFolders = async (req, res) => {
   try {
@@ -29,18 +32,25 @@ export const createFolder = async (path) => {
 export const deleteFolders = async (folderDirs) => {
   try {
     for (const folderDir of folderDirs) {
-      // 1. Lấy folder cần xoá
       const folder = await Folder.findOne({ path: folderDir });
 
       if (!folder) continue;
 
-      // 2. Xoá toàn bộ ảnh thuộc folder
-      await Asset.deleteMany({
+      const assetCount = await Asset.countDocuments({
         folder: folder._id,
       });
 
-      // 3. Xoá folder
+      // nếu có asset → xoá asset DB
+      if (assetCount > 0) {
+        await Asset.deleteMany({
+          folder: folder._id,
+        });
+      }
+
+      // xoá folder
       await Folder.findByIdAndDelete(folder._id);
+
+      await clearRelatedCaches(`$${folderDir}`);
     }
 
     return { success: true };
@@ -58,22 +68,20 @@ export const getFolders = async (req, res) => {
     const search = req.query.search || "";
     const sortKey = req.query.sort || "latest";
 
-    const cacheKey = `GET:/v1/folders?page=${page}&limit=${limit}&search=${search}&sort=${sortKey}`;
+    const filter = {};
 
-    const data = await getOrSetCachedData(cacheKey, async () => {
-      const filter = {};
+    if (search.trim() !== "") {
+      filter.path = { $regex: search, $options: "i" };
+    }
 
-      if (search.trim() !== "") {
-        filter.path = { $regex: search, $options: "i" };
-      }
+    const sortOption = {
+      latest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      az: { path: 1 },
+      za: { path: -1 },
+    }[sortKey] || { createdAt: -1 };
 
-      const sortOption = {
-        latest: { createdAt: -1 },
-        oldest: { createdAt: 1 },
-        az: { path: 1 },
-        za: { path: -1 },
-      }[sortKey] || { createdAt: -1 };
-
+    const fetchFolders = async () => {
       const folders = await Folder.find(filter)
         .sort(sortOption)
         .skip((page - 1) * limit)
@@ -87,9 +95,24 @@ export const getFolders = async (req, res) => {
         totalPages: Math.ceil(totalItems / limit),
         totalItems,
       };
-    });
+    };
+
+    const cacheKey = `GET:/v1/folders?page=${page}&limit=${limit}&search=${search}&sort=${sortKey}`;
+
+    const data = await getOrSetCachedData(cacheKey, fetchFolders);
 
     return res.status(200).json(data);
+  } catch (err) {
+    console.error("❌ getFolders error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const getFoldersForCombobox = async (req, res) => {
+  try {
+    const folders = await Folder.find().sort({ path: 1 });
+
+    return res.json({ folders });
   } catch (err) {
     console.error("❌ getFolders error:", err);
     res.status(500).json({ message: "Server error", error: err.message });

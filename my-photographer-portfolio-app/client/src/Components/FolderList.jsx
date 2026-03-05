@@ -56,7 +56,11 @@ const FolderList = ({
       });
       if (res.status === 200) {
         showNotification(res.data.message, "success");
-        await loadFolders();
+        setFolderParams(prev => ({
+          ...prev,
+          page: 1,
+          refresh: Date.now()
+        }));
         setSelectedDirs([]);
         setImages([]);
       } 
@@ -164,6 +168,7 @@ const FolderList = ({
 
       <CreateFolderModal
         folders={foldersForCombobox}
+        setFolderParams={setFolderParams}
         loadFoldersForCombobox={loadFoldersForCombobox}
         open={openCreate}
         onClose={() => setOpenCreate(false)}

@@ -4,7 +4,7 @@ import{ authApi, endpoints } from "../config/APIs";
 import { useNotification } from "../Context/NotificationContext";
 
 
-export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders }) {
+export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders, setFolderParams }) {
   const [folderName, setFolderName] = useState("");
   const [selectedRootDir, setSelectedRootDir] = useState("")
   const {showNotification} = useNotification()
@@ -27,7 +27,12 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
 
       if (res.status === 201) {
         showNotification(res.data.message, "success");
-        await loadFolders();
+        // await loadFolders();
+        setFolderParams(prev => ({
+          ...prev,
+          page: 1,
+          refresh: Date.now()
+        }));
         resetCreateState();
         onClose();
       }

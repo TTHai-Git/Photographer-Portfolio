@@ -160,7 +160,7 @@ export const saveAssets = async (req, res) => {
 
   try {
     // Get folder ID
-    const folderDoc = await Folder.findOne({ path: folder }).select("_id");
+    const folderDoc = await Folder.findOne({ path: folder });
 
     if (!folderDoc) {
       return res
@@ -185,7 +185,7 @@ export const saveAssets = async (req, res) => {
     }
 
     // Clear cache BEFORE sending response
-    await clearRelatedCaches("GET:/v1/images", "GET:/v1/folders");
+    await clearRelatedCaches(`${folderDoc.path}`);
 
     return res.status(201).json({
       success: true,
@@ -203,7 +203,7 @@ export const saveAssets = async (req, res) => {
 
 export const handleDeleteImages = async (req, res) => {
   try {
-    const { public_ids } = req.body;
+    const { public_ids, selectedFolder } = req.body;
 
     if (!public_ids || public_ids.length === 0) {
       return res.status(400).json({
@@ -251,7 +251,7 @@ export const handleDeleteImages = async (req, res) => {
     }
 
     // Clear cache BEFORE sending response
-    await clearCacheByKeyword("GET:/v1/images", "GET:/v1/folders");
+    await clearRelatedCaches(`${selectedFolder}`);
 
     return res.status(200).json({
       message: "Xóa assets thành công.",
@@ -267,50 +267,59 @@ export const handleDeleteImages = async (req, res) => {
 
 export const handleDeleteFolders = async (req, res) => {
   try {
-    // console.log("req.body.folderDirs", req.body.folderDirs);
     const folderDirs = req.body.folderDirs;
 
     if (!folderDirs || folderDirs.length === 0) {
       return res.status(400).json({
-        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục!",
+        message: "Thiếu thông tin đường dẫn thư mục!",
       });
     }
 
-    // delete folders onto Cloudinary
     for (const folderPrefix of folderDirs) {
-      await Promise.all([
-        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
-          resource_type: "image",
-        }),
-        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
-          resource_type: "video",
-        }),
-        cloudinary.api.delete_resources_by_prefix(folderPrefix, {
-          resource_type: "raw",
-        }),
-      ]);
+      const folderDoc = await Folder.findOne({ path: folderPrefix });
 
+      if (!folderDoc) continue;
+
+      // kiểm tra có asset không
+      const assetCount = await Asset.countDocuments({
+        folder: folderDoc._id,
+      });
+
+      // nếu có asset
+      if (assetCount > 0) {
+        await Promise.all([
+          cloudinary.api.delete_resources_by_prefix(folderPrefix, {
+            resource_type: "image",
+          }),
+          cloudinary.api.delete_resources_by_prefix(folderPrefix, {
+            resource_type: "video",
+          }),
+        ]);
+      }
+
+      // xoá folder cloudinary (dù có asset hay không)
       await cloudinary.api.delete_folder(folderPrefix).catch(() => {});
     }
 
-    // handle delete folders into DB
+    // xoá DB
     const resultsOfDB = await deleteFolders(folderDirs);
 
     if (!resultsOfDB.success) {
-      return res
-        .status(500)
-        .json({ message: "Xóa thư mục trong DB thất bại!" });
+      return res.status(500).json({
+        message: "Xóa thư mục trong DB thất bại!",
+      });
     }
 
-    // Clear cache BEFORE sending response
-    await clearRelatedCaches("GET:/v1/folders", "GET:/v1/images");
+    await clearRelatedCaches("GET:/v1/folders");
 
     return res.status(200).json({
       message: "Xóa thư mục thành công.",
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Xóa thư mục thất bại!" });
+    return res.status(500).json({
+      message: "Xóa thư mục thất bại!",
+    });
   }
 };
 
@@ -356,8 +365,7 @@ export const handleCreateFolder = async (req, res) => {
     }
 
     // Clear cache BEFORE sending response
-    // await clearRelatedCaches("GET:/v1/folders");
-    await getRedisClient.flushAll();
+    await clearRelatedCaches("GET:/v1/folders");
 
     return res.status(201).json({
       message: "Tạo thư mục thành công.",
@@ -372,7 +380,7 @@ export const handleCreateFolder = async (req, res) => {
 
 export const handleMoveImages = async (req, res) => {
   try {
-    const { oldPublicIds, newFolder } = req.body;
+    const { oldPublicIds, newFolder, oldFolder } = req.body;
 
     if (!oldPublicIds || !newFolder)
       return res.status(400).json({ message: "Bad request" });
@@ -427,7 +435,7 @@ export const handleMoveImages = async (req, res) => {
 
     // Clear cache ONLY if at least one file was moved successfully
     if (hasSuccess) {
-      await clearRelatedCaches("GET:/v1/images", "GET:/v1/folders");
+      await clearRelatedCaches(`${newFolder}`, `${oldFolder}`);
     }
 
     return res.status(hasError ? 207 : 200).json({

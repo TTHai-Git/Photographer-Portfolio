@@ -5,6 +5,7 @@ export const endpoints = {
   getImagesFromDB: "/images",
   getEachImageOfEachFolder: "/images/get-each-image-of-each-folder",
   getFoldersFromDB: "/folders",
+  getFoldersForCombobox: "/folders/all",
   // getFolders: "/cloudinaries/get-folders",
   createFolder: "/cloudinaries/folders/cre",
   deleteFolders: "/cloudinaries/folders/del",

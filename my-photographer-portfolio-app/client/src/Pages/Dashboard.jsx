@@ -15,13 +15,14 @@ export default function Dashboard() {
   const [folderParams, setFolderParams] = useState({
     page: 1,
     search: "",
-    sort: "",
+    sort: "latest",
+    refresh: Date.now(), // thêm trường này để làm mới cache khi cần
   });
 
   // Image params (tách riêng)
   const [imageParams, setImageParams] = useState({
     page: 1,
-    sort: "",
+    sort: "latest",
   });
 
   const [folders, setFolders] = useState([]);
@@ -61,7 +62,7 @@ export default function Dashboard() {
   /** For MoveImageModal, UploadImageModal */
   const loadFoldersForCombobox = async () => {
     const res = await APIs.get(
-      `${endpoints.getFoldersFromDB}?page=1&limit=500&sort=oldest`
+      `${endpoints.getFoldersForCombobox}`
     );
     setFoldersForCombobox(res.data.folders);
   };
@@ -85,11 +86,11 @@ export default function Dashboard() {
   useEffect(() => {
   if (!user) navigate("/login")
   loadFolders();
-}, [folderParams.search, folderParams.sort, folderParams.page]);
+}, [folderParams]);
 
   useEffect(() => {
     loadImages(); 
-  }, [selectedFolder, imageParams.sort, imageParams.page]);
+  }, [selectedFolder, imageParams]);
 
   return (
     <div className="dashboard">

@@ -4,7 +4,7 @@ import "../Assets/CSS/modal.css";
 import { authApi, endpoints } from '../config/APIs';
 import { useNotification } from '../Context/NotificationContext';
 
-export const MoveImageModal = ({folders, loadFoldersForCombobox, open , oldPublicIds, setOldPublicIds, onClose, loadImages }) => {
+export const MoveImageModal = ({folders, loadFoldersForCombobox, open , oldPublicIds, setOldPublicIds, onClose, loadImages, selectedFolder }) => {
   const [newFolder, setNewFolder] = useState("")
   const [loadingMove, setLoadingMove] = useState(false)
   const {showNotification} = useNotification()
@@ -21,7 +21,8 @@ const handleMoveImagesToAnotherFolder = async () => {
 
     const res = await authApi.post(endpoints.moveImages, {
       oldPublicIds,
-      newFolder
+      newFolder,
+      oldFolder: selectedFolder
     });
 
     showNotification(res.data.message, "success");

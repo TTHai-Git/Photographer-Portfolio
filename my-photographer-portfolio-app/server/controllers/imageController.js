@@ -75,8 +75,6 @@ export const deletedImages = async (public_ids) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });
-  } finally {
-    await clearCacheByKeyword("GET:/v1/images");
   }
 };
 
