@@ -2,7 +2,7 @@ import Folder from "../models/folderModel.js";
 import Asset from "../models/assetModel.js";
 import {
   clearRelatedCaches,
-  getOrSetCachedData,
+  getOrSetCachedData
 } from "./redisCloudControllers.js";
 
 export const createFolders = async (req, res) => {
@@ -37,13 +37,13 @@ export const deleteFolders = async (folderDirs) => {
       if (!folder) continue;
 
       const assetCount = await Asset.countDocuments({
-        folder: folder._id,
+        folder: folder._id
       });
 
       // nếu có asset → xoá asset DB
       if (assetCount > 0) {
         await Asset.deleteMany({
-          folder: folder._id,
+          folder: folder._id
         });
       }
 
@@ -78,7 +78,7 @@ export const getFolders = async (req, res) => {
       latest: { createdAt: -1 },
       oldest: { createdAt: 1 },
       az: { path: 1 },
-      za: { path: -1 },
+      za: { path: -1 }
     }[sortKey] || { createdAt: -1 };
 
     const fetchFolders = async () => {
@@ -93,7 +93,7 @@ export const getFolders = async (req, res) => {
         folders,
         current: page,
         totalPages: Math.ceil(totalItems / limit),
-        totalItems,
+        totalItems
       };
     };
 

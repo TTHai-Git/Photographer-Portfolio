@@ -15,8 +15,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         className="pagination-btn"
         disabled={currentPage === 1}
-        onClick={handlePrev}
-      >
+        onClick={handlePrev}>
         ◀ Prev
       </button>
 
@@ -27,8 +26,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         className="pagination-btn"
         disabled={currentPage === totalPages}
-        onClick={handleNext}
-      >
+        onClick={handleNext}>
         Next ▶
       </button>
     </div>

@@ -1,10 +1,9 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { Snackbar, Alert } from "@mui/material";
 
 const NotificationContext = createContext();
 
-export const NotificationProvider = ({children}) => {
+export const NotificationProvider = ({ children }) => {
   const [popupMessage, setPopupMessage] = useState("");
   const [popupType, setPopupType] = useState("info");
   const [open, setOpen] = useState(false);
@@ -27,17 +26,14 @@ export const NotificationProvider = ({children}) => {
     }, 5000);
   };
 
-  const handleClose = (
-    event,
-    reason,
-  ) => {
+  const handleClose = (event, reason) => {
     if (reason === "clickaway") return;
     setOpen(false);
   };
   return (
-    <NotificationContext.Provider value={{showNotification, handleClose}}>
-        {children}
-          {/* ✅ Global Snackbar Popup */}
+    <NotificationContext.Provider value={{ showNotification, handleClose }}>
+      {children}
+      {/* ✅ Global Snackbar Popup */}
       <Snackbar
         open={open}
         autoHideDuration={5000} // mờ dần sau 5s
@@ -54,13 +50,12 @@ export const NotificationProvider = ({children}) => {
             boxShadow: 2,
             animation: "fadeIn 0.3s ease",
           }}
-          variant="filled"
-        >
+          variant="filled">
           {popupMessage}
         </Alert>
       </Snackbar>
     </NotificationContext.Provider>
-  )
-}
+  );
+};
 
-export const useNotification = () => useContext(NotificationContext)
+export const useNotification = () => useContext(NotificationContext);

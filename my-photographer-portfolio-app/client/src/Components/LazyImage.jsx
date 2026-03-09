@@ -26,8 +26,7 @@ const LazyImage = ({ src, alt, onClick, className }) => {
   return (
     <div
       ref={imgRef}
-      style={{ minHeight: 200, width: "100%", position: "relative" }}
-    >
+      style={{ minHeight: 200, width: "100%", position: "relative" }}>
       {visible && (
         <img
           src={src}

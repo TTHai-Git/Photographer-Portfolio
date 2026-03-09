@@ -11,39 +11,39 @@ import Portrait from "./Pages/Portrait";
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",          // parent route
+      path: "/", // parent route
       element: <Layout />, // layout with header/footer
       children: [
         {
-          index: true,     // default child route
-          element: <Home />,
+          index: true, // default child route
+          element: <Home />
         },
         {
           path: "login",
-          element: <Login/>
+          element: <Login />
         },
         {
           path: "dashboard",
-          element: <Dashboard/>
+          element: <Dashboard />
         },
         {
           path: "my-project",
-          element: <ShowCase />,      
+          element: <ShowCase />
         },
         {
           path: "portrait",
-          element: <Portrait/>
+          element: <Portrait />
         },
         {
           path: "animation",
-          element: <VideoGallery />,      
+          element: <VideoGallery />
         },
         {
           path: "about",
           element: <About />
         }
-      ],
-    },
+      ]
+    }
   ]);
 
   return <RouterProvider router={router} />;

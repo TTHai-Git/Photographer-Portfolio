@@ -36,7 +36,7 @@ export const createAcount = async (req, res) => {
       username,
       password: hashedPassword,
       email,
-      role,
+      role
     });
     // console.log(newUser);
 
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
       { username: user.username, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "1h"
       }
     );
 
@@ -84,7 +84,7 @@ export const login = async (req, res) => {
       { username: user.username, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d",
+        expiresIn: "7d"
       }
     );
 
@@ -94,22 +94,22 @@ export const login = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: isProd, // chỉ bật HTTPS khi production
-      sameSite: isProd ? "None" : "Lax",
+      sameSite: isProd ? "None" : "Lax"
     };
 
     res.cookie("accessToken", accessToken, {
       ...cookieOptions,
-      maxAge: 60 * 60 * 1000, // 1h
+      maxAge: 60 * 60 * 1000 // 1h
     });
 
     res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7d
     });
 
     return res.status(200).json({
       isVerified: true,
-      message: "Đăng nhập thành công.",
+      message: "Đăng nhập thành công."
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -122,7 +122,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: isProd, // chỉ bật HTTPS khi production
     sameSite: isProd ? "None" : "Lax",
-    path: "/", // thêm cái này để chắc chắn clear đúng cookie
+    path: "/" // thêm cái này để chắc chắn clear đúng cookie
   };
 
   // clear access token
@@ -145,7 +145,7 @@ export const refreshToken = (req, res) => {
       { username: decoded.username, role: decoded.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "1h"
       }
     );
 
@@ -155,7 +155,7 @@ export const refreshToken = (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: isProd, // chỉ bật HTTPS khi production
-      sameSite: isProd ? "None" : "Lax",
+      sameSite: isProd ? "None" : "Lax"
     };
 
     res.cookie("accessToken", newAccessToken, cookieOptions);
@@ -170,7 +170,7 @@ export const getMe = (req, res) => {
   return res.status(200).json({
     user: {
       username: req.user.username,
-      role: req.user.role,
-    },
+      role: req.user.role
+    }
   });
 };

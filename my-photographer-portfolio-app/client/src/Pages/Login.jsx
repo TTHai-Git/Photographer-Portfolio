@@ -15,8 +15,6 @@ const Login = () => {
 
     const ok = await login(username, password);
     if (ok) navigate("/dashboard");
-      
-    
   };
 
   return (

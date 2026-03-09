@@ -4,7 +4,7 @@ import {
   getMe,
   login,
   logout,
-  refreshToken,
+  refreshToken
 } from "../controllers/authController.js";
 import { authMiddleware, isAdmin } from "../middlewares/authMiddleware.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
@@ -15,7 +15,7 @@ authRouters.post(
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300,
+    blockSeconds: 300
   }),
   isAdmin,
   createAcount
@@ -25,7 +25,7 @@ authRouters.post(
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300,
+    blockSeconds: 300
   }),
   login
 );
@@ -35,7 +35,7 @@ authRouters.get(
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600,
+    blockSeconds: 600
   }),
   authMiddleware,
   getMe
@@ -45,7 +45,7 @@ authRouters.post(
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600,
+    blockSeconds: 600
   }),
   authMiddleware,
   refreshToken

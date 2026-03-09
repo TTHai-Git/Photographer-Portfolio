@@ -2,7 +2,7 @@ import Folder from "../models/folderModel.js";
 import Asset from "../models/assetModel.js";
 import {
   clearCacheByKeyword,
-  getOrSetCachedData,
+  getOrSetCachedData
 } from "./redisCloudControllers.js";
 
 export const getEachImageOfEachFolder = async (req, res) => {
@@ -17,7 +17,7 @@ export const getEachImageOfEachFolder = async (req, res) => {
       latest: { createdAt: -1 },
       oldest: { createdAt: 1 },
       az: { path: 1 },
-      za: { path: -1 },
+      za: { path: -1 }
     }[sort] || { createdAt: -1 };
 
     const cachedData = await getOrSetCachedData(cachedKey, async () => {
@@ -25,14 +25,14 @@ export const getEachImageOfEachFolder = async (req, res) => {
       // ĐẾM TẤT CẢ FOLDER
       // ==========================
       const totalFolders = await Folder.countDocuments({
-        path: { $regex: `^${path}` },
+        path: { $regex: `^${path}` }
       });
 
       // ==========================
       // LẤY FOLDER THEO TRANG
       // ==========================
       const folders = await Folder.find({
-        path: { $regex: `^${path}` },
+        path: { $regex: `^${path}` }
       })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -45,7 +45,7 @@ export const getEachImageOfEachFolder = async (req, res) => {
       // ==========================
       for (const folder of folders) {
         const image = await Asset.findOne({
-          folder: folder._id,
+          folder: folder._id
         })
           .sort(sortOption)
           .populate("folder");
@@ -60,7 +60,7 @@ export const getEachImageOfEachFolder = async (req, res) => {
       images: cachedData.result,
       current: page,
       totalPages: Math.ceil(cachedData.totalFolders / limit),
-      totalItems: cachedData.totalFolders,
+      totalItems: cachedData.totalFolders
     });
   } catch (error) {
     console.log(error);
@@ -99,25 +99,25 @@ export const getImages = async (req, res) => {
         latest: { createdAt: -1 },
         oldest: { createdAt: 1 },
         az: { public_id: 1 },
-        za: { public_id: -1 },
+        za: { public_id: -1 }
       }[sortKey] || { createdAt: -1 };
 
       const images = await Asset.find({
-        folder: folder._id,
+        folder: folder._id
       })
         .sort(sortOption)
         .skip((page - 1) * limit)
         .limit(limit);
 
       const totalItems = await Asset.countDocuments({
-        folder: folder._id,
+        folder: folder._id
       });
 
       return {
         images,
         current: page,
         totalPages: Math.ceil(totalItems / limit),
-        totalItems,
+        totalItems
       };
     });
 

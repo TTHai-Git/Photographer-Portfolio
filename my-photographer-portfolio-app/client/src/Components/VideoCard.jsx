@@ -26,8 +26,7 @@ export default function VideoCard({ video }) {
         className="video-card"
         onClick={() => setOpen(true)}
         onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+        onMouseLeave={handleMouseLeave}>
         <video
           ref={videoRef}
           src={previewUrl}
@@ -40,10 +39,7 @@ export default function VideoCard({ video }) {
       </div>
 
       {open && (
-        <VideoModalPlayer
-          publicId={publicId}
-          onClose={() => setOpen(false)}
-        />
+        <VideoModalPlayer publicId={publicId} onClose={() => setOpen(false)} />
       )}
     </>
   );

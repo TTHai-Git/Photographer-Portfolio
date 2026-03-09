@@ -3,7 +3,7 @@ import {
   createRole,
   deleteRole,
   getRoles,
-  updateRole,
+  updateRole
 } from "../controllers/roleController.js";
 import { isAdmin } from "../middlewares/authMiddleware.js";
 

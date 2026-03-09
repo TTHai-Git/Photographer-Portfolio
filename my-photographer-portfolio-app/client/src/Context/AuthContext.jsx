@@ -6,31 +6,30 @@ import { useNotification } from "./NotificationContext";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);  // null = chưa đăng nhập
+  const [user, setUser] = useState(null); // null = chưa đăng nhập
   const [loading, setLoading] = useState(true);
-  const {showNotification} = useNotification()
+  const { showNotification } = useNotification();
 
   // ======================
   // LOGIN
   // ======================
   const login = async (username, password) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await authApi.post(endpoints.login, { username, password });
 
       if (res.data.isVerified) {
         setUser({ username });
-        showNotification(res.data.message, "success")
+        showNotification(res.data.message, "success");
         return true;
-      }
-      else {
-        alert(res.data.message)
+      } else {
+        alert(res.data.message);
       }
     } catch (error) {
-      showNotification(error.response.data.message,"error")
+      showNotification(error.response.data.message, "error");
       return false;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -39,13 +38,13 @@ export const AuthProvider = ({ children }) => {
   // ======================
   const logout = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       await authApi.post(endpoints.logout);
       setUser(null);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 

@@ -14,7 +14,7 @@ const assetSchema = new Schema(
       type: String,
       enum: ["image", "video"],
       required: true,
-      index: true,
+      index: true
     },
 
     format: { type: String, required: true },
@@ -29,7 +29,7 @@ const assetSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Folder",
       required: true,
-      index: true,
+      index: true
     },
 
     videoMeta: {
@@ -39,16 +39,16 @@ const assetSchema = new Schema(
       frame_rate: Number,
       resolution: String, // `${width}x${height}`
       posterUrl: String, // m3u8
-      playback_url: String, // chỉ video mới có
+      playback_url: String // chỉ video mới có
     },
 
     isDeleted: {
       type: Boolean,
       default: false,
-      index: true,
-    },
+      index: true
+    }
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 //
@@ -62,20 +62,20 @@ assetSchema.index({ folder: 1, public_id: 1 }, { unique: true });
 assetSchema.index({
   folder: 1,
   resource_type: 1,
-  createdAt: -1,
+  createdAt: -1
 });
 
 // 3️⃣ Query tất cả media trong folder (sort mới nhất)
 assetSchema.index({
   folder: 1,
-  createdAt: -1,
+  createdAt: -1
 });
 
 // 4️⃣ Soft delete optimization
 assetSchema.index({
   folder: 1,
   isDeleted: 1,
-  createdAt: -1,
+  createdAt: -1
 });
 
 //

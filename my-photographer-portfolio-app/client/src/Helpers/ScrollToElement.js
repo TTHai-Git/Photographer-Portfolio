@@ -7,6 +7,6 @@ export const scrollToElement = (id, offset = 80) => {
 
   window.scrollTo({
     top: absoluteTop - offset,
-    behavior: "smooth",
+    behavior: "smooth"
   });
 };

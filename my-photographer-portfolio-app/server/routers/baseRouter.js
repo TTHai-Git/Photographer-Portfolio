@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   welcomeToAPIsOfServer,
-  welcomeToServer,
+  welcomeToServer
 } from "../controllers/baseController.js";
 
 const baseRoutes = new Router();

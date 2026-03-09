@@ -11,71 +11,71 @@ export const SUPPORTED_IMAGE_FORMATS = {
     extension: "jpg",
     quality: "auto",
     optimized: "webp",
-    description: "JPEG - Tương thích tốt nhất, phù hợp cho ảnh photo",
+    description: "JPEG - Tương thích tốt nhất, phù hợp cho ảnh photo"
   },
   jpeg: {
     mime: "image/jpeg",
     extension: "jpeg",
     quality: "auto",
     optimized: "webp",
-    description: "JPEG - Tương thích tốt nhất, phù hợp cho ảnh photo",
+    description: "JPEG - Tương thích tốt nhất, phù hợp cho ảnh photo"
   },
   png: {
     mime: "image/png",
     extension: "png",
     quality: "auto",
     optimized: "webp",
-    description: "PNG - Có alpha channel, phù hợp cho graphic",
+    description: "PNG - Có alpha channel, phù hợp cho graphic"
   },
   webp: {
     mime: "image/webp",
     extension: "webp",
     quality: "auto",
     optimized: "webp",
-    description: "WebP - Tối ưu nhất cho web, file nhẹ nhất",
+    description: "WebP - Tối ưu nhất cho web, file nhẹ nhất"
   },
   avif: {
     mime: "image/avif",
     extension: "avif",
     quality: "auto",
     optimized: "avif",
-    description: "AVIF - Hiện đại nhất, compression tốt nhất",
+    description: "AVIF - Hiện đại nhất, compression tốt nhất"
   },
   gif: {
     mime: "image/gif",
     extension: "gif",
     quality: "auto",
     optimized: "webp",
-    description: "GIF - Ảnh động",
+    description: "GIF - Ảnh động"
   },
   tiff: {
     mime: "image/tiff",
     extension: "tiff",
     quality: "auto",
     optimized: "webp",
-    description: "TIFF - Chất lượng cao, file nặng",
+    description: "TIFF - Chất lượng cao, file nặng"
   },
   bmp: {
     mime: "image/bmp",
     extension: "bmp",
     quality: "auto",
     optimized: "webp",
-    description: "BMP - Định dạng cũ, không nén",
+    description: "BMP - Định dạng cũ, không nén"
   },
   ico: {
     mime: "image/x-icon",
     extension: "ico",
     quality: "auto",
     optimized: "webp",
-    description: "ICO - Icon định dạng",
+    description: "ICO - Icon định dạng"
   },
   svg: {
     mime: "image/svg+xml",
     extension: "svg",
     quality: "auto",
     optimized: "svg",
-    description: "SVG - Vector format, scalable",
-  },
+    description: "SVG - Vector format, scalable"
+  }
 };
 
 /**
@@ -120,7 +120,7 @@ export const getCloudinaryOptimizationParams = (format = "auto") => {
     // Performance
     delay: "progressive", // Progressive encoding untuk JPG
     interlace: "true", // Interlace untuk PNG/GIF
-    flags: ["immutable"], // Cache các ảnh đã optimize
+    flags: ["immutable"] // Cache các ảnh đã optimize
   };
 };
 
@@ -135,7 +135,7 @@ export const getOptimizedImageUrl = (publicId, cloudinary = null) => {
     return cloudinary.url(publicId, {
       quality: "auto",
       fetch_format: "auto",
-      dpr: "auto",
+      dpr: "auto"
     });
   }
 
@@ -147,7 +147,7 @@ export const getOptimizedImageUrl = (publicId, cloudinary = null) => {
       ${publicId}?q=auto&f=auto&w=640 640w,
       ${publicId}?q=auto&f=auto&w=1280 1280w,
       ${publicId}?q=auto&f=auto&w=1920 1920w
-    `,
+    `
   };
 };
 
@@ -161,13 +161,13 @@ export const getOptimizedImageUrl = (publicId, cloudinary = null) => {
 export const getResponsiveImageUrls = (
   publicId,
   widths = [320, 640, 1280, 1920],
-  cloudinary = null,
+  cloudinary = null
 ) => {
   if (!cloudinary) {
     console.warn("Cloudinary instance not provided");
     return {
       src: publicId,
-      srcset: "",
+      srcset: ""
     };
   }
 
@@ -178,7 +178,7 @@ export const getResponsiveImageUrls = (
         quality: "auto",
         fetch_format: "auto",
         crop: "fill",
-        gravity: "auto",
+        gravity: "auto"
       });
       return `${url} ${width}w`;
     })
@@ -190,9 +190,9 @@ export const getResponsiveImageUrls = (
       fetch_format: "auto",
       width: 1280,
       crop: "fill",
-      gravity: "auto",
+      gravity: "auto"
     }),
-    srcset: srcset,
+    srcset: srcset
   };
 };
 
@@ -214,7 +214,7 @@ export const getThumbnailUrl = (publicId, size = 200, cloudinary = null) => {
     quality: "auto",
     fetch_format: "auto",
     crop: "fill",
-    gravity: "auto",
+    gravity: "auto"
   });
 };
 
@@ -230,8 +230,8 @@ export const getUploadConfiguration = () => {
       {
         quality: "auto",
         fetch_format: "auto",
-        dpr: "auto",
-      },
+        dpr: "auto"
+      }
     ],
     // Eager transformations - tạo các version đã optimize
     eager: [
@@ -239,21 +239,21 @@ export const getUploadConfiguration = () => {
         quality: "auto",
         fetch_format: "auto",
         width: 1280,
-        crop: "limit",
+        crop: "limit"
       },
       {
         quality: "auto",
         fetch_format: "auto",
         width: 640,
-        crop: "limit",
+        crop: "limit"
       },
       {
         quality: "auto",
         fetch_format: "auto",
         width: 320,
-        crop: "limit",
-      },
-    ],
+        crop: "limit"
+      }
+    ]
   };
 };
 
@@ -265,5 +265,5 @@ export default {
   getOptimizedImageUrl,
   getResponsiveImageUrls,
   getThumbnailUrl,
-  getUploadConfiguration,
+  getUploadConfiguration
 };

@@ -6,7 +6,7 @@ const whitelist = [
   "http://localhost:3000",
   "http://localhost:8080",
   "http://localhost:5000",
-  "http://localhost:8000",
+  "http://localhost:8000"
 ];
 
 export const getOrSetCachedData = async (key, callback, ttl = 1800) => {
@@ -63,7 +63,7 @@ export const clearCacheByKeyword = async (keyword) => {
       // Object destructuring for @redis/client
       const { cursor: nextCursor, keys } = await getRedisClient.scan(cursor, {
         MATCH: `*${keyword}*`,
-        COUNT: 100,
+        COUNT: 100
       });
 
       if (keys.length > 0) {
@@ -75,7 +75,7 @@ export const clearCacheByKeyword = async (keyword) => {
     } while (cursor !== "0");
 
     console.log(
-      `🧹 Cleared ${deletedCount} cache keys containing "${keyword}"`,
+      `🧹 Cleared ${deletedCount} cache keys containing "${keyword}"`
     );
     return { success: true, deletedCount };
   } catch (error) {
@@ -113,7 +113,7 @@ export const ipRateCheck = (opts = {}) => {
   const {
     maxAttempts = 100, // số lần request tối đa
     windowSeconds = 60, // reset lại sau bao lâu (VD: 60s)
-    blockSeconds = 60 * 15, // block IP bao lâu nếu vượt limit
+    blockSeconds = 60 * 15 // block IP bao lâu nếu vượt limit
   } = opts;
 
   return async (req, res, next) => {
@@ -139,7 +139,7 @@ export const ipRateCheck = (opts = {}) => {
         let ttl = await getRedisClient.ttl(BLOCK_KEY(ip));
         if (ttl < 0) ttl = blockSeconds;
         return res.status(429).json({
-          message: `🚫 Your IP is blocked. Try again in ${ttl} seconds.`,
+          message: `🚫 Your IP is blocked. Try again in ${ttl} seconds.`
         });
       }
 
@@ -148,7 +148,7 @@ export const ipRateCheck = (opts = {}) => {
       const attempts = await getRedisClient.incr(key);
 
       console.log(
-        `[RateLimit] ${ip} → ${method} ${path} | Attempt ${attempts}/${maxAttempts}`,
+        `[RateLimit] ${ip} → ${method} ${path} | Attempt ${attempts}/${maxAttempts}`
       );
 
       if (attempts === 1) {
@@ -160,7 +160,7 @@ export const ipRateCheck = (opts = {}) => {
         await getRedisClient.setEx(BLOCK_KEY(ip), blockSeconds, "1");
         await getRedisClient.del(key); // reset counter
         return res.status(429).json({
-          message: `Too many requests to ${method} ${path}. IP blocked for ${blockSeconds} seconds.`,
+          message: `Too many requests to ${method} ${path}. IP blocked for ${blockSeconds} seconds.`
         });
       }
 

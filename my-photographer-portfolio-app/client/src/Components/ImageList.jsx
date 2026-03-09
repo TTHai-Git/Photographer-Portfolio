@@ -4,7 +4,12 @@ import { useState } from "react";
 import UploadImageModal from "./UploadImageModal";
 import { useNotification } from "../Context/NotificationContext";
 import { MoveImageModal } from "./MoveImageModal";
-import { Autocomplete, ImageListItem, InputAdornment, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  ImageListItem,
+  InputAdornment,
+  TextField
+} from "@mui/material";
 import SortIcon from "@mui/icons-material/Sort";
 import { authApi, endpoints } from "../config/APIs";
 import UploadVideoModal from "./UploadVideoModel";
@@ -21,7 +26,7 @@ export default function ImageList({
   loadImages,
   imageParams,
   setImageParams,
-  sortFileds,
+  sortFileds
 }) {
   const [oldPublicIds, setOldPublicIds] = useState([]);
   const [openUpload, setOpenUpload] = useState(false);
@@ -37,20 +42,22 @@ export default function ImageList({
     setImageParams((prev) => ({
       ...prev,
       page: 1,
-      [key]: val,
+      [key]: val
     }));
   };
 
   const handleImageClick = (index) => {
-    const slideList = images.filter((image) => image.resource_type === "image").map((image) => {
-      const parts = image.public_id.split("/");
-      const folderName = parts[parts.length - 2];
-      
-      return {
-        src: image.secure_url,
-        title: folderName,
-      };
-    });
+    const slideList = images
+      .filter((image) => image.resource_type === "image")
+      .map((image) => {
+        const parts = image.public_id.split("/");
+        const folderName = parts[parts.length - 2];
+
+        return {
+          src: image.secure_url,
+          title: folderName
+        };
+      });
 
     setSlides(slideList);
     setStartIndex(index);
@@ -68,7 +75,7 @@ export default function ImageList({
       setLoadingDelete(true);
 
       const res = await authApi.delete(endpoints.deleteImages, {
-        data: { public_ids: oldPublicIds, selectedFolder },
+        data: { public_ids: oldPublicIds, selectedFolder }
       });
 
       showNotification(res.data.message, "success");
@@ -94,18 +101,22 @@ export default function ImageList({
             + Tải ảnh lên
           </button>
 
-          <button className="btn btn-green" onClick={() => setOpenUploadVideo(true)}>
+          <button
+            className="btn btn-green"
+            onClick={() => setOpenUploadVideo(true)}>
             + Tải video lên
           </button>
 
-          <button className="btn btn-primary" onClick={() => {
-            if (oldPublicIds.length === 0) {
-              showNotification("Vui lòng chọn ảnh để di chuyển!", "warning");
-              setOpenMove(false);
-            } else {
-              setOpenMove(true);
-            }
-          }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              if (oldPublicIds.length === 0) {
+                showNotification("Vui lòng chọn ảnh để di chuyển!", "warning");
+                setOpenMove(false);
+              } else {
+                setOpenMove(true);
+              }
+            }}>
             + Di chuyển ảnh/video ({oldPublicIds.length})
           </button>
 
@@ -113,9 +124,14 @@ export default function ImageList({
             <button
               className="btn btn-red"
               onClick={handleDelete}
-              disabled={loadingDelete}
-            >
-              {loadingDelete ? "Đang xóa..." : <><FaTrash /> Xóa ({oldPublicIds.length})</>}
+              disabled={loadingDelete}>
+              {loadingDelete ? (
+                "Đang xóa..."
+              ) : (
+                <>
+                  <FaTrash /> Xóa ({oldPublicIds.length})
+                </>
+              )}
             </button>
           )}
         </div>
@@ -136,7 +152,7 @@ export default function ImageList({
                     <InputAdornment position="start">
                       <SortIcon />
                     </InputAdornment>
-                  ),
+                  )
                 }}
               />
             )}
@@ -146,46 +162,43 @@ export default function ImageList({
       </div>
       {loading ? (
         <div className="images-grid">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="image-skeleton"></div>
-        ))}
-      </div>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="image-skeleton"></div>
+          ))}
+        </div>
       ) : (
         <div className="images-grid">
-        {images.map((img, index) => (
-          <div key={img.public_id} className="image-item">
-            <input
-              type="checkbox"
-              checked={oldPublicIds.includes(img.public_id)}
-              onChange={() =>
-                setOldPublicIds((prev) =>
-                  prev.includes(img.public_id)
-                    ? prev.filter((x) => x !== img.public_id)
-                    : [...prev, img.public_id]
-                )
-              }
-            />
-            {img.resource_type === "video" ? (
-              <VideoCard key={img.public_id} video={img} />
-            ) : (
-              // <img src={img.secure_url} alt="" />
-              <ImageListItem key={img.public_id}>
-                 <LazyImage
+          {images.map((img, index) => (
+            <div key={img.public_id} className="image-item">
+              <input
+                type="checkbox"
+                checked={oldPublicIds.includes(img.public_id)}
+                onChange={() =>
+                  setOldPublicIds((prev) =>
+                    prev.includes(img.public_id)
+                      ? prev.filter((x) => x !== img.public_id)
+                      : [...prev, img.public_id]
+                  )
+                }
+              />
+              {img.resource_type === "video" ? (
+                <VideoCard key={img.public_id} video={img} />
+              ) : (
+                // <img src={img.secure_url} alt="" />
+                <ImageListItem key={img.public_id}>
+                  <LazyImage
                     src={img.secure_url}
                     alt={img.file_name}
                     className="fade-in"
                     onClick={() => handleImageClick(index)}
                   />
-              </ImageListItem>
-             
-            )
-          }
-            
-          </div>
-        ))}
-      </div>
+                </ImageListItem>
+              )}
+            </div>
+          ))}
+        </div>
       )}
-      
+
       {/* --- LightBox --- */}
       {!loading && isOpen && (
         <LightBox
@@ -225,6 +238,5 @@ export default function ImageList({
         loadImages={loadImages}
       />
     </div>
-    
   );
 }

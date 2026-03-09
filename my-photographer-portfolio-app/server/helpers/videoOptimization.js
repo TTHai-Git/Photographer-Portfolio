@@ -11,7 +11,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "mp4",
     quality: "auto",
     bitrate: "auto",
-    description: "H.264 video codec - Tương thích tốt nhất",
+    description: "H.264 video codec - Tương thích tốt nhất"
   },
   webm: {
     mime: "video/webm",
@@ -19,7 +19,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "webm",
     quality: "auto",
     bitrate: "auto",
-    description: "VP8/VP9 codec - Tối ưu cho web",
+    description: "VP8/VP9 codec - Tối ưu cho web"
   },
   ogv: {
     mime: "video/ogg",
@@ -27,7 +27,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "ogg",
     quality: "auto",
     bitrate: "auto",
-    description: "Theora codec - Mã nguồn mở",
+    description: "Theora codec - Mã nguồn mở"
   },
   mov: {
     mime: "video/quicktime",
@@ -35,7 +35,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "mov",
     quality: "auto",
     bitrate: "auto",
-    description: "QuickTime format - iPhone/Mac",
+    description: "QuickTime format - iPhone/Mac"
   },
   avi: {
     mime: "video/x-msvideo",
@@ -43,7 +43,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "avi",
     quality: "auto",
     bitrate: "auto",
-    description: "AVI format - Định dạng cũ",
+    description: "AVI format - Định dạng cũ"
   },
   mkv: {
     mime: "video/x-matroska",
@@ -51,7 +51,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "matroska",
     quality: "auto",
     bitrate: "auto",
-    description: "Matroska format - Chất lượng cao",
+    description: "Matroska format - Chất lượng cao"
   },
   flv: {
     mime: "video/x-flv",
@@ -59,7 +59,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "flv",
     quality: "auto",
     bitrate: "auto",
-    description: "Flash Video - Legacy format",
+    description: "Flash Video - Legacy format"
   },
   wmv: {
     mime: "video/x-ms-wmv",
@@ -67,7 +67,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "wmv",
     quality: "auto",
     bitrate: "auto",
-    description: "Windows Media Video",
+    description: "Windows Media Video"
   },
   m4v: {
     mime: "video/x-m4v",
@@ -75,7 +75,7 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "mp4",
     quality: "auto",
     bitrate: "auto",
-    description: "MPEG-4 Video - iTunes compatible",
+    description: "MPEG-4 Video - iTunes compatible"
   },
   m3u8: {
     mime: "application/x-mpegURL",
@@ -83,8 +83,8 @@ export const SUPPORTED_VIDEO_FORMATS = {
     container: "hls",
     quality: "auto",
     bitrate: "auto",
-    description: "HLS Streaming format",
-  },
+    description: "HLS Streaming format"
+  }
 };
 
 /**
@@ -119,7 +119,7 @@ export const getCloudinaryOptimizationParams = () => {
     audio_codec: "aac", // AAC codec cho âm thanh
     fetch_format: "auto", // Tự động chọn định dạng tốt nhất cho browser
     // Thêm các tham số để có file nhỏ hơn:
-    aspect_ratio: "preserve", // Giữ nguyên tỷ lệ
+    aspect_ratio: "preserve" // Giữ nguyên tỷ lệ
     // Cloudinary sẽ tự động tối ưu hóa kích thước video khi được yêu cầu
   };
 };
@@ -134,7 +134,7 @@ export const getVideoPlaybackTransformation = (publicId) => {
     // Tối ưu hóa cho phát lại
     fetch_format: "auto", // Tự động chọn định dạng tốt nhất
     quality: "auto", // Chất lượng tự động điều chỉnh
-    default_image: "fetch_format:auto", // Poster image optimization
+    default_image: "fetch_format:auto" // Poster image optimization
   };
 };
 
@@ -156,21 +156,21 @@ export const getMultiFormatPlaybackUrls = (publicId, cloudinary) => {
       resource_type: "video",
       format: "mp4",
       quality: "auto",
-      fetch_format: "auto",
+      fetch_format: "auto"
     }),
     // WebM - Tối ưu cho web
     webm: cloudinary.url(publicId, {
       resource_type: "video",
       format: "webm",
       quality: "auto",
-      fetch_format: "auto",
+      fetch_format: "auto"
     }),
     // Phiên bản tối ưu chung
     default: cloudinary.url(publicId, {
       resource_type: "video",
       fetch_format: "auto",
-      quality: "auto",
-    }),
+      quality: "auto"
+    })
   };
 };
 
@@ -180,5 +180,5 @@ export default {
   isValidVideoFormat,
   getCloudinaryOptimizationParams,
   getVideoPlaybackTransformation,
-  getMultiFormatPlaybackUrls,
+  getMultiFormatPlaybackUrls
 };

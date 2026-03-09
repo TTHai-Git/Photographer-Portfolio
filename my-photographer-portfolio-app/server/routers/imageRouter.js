@@ -3,7 +3,7 @@ import {
   // AddFieldsToImage,
   // createImages,
   getEachImageOfEachFolder,
-  getImages,
+  getImages
 } from "../controllers/imageController.js";
 
 const imageRouters = express.Router();

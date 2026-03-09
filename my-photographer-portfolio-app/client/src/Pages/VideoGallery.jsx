@@ -4,14 +4,14 @@ import LightGallery from "lightgallery/react";
 import lgVideo from "lightgallery/plugins/video";
 import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgFullscreen from "lightgallery/plugins/fullscreen";
-import lgAutoplay   from 'lightgallery/plugins/autoplay';
+import lgAutoplay from "lightgallery/plugins/autoplay";
 import lgShare from "lightgallery/plugins/share";
 
 import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-video.css";
 import "lightgallery/css/lg-thumbnail.css";
 import "lightgallery/css/lg-fullscreen.css";
-import 'lightgallery/css/lg-autoplay.css';
+import "lightgallery/css/lg-autoplay.css";
 import "lightgallery/css/lg-share.css";
 
 import "../Assets/CSS/VideoGallery.css";
@@ -23,13 +23,13 @@ export default function VideoGallery() {
   const lgRef = useRef(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
-  const { images, totalPages, loading, } = useImages(
-    page, 
-    4, 
+  const { images, totalPages, loading } = useImages(
+    page,
+    4,
     "Hoang-Truc-Photographer-Portfolio/Animation",
-    sort, 
-    );
-  const [videos, setVideos] = useState([])
+    sort,
+  );
+  const [videos, setVideos] = useState([]);
 
   const getVideoFormats = (url, format) => {
     // Map of supported video formats to MIME types
@@ -46,7 +46,8 @@ export default function VideoGallery() {
     };
 
     // Get the original format from the URL
-    const fileFormat = format?.toLowerCase() || url.split(".").pop().toLowerCase();
+    const fileFormat =
+      format?.toLowerCase() || url.split(".").pop().toLowerCase();
     const mimeType = formatMap[fileFormat] || "video/mp4";
 
     // Return multiple format sources for better browser compatibility
@@ -54,7 +55,7 @@ export default function VideoGallery() {
       {
         src: url,
         type: mimeType,
-      }
+      },
     ];
 
     // Add WebM version if available and original is not WebM
@@ -77,24 +78,25 @@ export default function VideoGallery() {
   };
 
   const loadVideos = () => {
-    const videosData = images.filter(img => img.resource_type === "video").map(video => {
-      
-      return {
-        poster: video.secure_url.replace(/\.\w+$/, ".webp"),
-        thumb: video.secure_url.replace(/\.\w+$/, ".webp"),
-        video: {
-          source: getVideoFormats(video.secure_url, video.format),
-          attributes: {
-            controls: true,
-            preload: "metadata",
-            playsInline: true,
-          }
-        },
-        subHtml: "<h4>" + video.original_filename + "</h4>",
-        shareUrl: video.secure_url
-      }
-    });
-    return  videosData;
+    const videosData = images
+      .filter((img) => img.resource_type === "video")
+      .map((video) => {
+        return {
+          poster: video.secure_url.replace(/\.\w+$/, ".webp"),
+          thumb: video.secure_url.replace(/\.\w+$/, ".webp"),
+          video: {
+            source: getVideoFormats(video.secure_url, video.format),
+            attributes: {
+              controls: true,
+              preload: "metadata",
+              playsInline: true,
+            },
+          },
+          subHtml: "<h4>" + video.original_filename + "</h4>",
+          shareUrl: video.secure_url,
+        };
+      });
+    return videosData;
   };
 
   useEffect(() => {
@@ -104,17 +106,14 @@ export default function VideoGallery() {
     }
   }, [loading, images, sort, page]);
 
-
   return (
     <div className="video-gallery">
       <SortBar sort={sort} onSortChange={setSort} />
       <div className="video-grid">
         {loading ? (
-          
           <div className="loading-overlay">
             <div className="spinner"></div>
           </div>
-            
         ) : videos.length === 0 ? (
           <div className="no-videos">No videos found (Comming Soon).</div>
         ) : null}
@@ -122,8 +121,7 @@ export default function VideoGallery() {
           <div
             key={index}
             className="video-card"
-            onClick={() => lgRef.current.openGallery(index)}
-          >
+            onClick={() => lgRef.current.openGallery(index)}>
             <img
               src={item.poster}
               alt="Video thumbnail"
@@ -145,14 +143,14 @@ export default function VideoGallery() {
         plugins={[lgVideo, lgThumbnail, lgFullscreen, lgAutoplay, lgShare]}
         dynamic
         dynamicEl={videos}
-        carousel={true}            // enable carousel navigation
+        carousel={true} // enable carousel navigation
         thumbnail={true}
         fullScreen={true}
         download={true}
         videoAutoplay={false}
         autoplayFirstVideo={false}
         videojs={false}
-        autoplay={true}          // plugin‑specific options
+        autoplay={true} // plugin‑specific options
         autoplayControls={true}
         autoplayVideoOnSlide={true}
         addClass="lg-video-custom"

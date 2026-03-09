@@ -7,7 +7,7 @@ import { deletedImages } from "./imageController.js";
 import {
   clearCacheByKeyword,
   clearRelatedCaches,
-  getOrSetCachedData,
+  getOrSetCachedData
 } from "./redisCloudControllers.js";
 import streamifier from "streamifier";
 import getRedisClient from "../config/redisCloud.config.js";
@@ -180,7 +180,7 @@ export const saveAssets = async (req, res) => {
         format: item.format,
         resolution: item.resolution || "1920x1080",
         folder: folderDoc._id,
-        videoMeta: item.videoMeta || null,
+        videoMeta: item.videoMeta || null
       });
     }
 
@@ -189,14 +189,14 @@ export const saveAssets = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Lưu DB thành công",
+      message: "Lưu DB thành công"
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       success: false,
       message: "Lưu DB thất bại",
-      error: error.message,
+      error: error.message
     });
   }
 };
@@ -207,18 +207,18 @@ export const handleDeleteImages = async (req, res) => {
 
     if (!public_ids || public_ids.length === 0) {
       return res.status(400).json({
-        message: "Chưa cung cấp public_ids của các assets để xóa!",
+        message: "Chưa cung cấp public_ids của các assets để xóa!"
       });
     }
 
     // 1️⃣ Lấy toàn bộ asset 1 lần
     const assets = await Asset.find({
-      public_id: { $in: public_ids },
+      public_id: { $in: public_ids }
     }).select("public_id resource_type");
 
     if (!assets.length) {
       return res.status(404).json({
-        message: "Không tìm thấy asset nào!",
+        message: "Không tìm thấy asset nào!"
       });
     }
 
@@ -236,7 +236,7 @@ export const handleDeleteImages = async (req, res) => {
     // 3️⃣ Delete theo từng resource_type
     for (const [resource_type, ids] of Object.entries(grouped)) {
       const result = await cloudinary.api.delete_resources(ids, {
-        resource_type,
+        resource_type
       });
       cloudinaryResults[resource_type] = result;
     }
@@ -246,7 +246,7 @@ export const handleDeleteImages = async (req, res) => {
 
     if (!resultsOfDB.success) {
       return res.status(500).json({
-        message: "Xóa assets trong DB thất bại!",
+        message: "Xóa assets trong DB thất bại!"
       });
     }
 
@@ -255,12 +255,12 @@ export const handleDeleteImages = async (req, res) => {
 
     return res.status(200).json({
       message: "Xóa assets thành công.",
-      cloudinaryResults,
+      cloudinaryResults
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: "Xóa assets thất bại!",
+      message: "Xóa assets thất bại!"
     });
   }
 };
@@ -271,7 +271,7 @@ export const handleDeleteFolders = async (req, res) => {
 
     if (!folderDirs || folderDirs.length === 0) {
       return res.status(400).json({
-        message: "Thiếu thông tin đường dẫn thư mục!",
+        message: "Thiếu thông tin đường dẫn thư mục!"
       });
     }
 
@@ -282,18 +282,18 @@ export const handleDeleteFolders = async (req, res) => {
 
       // kiểm tra có asset không
       const assetCount = await Asset.countDocuments({
-        folder: folderDoc._id,
+        folder: folderDoc._id
       });
 
       // nếu có asset
       if (assetCount > 0) {
         await Promise.all([
           cloudinary.api.delete_resources_by_prefix(folderPrefix, {
-            resource_type: "image",
+            resource_type: "image"
           }),
           cloudinary.api.delete_resources_by_prefix(folderPrefix, {
-            resource_type: "video",
-          }),
+            resource_type: "video"
+          })
         ]);
       }
 
@@ -306,19 +306,19 @@ export const handleDeleteFolders = async (req, res) => {
 
     if (!resultsOfDB.success) {
       return res.status(500).json({
-        message: "Xóa thư mục trong DB thất bại!",
+        message: "Xóa thư mục trong DB thất bại!"
       });
     }
 
     await clearRelatedCaches("GET:/v1/folders");
 
     return res.status(200).json({
-      message: "Xóa thư mục thành công.",
+      message: "Xóa thư mục thành công."
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: "Xóa thư mục thất bại!",
+      message: "Xóa thư mục thất bại!"
     });
   }
 };
@@ -329,7 +329,7 @@ export const handleCreateFolder = async (req, res) => {
 
     if (!rootDir || !folderName) {
       return res.status(400).json({
-        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục!",
+        message: "Thiếu thông tin đường dẫn thư mục hoặc tên thư mục!"
       });
     }
 
@@ -342,13 +342,13 @@ export const handleCreateFolder = async (req, res) => {
     const existing = await cloudinary.api.sub_folders(parentDir);
 
     const isExist = existing.folders.some(
-      (f) => f.name.toLowerCase() === folderName.toLowerCase(),
+      (f) => f.name.toLowerCase() === folderName.toLowerCase()
     );
 
     if (isExist) {
       return res.status(409).json({
         message: "Thư mục đã tồn tại trên Cloudinary!",
-        folderPath,
+        folderPath
       });
     }
     // =======================================
@@ -370,7 +370,7 @@ export const handleCreateFolder = async (req, res) => {
     return res.status(201).json({
       message: "Tạo thư mục thành công.",
       folderPath,
-      result,
+      result
     });
   } catch (error) {
     console.log(error);
@@ -387,20 +387,20 @@ export const handleMoveImages = async (req, res) => {
 
     // 1️⃣ Lấy toàn bộ asset 1 lần
     const assets = await Asset.find({
-      public_id: { $in: oldPublicIds },
+      public_id: { $in: oldPublicIds }
     }).select("public_id resource_type");
 
     if (!assets.length) {
       return res.status(404).json({
-        message: "Assets not found",
+        message: "Assets not found"
       });
     }
 
     // 2️⃣ Move trên Cloudinary (song song)
     const moveResults = await Promise.all(
       assets.map((asset) =>
-        handleMoveAsset(asset.public_id, newFolder, asset.resource_type),
-      ),
+        handleMoveAsset(asset.public_id, newFolder, asset.resource_type)
+      )
     );
 
     // 3️⃣ Lấy folder mới
@@ -408,7 +408,7 @@ export const handleMoveImages = async (req, res) => {
 
     if (!newFolderDoc) {
       return res.status(404).json({
-        message: "New folder does not exist in database",
+        message: "New folder does not exist in database"
       });
     }
 
@@ -421,9 +421,9 @@ export const handleMoveImages = async (req, res) => {
           update: {
             public_id: item.newPublicId,
             secure_url: item.secure_url,
-            folder: newFolderDoc._id,
-          },
-        },
+            folder: newFolderDoc._id
+          }
+        }
       }));
 
     if (bulkOps.length > 0) {
@@ -442,7 +442,7 @@ export const handleMoveImages = async (req, res) => {
       message: hasError
         ? "Một số file không thể di chuyển!"
         : `Di chuyển toàn bộ file sang thư mục ${newFolder} thành công!`,
-      results: moveResults,
+      results: moveResults
     });
   } catch (error) {
     console.error(error);
@@ -456,7 +456,7 @@ const handleMoveAsset = async (oldPublicId, newFolder, resource_type) => {
 
   try {
     const result = await cloudinary.uploader.rename(oldPublicId, newPublicId, {
-      resource_type, // 🔥 QUAN TRỌNG
+      resource_type // 🔥 QUAN TRỌNG
     });
 
     return {
@@ -464,14 +464,14 @@ const handleMoveAsset = async (oldPublicId, newFolder, resource_type) => {
       oldPublicId,
       newPublicId,
       secure_url: result.secure_url,
-      resource_type,
+      resource_type
     };
   } catch (err) {
     return {
       success: false,
       oldPublicId,
       resource_type,
-      error: err.message,
+      error: err.message
     };
   }
 };

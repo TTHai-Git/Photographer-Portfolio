@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import "../Assets/CSS/modal.css";
-import{ authApi, endpoints } from "../config/APIs";
+import { authApi, endpoints } from "../config/APIs";
 import { useNotification } from "../Context/NotificationContext";
 
-
-export default function CreateFolderModal({folders, loadFoldersForCombobox, open, onClose, loadFolders, setFolderParams }) {
+export default function CreateFolderModal({
+  folders,
+  loadFoldersForCombobox,
+  open,
+  onClose,
+  loadFolders,
+  setFolderParams
+}) {
   const [folderName, setFolderName] = useState("");
-  const [selectedRootDir, setSelectedRootDir] = useState("")
-  const {showNotification} = useNotification()
-  const [loadingCreate, setLoadingCreate] = useState(false) 
-
+  const [selectedRootDir, setSelectedRootDir] = useState("");
+  const { showNotification } = useNotification();
+  const [loadingCreate, setLoadingCreate] = useState(false);
 
   const handleCreateFolder = async () => {
     if (!folderName || !selectedRootDir) {
       showNotification("Vui lòng chọn đường dẫn và nhập tên", "warning");
-      return 
+      return;
     }
 
     try {
@@ -22,13 +27,13 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
 
       const res = await authApi.post(endpoints.createFolder, {
         rootDir: selectedRootDir,
-        folderName,
+        folderName
       });
 
       if (res.status === 201) {
         showNotification(res.data.message, "success");
         // await loadFolders();
-        setFolderParams(prev => ({
+        setFolderParams((prev) => ({
           ...prev,
           page: 1,
           refresh: Date.now()
@@ -36,7 +41,6 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
         resetCreateState();
         onClose();
       }
-      
     } catch (error) {
       showNotification(error.response?.data?.message, "error");
     } finally {
@@ -44,10 +48,9 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
     }
   };
 
-
   const resetCreateState = () => {
-  setFolderName("");
-  setSelectedRootDir("");
+    setFolderName("");
+    setSelectedRootDir("");
   };
 
   useEffect(() => {
@@ -57,36 +60,36 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
     }
   }, [open]);
 
-
   if (!open) return null;
 
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
-        <div className="modal-header">Biểu Mẫu Tạo Thư Mục
+        <div className="modal-header">Biểu Mẫu Tạo Thư Mục</div>
 
-        </div>
-
-        <div className='modal-content'>
-            {/* Select Folder */}
+        <div className="modal-content">
+          {/* Select Folder */}
           <label className="label">Chọn Đường Dẫn</label>
-        
-        
+
           <select
             className="select"
             value={selectedRootDir}
-            onChange={(e) => setSelectedRootDir(e.target.value)}
-          >
-            <option value="" disabled={true}>-- Chọn Đường Dẫn Gốc --</option>
-            <option key={"Hoang-Truc-Photographer-Portfolio"} value={"Hoang-Truc-Photographer-Portfolio"}>Hoang-Truc-Photographer-Portfolio</option>
+            onChange={(e) => setSelectedRootDir(e.target.value)}>
+            <option value="" disabled={true}>
+              -- Chọn Đường Dẫn Gốc --
+            </option>
+            <option
+              key={"Hoang-Truc-Photographer-Portfolio"}
+              value={"Hoang-Truc-Photographer-Portfolio"}>
+              Hoang-Truc-Photographer-Portfolio
+            </option>
             {folders.map((folder) => (
               <option key={folder._id} value={folder.path}>
                 {folder.path}
               </option>
             ))}
           </select>
-          
-        
+
           <label className="label">Đặt Tên Thư Mục</label>
           <input
             className="modal-input"
@@ -96,15 +99,23 @@ export default function CreateFolderModal({folders, loadFoldersForCombobox, open
           />
 
           <div className="modal-actions">
-            <button className="btn" onClick={onClose}>Hủy</button>
-
-            <button className="btn btn-primary" onClick={handleCreateFolder} disabled={loadingCreate}>
-              {loadingCreate ? <>
-                <span>Đang tạo thư mục...</span>
-                <span className="spinner-btn"></span> 
-              </> : ( <span>Tạo</span>)}
+            <button className="btn" onClick={onClose}>
+              Hủy
             </button>
 
+            <button
+              className="btn btn-primary"
+              onClick={handleCreateFolder}
+              disabled={loadingCreate}>
+              {loadingCreate ? (
+                <>
+                  <span>Đang tạo thư mục...</span>
+                  <span className="spinner-btn"></span>
+                </>
+              ) : (
+                <span>Tạo</span>
+              )}
+            </button>
           </div>
         </div>
       </div>

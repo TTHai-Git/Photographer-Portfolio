@@ -23,14 +23,14 @@ self.onmessage = async (e) => {
     let quality = 0.9;
     let blob = await canvas.convertToBlob({
       type: "image/webp",
-      quality,
+      quality
     });
 
     while (blob.size > maxBytes && quality > 0.4) {
       quality -= 0.1;
       blob = await canvas.convertToBlob({
         type: "image/webp",
-        quality,
+        quality
       });
     }
 

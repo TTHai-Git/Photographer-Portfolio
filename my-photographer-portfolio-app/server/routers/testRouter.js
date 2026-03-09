@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   AddFieldsToAsset,
   renameFields,
-  renameMyCollection,
+  renameMyCollection
 } from "../controllers/test.js";
 const testRouters = new Router();
 // testRouters.get("/change-collection-name", renameMyCollection);

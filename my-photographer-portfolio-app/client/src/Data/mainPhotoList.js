@@ -18,7 +18,7 @@ export const mainPhotoList = [
     alt: "verdant-cocktail-bar",
     caption: "VERDANT COCKTAIL BAR",
     rootFolder: "VERDANT COCKTAIL BAR",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "choi-xuan-gift-box",
@@ -27,7 +27,7 @@ export const mainPhotoList = [
     alt: "choi-xuan-gift-box",
     caption: "CHOI XUAN GIFT BOX",
     rootFolder: "CHOI XUAN_GIFT BOX",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "nguyen-sac-candle",
@@ -36,7 +36,7 @@ export const mainPhotoList = [
     alt: "nguyen-sac-candle",
     caption: "NGUYEN SAC CANDLE",
     rootFolder: "NGUYEN SAC CANDLE",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "yen-sao-phuong-dong",
@@ -45,7 +45,7 @@ export const mainPhotoList = [
     alt: "yen-sao-phuong-dong",
     caption: "YEN SAO PHUONG DONG",
     rootFolder: "YEN SAO PHUONG DONG",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "product-set-up",
@@ -54,7 +54,7 @@ export const mainPhotoList = [
     alt: "product-set-up",
     caption: "PRODUCT SET UP",
     rootFolder: "PRODUCT SET UP",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "amy-cake-lunar-new-year",
@@ -63,7 +63,7 @@ export const mainPhotoList = [
     alt: "amy-cake-lunar-new-year",
     caption: "AMY CAKE LUNAR NEW YEAR",
     rootFolder: "AMY CAKE_LUNAR NEW YEAR",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "amy-cake-christmas-cake",
@@ -72,7 +72,7 @@ export const mainPhotoList = [
     alt: "amy-cake-christmas-cake",
     caption: "AMY CAKE CHRISTMAS CAKE",
     rootFolder: "AMY CAKE_CHRISTMAS CAKE",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "ghien-mysteri-deep-connection-card",
@@ -81,7 +81,7 @@ export const mainPhotoList = [
     alt: "ghien-mysteri-deep-connection-card",
     caption: "GHIEN MYSTERI DEEP CONNECTION CARD",
     rootFolder: "GHIEN MYSTERI_DEEP CONNECTION CARD",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "macro",
@@ -90,7 +90,7 @@ export const mainPhotoList = [
     alt: "macro",
     caption: "MACRO",
     rootFolder: "MACRO",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "swimming-equipment",
@@ -99,7 +99,7 @@ export const mainPhotoList = [
     alt: "swimming-equipment",
     caption: "SWIMMING EQUIPMENT",
     rootFolder: "SWIMMING EQUIPMENT",
-    indexImageList: 0,
+    indexImageList: 0
   },
   {
     key: "yves-rocher",
@@ -108,6 +108,6 @@ export const mainPhotoList = [
     alt: "yves-rocher",
     caption: "YVES ROCHER",
     rootFolder: "YVES ROCHER",
-    indexImageList: 0,
-  },
+    indexImageList: 0
+  }
 ];

@@ -7,11 +7,7 @@ const ShowCaseItem = ({ src, alt, folderName, onClick }) => {
   return (
     <div className="showcase-card">
       {/* Thumbnail */}
-      <div
-        ref={imgRef}
-        className="showcase-thumb"
-        onClick={onClick}
-      >
+      <div ref={imgRef} className="showcase-thumb" onClick={onClick}>
         <img src={src} alt={alt} />
       </div>
 

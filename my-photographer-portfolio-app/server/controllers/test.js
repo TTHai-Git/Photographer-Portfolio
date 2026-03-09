@@ -21,9 +21,9 @@ export async function renameFields() {
     const result = await Asset.updateMany(
       {}, // An empty filter applies the update to all documents
       {
-        $rename: { secure_url: "secure_url", Folder: "folder" },
+        $rename: { secure_url: "secure_url", Folder: "folder" }
       }, // The $rename operator
-      { strict: false }, // Set strict to false to allow updating fields not in the schema during migration
+      { strict: false } // Set strict to false to allow updating fields not in the schema during migration
     ).exec();
 
     console.log(`Updated ${result.nModified} documents`);
@@ -39,15 +39,15 @@ export const AddFieldsToAsset = async (req, res) => {
       {},
       [
         {
-          $set: { videoMeta: null },
-        },
+          $set: { videoMeta: null }
+        }
       ],
-      { updatePipeline: true }, // 👈 QUAN TRỌNG
+      { updatePipeline: true } // 👈 QUAN TRỌNG
     );
 
     return res.status(200).json({
       message: "isDeleted field updated successfully",
-      modifiedCount: result.modifiedCount,
+      modifiedCount: result.modifiedCount
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });

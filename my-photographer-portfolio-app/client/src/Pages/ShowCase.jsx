@@ -1,5 +1,5 @@
 // ShowCase.jsx
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 import LightBox from "../utils/LightBox";
 // import { scrollToElement } from "../Helpers/ScrollToElement";
@@ -16,39 +16,44 @@ export const ShowCase = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
   // const {folders, loadingFolders} = useFolders(1, 500, "oldest")
-  const {mainPhotoList, totalPages, loadingEachImageOfEachFolder} = useEachImageOfEachFolder(page, 8, sort, "Hoang-Truc-Photographer-Portfolio/SHOW CASE/");
-  const { images, loading } = useImages(1,500,folder, "oldest");
+  const { mainPhotoList, totalPages, loadingEachImageOfEachFolder } =
+    useEachImageOfEachFolder(
+      page,
+      8,
+      sort,
+      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/",
+    );
+  const { images, loading } = useImages(1, 500, folder, "oldest");
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
-  const [slides, setSlides] = useState([])
+  const [slides, setSlides] = useState([]);
   const [pendingOpen, setPendingOpen] = useState(false);
 
   const handleImageClick = (folderDir, index) => {
     setFolder(folderDir);
     setStartIndex(index);
     setPendingOpen(true); // đánh dấu chờ load ảnh
-    
   };
 
   useEffect(() => {
-  if (!loading && pendingOpen && images.length > 0) {
-    const slidesData = images.filter(img => img.resource_type === "image").map(img => {
-      const parts = img.public_id.split("/");
-      const folderName = parts[parts.length - 2];
+    if (!loading && pendingOpen && images.length > 0) {
+      const slidesData = images
+        .filter((img) => img.resource_type === "image")
+        .map((img) => {
+          const parts = img.public_id.split("/");
+          const folderName = parts[parts.length - 2];
 
-      return {
-        src: img.secure_url,
-        title: folderName,
-      };
-    });
+          return {
+            src: img.secure_url,
+            title: folderName,
+          };
+        });
 
-    setSlides(slidesData);
-    setIsOpen(true);
-    setPendingOpen(false);
-  }
-}, [loading, images, pendingOpen]);
-
-
+      setSlides(slidesData);
+      setIsOpen(true);
+      setPendingOpen(false);
+    }
+  }, [loading, images, pendingOpen]);
 
   return (
     <div className="showcase-container">
@@ -86,7 +91,10 @@ export const ShowCase = () => {
           <>
             {mainPhotoList?.map((image) => {
               return (
-                <div key={image._id} id={image.folder._id} className="showcase-card fade-in" >
+                <div
+                  key={image._id}
+                  id={image.folder._id}
+                  className="showcase-card fade-in">
                   {/* <p className="showcase-caption">{image.caption}</p> */}
                   <ShowCaseItem
                     key={image._id}
@@ -94,13 +102,13 @@ export const ShowCase = () => {
                     alt={image.public_id}
                     folderName={handleGetFolderName(image.folder.path)}
                     className="showcase-image"
-                    onClick={() => handleImageClick(image.folder.path,0)}
+                    onClick={() => handleImageClick(image.folder.path, 0)}
                   />
                 </div>
-              )
+              );
             })}
-              </>
-            )}
+          </>
+        )}
       </div>
 
       <Pagination
@@ -109,7 +117,7 @@ export const ShowCase = () => {
         onPageChange={(page) => setPage(page)}
       />
 
-      {loading && loadingEachImageOfEachFolder  && pendingOpen && (
+      {loading && loadingEachImageOfEachFolder && pendingOpen && (
         <div className="loading-overlay">
           <div className="spinner"></div>
         </div>
@@ -122,9 +130,9 @@ export const ShowCase = () => {
           slides={slides}
           startIndex={startIndex}
           onClose={() => {
-            setIsOpen(false)
-            setFolder(null)
-            setSlides([])
+            setIsOpen(false);
+            setFolder(null);
+            setSlides([]);
           }}
         />
       )}

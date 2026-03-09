@@ -2,7 +2,7 @@ import express from "express";
 import {
   // createFolders,
   getFolders,
-  getFoldersForCombobox,
+  getFoldersForCombobox
 } from "../controllers/folderController.js";
 
 const folderRouters = express.Router();

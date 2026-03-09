@@ -20,7 +20,7 @@ export const compressToWebp = async (buffer) => {
       width: MAX_WIDTH,
       height: MAX_HEIGHT,
       fit: "inside",
-      withoutEnlargement: true,
+      withoutEnlargement: true
     });
   }
 
@@ -29,7 +29,7 @@ export const compressToWebp = async (buffer) => {
     const output = await pipeline
       .webp({
         quality,
-        effort: 6, // tối ưu cân bằng tốc độ / chất lượng
+        effort: 6 // tối ưu cân bằng tốc độ / chất lượng
       })
       .toBuffer();
 

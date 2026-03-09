@@ -9,8 +9,7 @@ const SortBar = ({ sort, onSortChange }) => {
       <select
         className="sortbar-select"
         value={sort}
-        onChange={(e) => onSortChange(e.target.value)}
-      >
+        onChange={(e) => onSortChange(e.target.value)}>
         <option value="latest">Latest</option>
         <option value="oldest">Oldest</option>
         <option value="az">A → Z</option>

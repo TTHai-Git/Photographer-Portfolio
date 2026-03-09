@@ -30,19 +30,13 @@ export default function VideoModalPlayer({ publicId, onClose }) {
     <div
       ref={containerRef}
       className="modal-container"
-      onClick={handleOutsideClick}
-    >
+      onClick={handleOutsideClick}>
       <div className="modal-content">
         <button className="close-btn" onClick={onClose}>
           ×
         </button>
 
-        <video
-          ref={videoRef}
-          controls
-          preload="auto"
-          className="modal-video"
-        />
+        <video ref={videoRef} controls preload="auto" className="modal-video" />
       </div>
     </div>
   );

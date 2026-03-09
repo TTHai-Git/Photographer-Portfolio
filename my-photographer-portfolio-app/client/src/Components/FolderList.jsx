@@ -8,7 +8,7 @@ import {
   Autocomplete,
   IconButton,
   InputAdornment,
-  TextField,
+  TextField
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -26,7 +26,7 @@ const FolderList = ({
   setSelectedFolder,
   folderParams,
   setFolderParams,
-  sortFileds,
+  sortFileds
 }) => {
   const [selectedDirs, setSelectedDirs] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
@@ -37,7 +37,7 @@ const FolderList = ({
     setFolderParams((prev) => ({
       ...prev,
       page: 1,
-      [key]: val,
+      [key]: val
     }));
   };
 
@@ -46,32 +46,35 @@ const FolderList = ({
       showNotification("Vui lòng chọn thư mục để xóa!", "warning");
       return;
     }
-    if (!window.confirm("Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)")) return;
+    if (
+      !window.confirm(
+        "Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)"
+      )
+    )
+      return;
 
     try {
       setLoadingDelete(true);
 
       const res = await authApi.delete(endpoints.deleteFolders, {
-        data: { folderDirs: selectedDirs },
+        data: { folderDirs: selectedDirs }
       });
       if (res.status === 200) {
         showNotification(res.data.message, "success");
-        setFolderParams(prev => ({
+        setFolderParams((prev) => ({
           ...prev,
           page: 1,
           refresh: Date.now()
         }));
         setSelectedDirs([]);
         setImages([]);
-      } 
+      }
     } catch (err) {
       showNotification(err.response?.data?.message, "error");
     } finally {
       setLoadingDelete(false);
     }
   };
-
-  
 
   return (
     <div className="folder-list">
@@ -83,9 +86,14 @@ const FolderList = ({
         <button
           className="btn btn-red"
           onClick={handleDeleteFolders}
-          disabled={loadingDelete}
-        >
-          {loadingDelete ? "Đang xóa..." : <><FaTrash /> Xóa ({selectedDirs.length})</>}
+          disabled={loadingDelete}>
+          {loadingDelete ? (
+            "Đang xóa..."
+          ) : (
+            <>
+              <FaTrash /> Xóa ({selectedDirs.length})
+            </>
+          )}
         </button>
       </div>
 
@@ -105,7 +113,7 @@ const FolderList = ({
               <IconButton onClick={() => updateParams("search", "")}>
                 <ClearIcon />
               </IconButton>
-            ),
+            )
           }}
           sx={{ width: 350, bgcolor: "white", borderRadius: 2 }}
         />
@@ -125,7 +133,7 @@ const FolderList = ({
                   <InputAdornment position="start">
                     <SortIcon />
                   </InputAdornment>
-                ),
+                )
               }}
             />
           )}
@@ -134,37 +142,34 @@ const FolderList = ({
       </div>
 
       {/* Folder Items */}
-      {loading ? (
-        Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="folder-skeleton"></div>
-        ))
-      ) : (
-        folders.map((f) => (
-          <div
-            key={f._id}
-            className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
-            onClick={() => setSelectedFolder(f.path)}
-          >
-            <input
-              type="checkbox"
-              checked={selectedDirs.includes(f.path)}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedDirs((prev) =>
-                  prev.includes(f.path)
-                    ? prev.filter((x) => x !== f.path)
-                    : [...prev, f.path]
-                );
-              }}
-            />
+      {loading
+        ? Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="folder-skeleton"></div>
+          ))
+        : folders.map((f) => (
+            <div
+              key={f._id}
+              className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
+              onClick={() => setSelectedFolder(f.path)}>
+              <input
+                type="checkbox"
+                checked={selectedDirs.includes(f.path)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedDirs((prev) =>
+                    prev.includes(f.path)
+                      ? prev.filter((x) => x !== f.path)
+                      : [...prev, f.path]
+                  );
+                }}
+              />
 
-            <div className="folder-left">
-              <FaFolder className="folder-icon" />
-              <span>{handleGetFolderName(f.path)}</span>
+              <div className="folder-left">
+                <FaFolder className="folder-icon" />
+                <span>{handleGetFolderName(f.path)}</span>
+              </div>
             </div>
-          </div>
-        ))
-      )}
+          ))}
 
       <CreateFolderModal
         folders={foldersForCombobox}
@@ -176,6 +181,6 @@ const FolderList = ({
       />
     </div>
   );
-}
+};
 
 export default React.memo(FolderList);

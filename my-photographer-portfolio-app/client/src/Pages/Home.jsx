@@ -14,20 +14,22 @@ export const Home = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
   const { images, totalPages, loading } = useImages(
-  page,
-  500,
-  "Hoang-Truc-Photographer-Portfolio/HOME",
-  sort,
-);
+    page,
+    500,
+    "Hoang-Truc-Photographer-Portfolio/HOME",
+    sort,
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 
   const handleImageClick = (index) => {
-    const slideList = images.filter((image) => image.resource_type === "image").map((image) => ({
-      src: image.secure_url,
-      title: "HOME"
-    }));
+    const slideList = images
+      .filter((image) => image.resource_type === "image")
+      .map((image) => ({
+        src: image.secure_url,
+        title: "HOME",
+      }));
 
     setSlides(slideList);
     setStartIndex(index);
@@ -41,8 +43,7 @@ export const Home = () => {
         component="div"
         gutterBottom
         align="center"
-        className="home-heading"
-      >
+        className="home-heading">
         Welcome to My Photography Portfolio
       </Typography>
 
@@ -60,12 +61,7 @@ export const Home = () => {
       )}
 
       {/* --- Masonry Image Grid --- */}
-      <ImageList
-        variant="masonry"
-        cols={3}
-        gap={24}
-        className="gallery-grid"
-      >
+      <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {images.map((image, index) => (
           <ImageListItem key={image._id}>
             {/* <img
@@ -84,7 +80,7 @@ export const Home = () => {
           </ImageListItem>
         ))}
       </ImageList>
-       
+
       <Pagination
         currentPage={page}
         totalPages={totalPages || 1}

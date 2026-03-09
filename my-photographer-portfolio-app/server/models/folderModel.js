@@ -3,12 +3,12 @@ const FolderSchema = new Schema(
   {
     path: {
       type: String,
-      require: true,
-    },
+      require: true
+    }
   },
   {
-    timestamps: true,
-  },
+    timestamps: true
+  }
 );
 const Folder = model("Folder", FolderSchema);
 export default Folder;

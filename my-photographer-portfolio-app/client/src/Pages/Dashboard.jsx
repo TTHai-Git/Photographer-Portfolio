@@ -50,7 +50,7 @@ export default function Dashboard() {
     try {
       setLoadingFolders(true);
       const res = await APIs.get(
-        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sort=${folderParams.sort}`
+        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sort=${folderParams.sort}`,
       );
       setFolders(res.data.folders);
       setTotalPagesOfFolders(res.data.totalPages);
@@ -61,9 +61,7 @@ export default function Dashboard() {
 
   /** For MoveImageModal, UploadImageModal */
   const loadFoldersForCombobox = async () => {
-    const res = await APIs.get(
-      `${endpoints.getFoldersForCombobox}`
-    );
+    const res = await APIs.get(`${endpoints.getFoldersForCombobox}`);
     setFoldersForCombobox(res.data.folders);
   };
 
@@ -74,7 +72,7 @@ export default function Dashboard() {
     try {
       setLoadingImages(true);
       const res = await authApi.get(
-        `${endpoints.getImagesFromDB}?page=${imageParams.page}&limit=10&sort=${imageParams.sort}&path=${selectedFolder}`
+        `${endpoints.getImagesFromDB}?page=${imageParams.page}&limit=10&sort=${imageParams.sort}&path=${selectedFolder}`,
       );
       setImages(res.data.images);
       setTotalPagesOfImages(res.data.totalPages);
@@ -84,12 +82,12 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-  if (!user) navigate("/login")
-  loadFolders();
-}, [folderParams]);
+    if (!user) navigate("/login");
+    loadFolders();
+  }, [folderParams]);
 
   useEffect(() => {
-    loadImages(); 
+    loadImages();
   }, [selectedFolder, imageParams]);
 
   return (
@@ -154,13 +152,23 @@ function Pagination({ page, total, onPageChange }) {
 
   return (
     <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
-      <Button onClick={() => onPageChange(1)} disabled={page === 1}>First</Button>
-      <Button onClick={() => onPageChange(page - 1)} disabled={page === 1}>Prev</Button>
+      <Button onClick={() => onPageChange(1)} disabled={page === 1}>
+        First
+      </Button>
+      <Button onClick={() => onPageChange(page - 1)} disabled={page === 1}>
+        Prev
+      </Button>
 
-      <Typography>Page {page} / {total}</Typography>
+      <Typography>
+        Page {page} / {total}
+      </Typography>
 
-      <Button onClick={() => onPageChange(page + 1)} disabled={page === total}>Next</Button>
-      <Button onClick={() => onPageChange(total)} disabled={page === total}>Last</Button>
+      <Button onClick={() => onPageChange(page + 1)} disabled={page === total}>
+        Next
+      </Button>
+      <Button onClick={() => onPageChange(total)} disabled={page === total}>
+        Last
+      </Button>
     </Stack>
   );
 }
