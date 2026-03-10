@@ -16,34 +16,34 @@ function App() {
       children: [
         {
           index: true, // default child route
-          element: <Home />
+          element: <Home />,
         },
         {
           path: "login",
-          element: <Login />
+          element: <Login />,
         },
         {
           path: "dashboard",
-          element: <Dashboard />
+          element: <Dashboard />,
         },
         {
           path: "my-project",
-          element: <ShowCase />
+          element: <ShowCase />,
         },
         {
           path: "portrait",
-          element: <Portrait />
+          element: <Portrait />,
         },
-        {
-          path: "animation",
-          element: <VideoGallery />
-        },
+        // {
+        //   path: "animation",
+        //   element: <VideoGallery />
+        // },
         {
           path: "about",
-          element: <About />
-        }
-      ]
-    }
+          element: <About />,
+        },
+      ],
+    },
   ]);
 
   return <RouterProvider router={router} />;

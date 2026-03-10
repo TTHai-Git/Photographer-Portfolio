@@ -38,9 +38,9 @@ export const Navbar = () => {
           <NavLink to="/portrait" onClick={closeMenu}>
             Portrait
           </NavLink>
-          <NavLink to="/animation" onClick={closeMenu}>
+          {/* <NavLink to="/animation" onClick={closeMenu}>
             Animation (Demo)
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/about" onClick={closeMenu}>
             About
           </NavLink>
@@ -59,7 +59,8 @@ export const Navbar = () => {
                     logout();
                     closeMenu();
                     navigate("/");
-                  }}>
+                  }}
+                >
                   logout
                 </NavLink>
               </div>
