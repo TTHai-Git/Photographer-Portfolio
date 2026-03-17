@@ -17,7 +17,7 @@ export const Home = () => {
     page,
     500,
     "Hoang-Truc-Photographer-Portfolio/HOME",
-    sort,
+    sort
   );
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
@@ -28,7 +28,7 @@ export const Home = () => {
       .filter((image) => image.resource_type === "image")
       .map((image) => ({
         src: image.secure_url,
-        title: "HOME",
+        title: "HOME"
       }));
 
     setSlides(slideList);

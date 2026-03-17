@@ -1,6 +1,5 @@
 import React from "react";
 import "../Assets/CSS/About.css";
-import hero from "../Assets/Images/about/figma/about-hero.png";
 
 const About = () => {
   return (
@@ -13,7 +12,11 @@ const About = () => {
         <div className="about-left-column">
           {/* Hero Image */}
           <div className="about-hero-wrapper">
-            <img src={hero} alt="Hoang Truc" className="about-hero" />
+            <img
+              src={`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}${process.env.REACT_APP_DIR_CLOUD}v1773729068/Hoang-Truc-Photographer-Portfolio/about/Avatar_ic7riv.webp`}
+              alt="Hoang Truc"
+              className="about-hero"
+            />
           </div>
         </div>
 

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "../Assets/CSS/Navbar.css";
 import { Menu, X } from "lucide-react";
-import Logo from "../Assets/Images/navbar/Logo.png";
 import { useAuth } from "../Context/AuthContext";
 
 export const Navbar = () => {
@@ -59,8 +58,7 @@ export const Navbar = () => {
                     logout();
                     closeMenu();
                     navigate("/");
-                  }}
-                >
+                  }}>
                   logout
                 </NavLink>
               </div>
