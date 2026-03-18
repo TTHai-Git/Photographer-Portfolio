@@ -22,10 +22,23 @@ export const endpoints = {
 export const authApi = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "content-type": "application/json",
+    "Content-Type": "application/json",
   },
   withCredentials: true, // ✅ cookies included in all calls
+  timeout: 30000, // ✅ Thêm timeout để tránh hanging requests
 });
+
+// ✅ Request interceptor - đảm bảo Content-Type luôn được set
+authApi.interceptors.request.use(
+  (config) => {
+    // Luôn set Content-Type là application/json
+    if (!config.headers["Content-Type"]) {
+      config.headers["Content-Type"] = "application/json";
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 // Add interceptor
 authApi.interceptors.response.use(
@@ -43,10 +56,12 @@ authApi.interceptors.response.use(
       try {
         // Call refresh endpoint
         const refreshResponse = await axios.post(
-          endpoints.refreshToken,
+          `${BASE_URL}${endpoints.refreshToken}`,
           {},
           {
-            baseURL: BASE_URL,
+            headers: {
+              "Content-Type": "application/json",
+            },
             withCredentials: true,
           },
         );
@@ -68,8 +83,8 @@ authApi.interceptors.response.use(
 export default axios.create({
   baseURL: BASE_URL,
   headers: {
-    "content-type": "application/json",
+    "Content-Type": "application/json",
   },
-  timeout: 0,
-  // withCredentials: true,
+  timeout: 30000, // ✅ Thêm timeout
+  withCredentials: true, // ✅ Bật credentials
 });
