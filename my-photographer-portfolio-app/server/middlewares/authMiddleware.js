@@ -2,16 +2,23 @@ import jwt from "jsonwebtoken";
 import Role from "../models/roleModel.js";
 
 export const authMiddleware = async (req, res, next) => {
-  const token =
-    req.cookies.accessToken || req.headers["authorization"]?.split(" ")[1];
+  const authHeader = req.headers["authorization"];
 
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if ((await Role.findById(decoded.role).select("name"))?.name !== "user") {
+
+    const role = await Role.findById(decoded.role).select("name");
+
+    if (role?.name !== "user") {
       return res.status(403).json({ message: "Forbidden: Users only" });
     }
+
     req.user = decoded;
     next();
   } catch (err) {
@@ -23,28 +30,24 @@ export const authMiddleware = async (req, res, next) => {
 };
 
 export const isAdmin = async (req, res, next) => {
-  const token =
-    req.cookies.accessToken || req.headers["authorization"]?.split(" ")[1];
+  const authHeader = req.headers["authorization"];
 
-  // ✅ DEBUG: Log token và cookies
-  console.log("🔐 isAdmin Check:");
-  console.log("   Cookies:", req.cookies);
-  console.log(
-    "   Token from cookie:",
-    req.cookies.accessToken ? "✅ Received" : "❌ Missing",
-  );
-  console.log(
-    "   Authorization header:",
-    req.headers["authorization"] ? "✅ Received" : "❌ Missing",
-  );
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if ((await Role.findById(decoded.role).select("name"))?.name !== "admin") {
+
+    const role = await Role.findById(decoded.role).select("name");
+
+    if (role?.name !== "admin") {
       return res.status(403).json({ message: "Forbidden: Admins only" });
     }
+
+    req.user = decoded;
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

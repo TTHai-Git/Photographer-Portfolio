@@ -2,6 +2,9 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+// ======================================================
+// 📌 ENDPOINTS
+// ======================================================
 export const endpoints = {
   getImagesFromDB: "/images",
   getEachImageOfEachFolder: "/images/get-each-image-of-each-folder",
@@ -19,38 +22,41 @@ export const endpoints = {
 };
 
 // ======================================================
-// 🔐 AUTH API (USE FOR LOGIN / AUTH REQUIRED REQUESTS)
+// 🔐 AUTH API (Bearer Token)
 // ======================================================
 export const authApi = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // ✅ BẮT BUỘC để gửi cookie
   timeout: 30000,
 });
 
-// ✅ Request interceptor
+// ✅ REQUEST INTERCEPTOR → AUTO ATTACH TOKEN
 authApi.interceptors.request.use(
   (config) => {
-    config.headers = {
-      ...config.headers,
-      "Content-Type": "application/json",
-    };
+    const token = localStorage.getItem("accessToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    config.headers["Content-Type"] = "application/json";
 
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// ❌ KHÔNG DÙNG REFRESH TOKEN NỮA
-// 👉 Nếu 401 → để backend xử lý hoặc frontend redirect login
-
+// ✅ RESPONSE INTERCEPTOR → AUTO HANDLE 401
 authApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn("Unauthorized - please login again");
+      console.warn("🔒 Unauthorized - token expired or invalid");
 
-      // 👉 Optional: redirect login
-      // window.location.href = "/login";
+      // ❌ clear token
+      localStorage.removeItem("accessToken");
+
+      // 👉 redirect login
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);
@@ -62,7 +68,6 @@ authApi.interceptors.response.use(
 // ======================================================
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // ✅ vẫn bật để nhận cookie nếu server set
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

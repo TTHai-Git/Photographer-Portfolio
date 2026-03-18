@@ -4,7 +4,7 @@ import { isAdmin } from "../middlewares/authMiddleware.js";
 
 const redisCloudRouters = Router();
 
-redisCloudRouters.get("/flush-db", flushDb);
-redisCloudRouters.get("/flush-all", flushAll);
+redisCloudRouters.get("/flush-db", isAdmin, flushDb);
+redisCloudRouters.get("/flush-all", isAdmin, flushAll);
 
 export default redisCloudRouters;

@@ -80,43 +80,15 @@ export const login = async (req, res) => {
       },
     );
 
-    // ✅ Removed: refreshToken (no longer needed)
-
-    // ✅ Set HttpOnly Cookies
-    const isProd = process.env.REACT_APP_NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProd, // chỉ bật HTTPS khi production
-      sameSite: isProd ? "None" : "Lax",
-      path: "/", // ✅ IMPORTANT: Cho phép cookie được gửi từ tất cả paths
-    };
-
-    res.cookie("accessToken", accessToken, {
-      ...cookieOptions,
-      maxAge: 60 * 60 * 1000, // 1h
-    });
-
     return res.status(200).json({
       isVerified: true,
       message: "Đăng nhập thành công.",
+      accessToken: accessToken, // ✅ trả về đây
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
 export const logout = (req, res) => {
-  const isProd = process.env.REACT_APP_NODE_ENV === "production";
-
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isProd, // chỉ bật HTTPS khi production
-    sameSite: isProd ? "None" : "Lax",
-    path: "/", // thêm cái này để chắc chắn clear đúng cookie
-  };
-
-  // clear access token
-  res.clearCookie("accessToken", cookieOptions);
-
   return res.status(200).json({ message: "Logged out" });
 };
