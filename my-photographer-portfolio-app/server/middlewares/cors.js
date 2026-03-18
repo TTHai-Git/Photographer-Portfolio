@@ -3,7 +3,7 @@ import cors from "cors";
 const corsInit = () =>
   cors({
     origin: [
-      "https://photographer-portfolio-plum.vercel.app/",
+      "https://photographer-portfolio-plum.vercel.app",
       "https://trucphotographer.duckdns.org",
       "http://localhost:3000",
       "http://localhost:8080",
