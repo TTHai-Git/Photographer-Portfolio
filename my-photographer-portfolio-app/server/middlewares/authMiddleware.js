@@ -25,7 +25,19 @@ export const authMiddleware = async (req, res, next) => {
 export const isAdmin = async (req, res, next) => {
   const token =
     req.cookies.accessToken || req.headers["authorization"]?.split(" ")[1];
-  console.log("token", token); // "Test print token on production IOS platform"
+
+  // ✅ DEBUG: Log token và cookies
+  console.log("🔐 isAdmin Check:");
+  console.log("   Cookies:", req.cookies);
+  console.log(
+    "   Token from cookie:",
+    req.cookies.accessToken ? "✅ Received" : "❌ Missing",
+  );
+  console.log(
+    "   Authorization header:",
+    req.headers["authorization"] ? "✅ Received" : "❌ Missing",
+  );
+
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
   try {

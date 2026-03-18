@@ -46,7 +46,7 @@ const cloudinaryRouters = express.Router();
 
 cloudinaryRouters.post(
   "/save",
-  // isAdmin,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -58,7 +58,7 @@ cloudinaryRouters.post(
 
 cloudinaryRouters.delete(
   "/images/del",
-  // isAdmin,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -68,7 +68,7 @@ cloudinaryRouters.delete(
 );
 cloudinaryRouters.post(
   "/images/mov",
-  // isAdmin,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -78,7 +78,7 @@ cloudinaryRouters.post(
 );
 cloudinaryRouters.post(
   "/folders/cre",
-  // isAdmin,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
@@ -88,7 +88,7 @@ cloudinaryRouters.post(
 );
 cloudinaryRouters.delete(
   "/folders/del",
-  // isAdmin,
+  isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,

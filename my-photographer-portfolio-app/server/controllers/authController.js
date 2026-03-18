@@ -89,6 +89,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: isProd, // chỉ bật HTTPS khi production
       sameSite: isProd ? "None" : "Lax",
+      path: "/", // ✅ IMPORTANT: Cho phép cookie được gửi từ tất cả paths
     };
 
     res.cookie("accessToken", accessToken, {

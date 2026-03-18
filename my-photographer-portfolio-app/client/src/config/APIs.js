@@ -29,7 +29,7 @@ export const authApi = axios.create({
   timeout: 30000, // ✅ Thêm timeout để tránh hanging requests
 });
 
-// ✅ Request interceptor - đảm bảo Content-Type + Authorization token luôn được set
+// ✅ Request interceptor - đảm bảo Content-Type được set
 authApi.interceptors.request.use(
   (config) => {
     // Luôn set Content-Type là application/json
@@ -37,16 +37,9 @@ authApi.interceptors.request.use(
       config.headers["Content-Type"] = "application/json";
     }
 
-    // ✅ NEW: Lấy token từ cookie và thêm vào Authorization header
-    // Điều này giúp các API được bảo vệ bởi isAdmin & authMiddleware
-    const accessToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("accessToken="))
-      ?.split("=")[1];
-
-    if (accessToken && !config.headers["Authorization"]) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
-    }
+    // ✅ IMPORTANT: withCredentials: true sẽ tự động gửi cookies (HttpOnly)
+    // Không cần lấy từ document.cookie (HttpOnly cookies không accessible từ JS anyway)
+    // Server sẽ nhận token từ req.cookies.accessToken
 
     return config;
   },
