@@ -1,96 +1,72 @@
 import axios from "axios";
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 export const endpoints = {
-  // getImages: "/cloudinaries",
   getImagesFromDB: "/images",
   getEachImageOfEachFolder: "/images/get-each-image-of-each-folder",
   getFoldersFromDB: "/folders",
   getFoldersForCombobox: "/folders/all",
-  // getFolders: "/cloudinaries/get-folders",
   createFolder: "/cloudinaries/folders/cre",
   deleteFolders: "/cloudinaries/folders/del",
-  // upload: "/cloudinaries/upload",
   deleteImages: "/cloudinaries/images/del",
   moveImages: "/cloudinaries/images/mov",
   login: "/auth/login",
   logout: "/auth/logout",
   getMe: "/auth/me",
-  refreshToken: "/auth/refresh-token",
   saveAssetToDB: "/cloudinaries/save",
   clearCachedData: "/redisCloud/flush-db",
 };
 
+// ======================================================
+// 🔐 AUTH API (USE FOR LOGIN / AUTH REQUIRED REQUESTS)
+// ======================================================
 export const authApi = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true, // ✅ cookies included in all calls
-  timeout: 30000, // ✅ Thêm timeout để tránh hanging requests
+  withCredentials: true, // ✅ BẮT BUỘC để gửi cookie
+  timeout: 30000,
 });
 
-// ✅ Request interceptor - đảm bảo Content-Type được set
+// ✅ Request interceptor
 authApi.interceptors.request.use(
   (config) => {
-    // Luôn set Content-Type là application/json
-    if (!config.headers["Content-Type"]) {
-      config.headers["Content-Type"] = "application/json";
-    }
-
-    // ✅ IMPORTANT: withCredentials: true sẽ tự động gửi cookies (HttpOnly)
-    // Không cần lấy từ document.cookie (HttpOnly cookies không accessible từ JS anyway)
-    // Server sẽ nhận token từ req.cookies.accessToken
+    config.headers = {
+      ...config.headers,
+      "Content-Type": "application/json",
+    };
 
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// Add interceptor
+// ❌ KHÔNG DÙNG REFRESH TOKEN NỮA
+// 👉 Nếu 401 → để backend xử lý hoặc frontend redirect login
+
 authApi.interceptors.response.use(
-  (response) => response, // pass through if successful
-  async (error) => {
-    const originalRequest = error.config;
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("Unauthorized - please login again");
 
-    // If token expired and not already retried
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
-      try {
-        // Call refresh endpoint
-        const refreshResponse = await axios.post(
-          `${BASE_URL}${endpoints.refreshToken}`,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            withCredentials: true,
-          },
-        );
-
-        if (refreshResponse.status === 200) {
-          // Retry original request
-          return authApi(originalRequest);
-        }
-      } catch (refreshError) {
-        console.error("Token refresh failed", refreshError);
-        // Optional: redirect to login or show error
-      }
+      // 👉 Optional: redirect login
+      // window.location.href = "/login";
     }
 
     return Promise.reject(error);
   },
 );
 
-export default axios.create({
+// ======================================================
+// 🌐 PUBLIC API (NO AUTH)
+// ======================================================
+const api = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true, // ✅ vẫn bật để nhận cookie nếu server set
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 30000, // ✅ Thêm timeout
-  withCredentials: true, // ✅ Bật credentials
 });
+
+export default api;
