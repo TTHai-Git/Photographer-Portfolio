@@ -6,7 +6,7 @@ import {
   handleDeleteFolders,
   handleDeleteImages,
   handleMoveImages,
-  saveAssets
+  saveAssets,
   // uploadImagesOnToCloudinary,
 } from "../controllers/cloudinaryController.js";
 // import { upload } from "../middlewares/multerHandle.js";
@@ -46,55 +46,55 @@ const cloudinaryRouters = express.Router();
 
 cloudinaryRouters.post(
   "/save",
-  isAdmin,
+  // isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600
+    blockSeconds: 600,
   }),
   // upload.array("images", 20),
-  saveAssets
+  saveAssets,
 );
 
 cloudinaryRouters.delete(
   "/images/del",
-  isAdmin,
+  // isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600
+    blockSeconds: 600,
   }),
-  handleDeleteImages
+  handleDeleteImages,
 );
 cloudinaryRouters.post(
   "/images/mov",
-  isAdmin,
+  // isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600
+    blockSeconds: 600,
   }),
-  handleMoveImages
+  handleMoveImages,
 );
 cloudinaryRouters.post(
   "/folders/cre",
-  isAdmin,
+  // isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600
+    blockSeconds: 600,
   }),
-  handleCreateFolder
+  handleCreateFolder,
 );
 cloudinaryRouters.delete(
   "/folders/del",
-  isAdmin,
+  // isAdmin,
   ipRateCheck({
     maxAttempts: 10,
     windowSeconds: 60,
-    blockSeconds: 600
+    blockSeconds: 600,
   }),
-  handleDeleteFolders
+  handleDeleteFolders,
 );
 
 export default cloudinaryRouters;

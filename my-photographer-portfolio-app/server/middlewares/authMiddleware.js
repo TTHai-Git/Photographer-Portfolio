@@ -25,6 +25,7 @@ export const authMiddleware = async (req, res, next) => {
 export const isAdmin = async (req, res, next) => {
   const token =
     req.cookies.accessToken || req.headers["authorization"]?.split(" ")[1];
+  console.log("token", token); // "Test print token on production IOS platform"
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
   try {
