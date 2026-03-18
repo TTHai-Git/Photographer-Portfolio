@@ -9,7 +9,7 @@ const corsInit = () =>
       "http://localhost:5000",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    credentials: true,
+    credentials: true, // ✅ Cho phép gửi cookies
     // ✅ Thêm các header được phép cho iOS/Safari
     allowedHeaders: [
       "Content-Type",
@@ -19,8 +19,13 @@ const corsInit = () =>
       "Access-Control-Request-Method",
       "Access-Control-Request-Headers",
     ],
-    exposedHeaders: ["Content-Length", "X-Content-Type"],
+    exposedHeaders: [
+      "Content-Length",
+      "X-Content-Type",
+      "Set-Cookie", // ✅ NEW: Expose Set-Cookie cho iOS
+    ],
     maxAge: 86400, // Cache preflight requests trong 24 giờ
+    optionsSuccessStatus: 200, // ✅ NEW: Cho phép iOS nhận 200 từ preflight
   });
 
 export default corsInit;

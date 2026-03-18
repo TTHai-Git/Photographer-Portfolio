@@ -1,5 +1,25 @@
 import axios from "axios";
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+con; // ✅ Request interceptor - đảm bảo Content-Type được set
+authApi.interceptors.request.use(
+  (config) => {
+    // Luôn set Content-Type là application/json
+    if (!config.headers["Content-Type"]) {
+      config.headers["Content-Type"] = "application/json";
+    }
+
+    // ✅ DEBUG: Log cookies (client-side)
+    console.log(`📤 Request to ${config.url}:`, {
+      method: config.method,
+      withCredentials: config.withCredentials,
+      documentCookie: document.cookie ? "✅ Exists" : "❌ Empty",
+      headers: config.headers,
+    });
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+ocess.env.REACT_APP_BASE_URL;
 export const endpoints = {
   // getImages: "/cloudinaries",
   getImagesFromDB: "/images",
