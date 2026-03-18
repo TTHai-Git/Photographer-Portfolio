@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { flushAll, flushDb } from "../controllers/redisCloudControllers.js";
+import { isAdmin } from "../middlewares/authMiddleware.js";
 
 const redisCloudRouters = Router();
 
-if (process.env.REACT_APP_NODE_ENV === "development") {
-  redisCloudRouters.get("/flush-db", flushDb);
-  redisCloudRouters.get("/flush-all", flushAll);
-}
+redisCloudRouters.get("/flush-db", isAdmin, flushDb);
+redisCloudRouters.get("/flush-all", isAdmin, flushAll);
 
 export default redisCloudRouters;

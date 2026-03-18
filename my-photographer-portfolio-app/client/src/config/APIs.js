@@ -17,6 +17,7 @@ export const endpoints = {
   getMe: "/auth/me",
   refreshToken: "/auth/refresh-token",
   saveAssetToDB: "/cloudinaries/save",
+  clearCachedData: "/redisCloud/flush-db",
 };
 
 export const authApi = axios.create({

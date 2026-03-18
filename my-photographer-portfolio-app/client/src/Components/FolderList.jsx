@@ -1,5 +1,5 @@
 import "../Assets/CSS/folders.css";
-import { FaTrash, FaFolder } from "react-icons/fa";
+import { FaTrash, FaFolder, FaSync } from "react-icons/fa";
 import React, { useState } from "react";
 import CreateFolderModal from "./CreateFolderModal";
 import { useNotification } from "../Context/NotificationContext";
@@ -8,7 +8,7 @@ import {
   Autocomplete,
   IconButton,
   InputAdornment,
-  TextField
+  TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -26,18 +26,19 @@ const FolderList = ({
   setSelectedFolder,
   folderParams,
   setFolderParams,
-  sortFileds
+  sortFileds,
 }) => {
   const [selectedDirs, setSelectedDirs] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingClearCachedData, setLoadingClearCachedData] = useState(false);
   const { showNotification } = useNotification();
 
   const updateParams = (key, val) => {
     setFolderParams((prev) => ({
       ...prev,
       page: 1,
-      [key]: val
+      [key]: val,
     }));
   };
 
@@ -48,7 +49,7 @@ const FolderList = ({
     }
     if (
       !window.confirm(
-        "Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)"
+        "Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)",
       )
     )
       return;
@@ -57,14 +58,14 @@ const FolderList = ({
       setLoadingDelete(true);
 
       const res = await authApi.delete(endpoints.deleteFolders, {
-        data: { folderDirs: selectedDirs }
+        data: { folderDirs: selectedDirs },
       });
       if (res.status === 200) {
         showNotification(res.data.message, "success");
         setFolderParams((prev) => ({
           ...prev,
           page: 1,
-          refresh: Date.now()
+          refresh: Date.now(),
         }));
         setSelectedDirs([]);
         setImages([]);
@@ -73,6 +74,28 @@ const FolderList = ({
       showNotification(err.response?.data?.message, "error");
     } finally {
       setLoadingDelete(false);
+    }
+  };
+
+  const handleClearCachedData = async () => {
+    try {
+      setLoadingClearCachedData(true);
+
+      const res = await authApi.get(endpoints.clearCachedData);
+      if (res.status === 200) {
+        showNotification(res.data.message, "success");
+        setFolderParams((prev) => ({
+          ...prev,
+          page: 1,
+          refresh: Date.now(),
+        }));
+        setSelectedDirs([]);
+        setImages([]);
+      }
+    } catch (err) {
+      showNotification(err.response?.data?.message, "error");
+    } finally {
+      setLoadingClearCachedData(false);
     }
   };
 
@@ -86,12 +109,26 @@ const FolderList = ({
         <button
           className="btn btn-red"
           onClick={handleDeleteFolders}
-          disabled={loadingDelete}>
+          disabled={loadingDelete}
+        >
           {loadingDelete ? (
             "Đang xóa..."
           ) : (
             <>
               <FaTrash /> Xóa ({selectedDirs.length})
+            </>
+          )}
+        </button>
+        <button
+          className="btn "
+          onClick={handleClearCachedData}
+          disabled={loadingClearCachedData}
+        >
+          {loadingClearCachedData ? (
+            "Đang đồng bộ ảnh và thư mục..."
+          ) : (
+            <>
+              <FaSync /> Đồng bộ
             </>
           )}
         </button>
@@ -113,7 +150,7 @@ const FolderList = ({
               <IconButton onClick={() => updateParams("search", "")}>
                 <ClearIcon />
               </IconButton>
-            )
+            ),
           }}
           sx={{ width: 350, bgcolor: "white", borderRadius: 2 }}
         />
@@ -133,7 +170,7 @@ const FolderList = ({
                   <InputAdornment position="start">
                     <SortIcon />
                   </InputAdornment>
-                )
+                ),
               }}
             />
           )}
@@ -150,7 +187,8 @@ const FolderList = ({
             <div
               key={f._id}
               className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
-              onClick={() => setSelectedFolder(f.path)}>
+              onClick={() => setSelectedFolder(f.path)}
+            >
               <input
                 type="checkbox"
                 checked={selectedDirs.includes(f.path)}
@@ -159,7 +197,7 @@ const FolderList = ({
                   setSelectedDirs((prev) =>
                     prev.includes(f.path)
                       ? prev.filter((x) => x !== f.path)
-                      : [...prev, f.path]
+                      : [...prev, f.path],
                   );
                 }}
               />
