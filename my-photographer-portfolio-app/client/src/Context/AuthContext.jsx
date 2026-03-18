@@ -1,5 +1,5 @@
 // AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import APIs, { authApi, endpoints } from "../config/APIs";
 import { useNotification } from "./NotificationContext";
 
@@ -7,7 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // null = chưa đăng nhập
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { showNotification } = useNotification();
 
   // ======================
@@ -47,24 +47,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
-  // ======================
-  // AUTO LOGIN bằng refreshToken
-  // ======================
-  const checkLoginStatus = async () => {
-    try {
-      const res = await authApi.get(endpoints.getMe);
-      setUser(res.data.user);
-    } catch (err) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkLoginStatus(); // load khi mở trang
-  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

@@ -36,7 +36,7 @@ export const createAcount = async (req, res) => {
       username,
       password: hashedPassword,
       email,
-      role
+      role,
     });
     // console.log(newUser);
 
@@ -71,22 +71,16 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Mật khẩu không hợp lệ!" });
     }
 
-    // Create JWT tokens
+    // Create JWT token (only accessToken now)
     const accessToken = jwt.sign(
       { username: user.username, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h"
-      }
+        expiresIn: "1h",
+      },
     );
 
-    const refreshToken = jwt.sign(
-      { username: user.username, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d"
-      }
-    );
+    // ✅ Removed: refreshToken (no longer needed)
 
     // ✅ Set HttpOnly Cookies
     const isProd = process.env.REACT_APP_NODE_ENV === "production";
@@ -94,22 +88,17 @@ export const login = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: isProd, // chỉ bật HTTPS khi production
-      sameSite: isProd ? "None" : "Lax"
+      sameSite: isProd ? "None" : "Lax",
     };
 
     res.cookie("accessToken", accessToken, {
       ...cookieOptions,
-      maxAge: 60 * 60 * 1000 // 1h
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7d
+      maxAge: 60 * 60 * 1000, // 1h
     });
 
     return res.status(200).json({
       isVerified: true,
-      message: "Đăng nhập thành công."
+      message: "Đăng nhập thành công.",
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -122,55 +111,11 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: isProd, // chỉ bật HTTPS khi production
     sameSite: isProd ? "None" : "Lax",
-    path: "/" // thêm cái này để chắc chắn clear đúng cookie
+    path: "/", // thêm cái này để chắc chắn clear đúng cookie
   };
 
   // clear access token
   res.clearCookie("accessToken", cookieOptions);
 
-  // clear refresh token
-  res.clearCookie("refreshToken", cookieOptions);
-
   return res.status(200).json({ message: "Logged out" });
-};
-
-export const refreshToken = (req, res) => {
-  const token = req.cookies.refreshToken;
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const newAccessToken = jwt.sign(
-      { username: decoded.username, role: decoded.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h"
-      }
-    );
-
-    // ✅ Set HttpOnly Cookies
-    const isProd = process.env.REACT_APP_NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProd, // chỉ bật HTTPS khi production
-      sameSite: isProd ? "None" : "Lax"
-    };
-
-    res.cookie("accessToken", newAccessToken, cookieOptions);
-
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid refresh" });
-  }
-};
-
-export const getMe = (req, res) => {
-  return res.status(200).json({
-    user: {
-      username: req.user.username,
-      role: req.user.role
-    }
-  });
 };

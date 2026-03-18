@@ -1,12 +1,6 @@
 import express from "express";
-import {
-  createAcount,
-  getMe,
-  login,
-  logout,
-  refreshToken
-} from "../controllers/authController.js";
-import { authMiddleware, isAdmin } from "../middlewares/authMiddleware.js";
+import { createAcount, login, logout } from "../controllers/authController.js";
+import { isAdmin } from "../middlewares/authMiddleware.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
 
 const authRouters = express.Router();
@@ -15,40 +9,26 @@ authRouters.post(
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300
+    blockSeconds: 300,
   }),
   isAdmin,
-  createAcount
+  createAcount,
 );
 authRouters.post(
   "/login",
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300
+    blockSeconds: 300,
   }),
-  login
+  login,
 );
 authRouters.post("/logout", isAdmin, logout);
-authRouters.get(
-  "/me",
-  ipRateCheck({
-    maxAttempts: 10,
-    windowSeconds: 60,
-    blockSeconds: 600
-  }),
-  authMiddleware,
-  getMe
-);
-authRouters.post(
-  "/refresh-token",
-  ipRateCheck({
-    maxAttempts: 10,
-    windowSeconds: 60,
-    blockSeconds: 600
-  }),
-  authMiddleware,
-  refreshToken
-);
+
+// ✅ REMOVED: /me route (getMe - auto-login no longer used)
+// authRouters.get("/me", ..., authMiddleware, getMe);
+
+// ✅ REMOVED: /refresh-token route (auto-login no longer used)
+// authRouters.post("/refresh-token", ..., authMiddleware, refreshToken);
 
 export default authRouters;
