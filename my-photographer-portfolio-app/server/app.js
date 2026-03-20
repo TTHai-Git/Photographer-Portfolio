@@ -17,6 +17,15 @@ testRedisCloud();
 // Initialize middlewares
 initMiddlewares(app);
 
+// ✅ DEBUG: Log request headers (kiểm tra cookies trước khi đi vào routes)
+app.use((req, res, next) => {
+  console.log(`\n📨 Request: ${req.method} ${req.path}`);
+  console.log(`   Origin: ${req.headers.origin || "❌ Missing"}`);
+  console.log(`   Cookie header: ${req.headers.cookie || "❌ Missing"}`);
+  console.log(`   Parsed cookies:`, req.cookies);
+  next();
+});
+
 // Mount routes
 app.use("/", routers);
 

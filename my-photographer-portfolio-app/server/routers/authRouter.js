@@ -1,5 +1,10 @@
 import express from "express";
-import { createAcount, login, logout } from "../controllers/authController.js";
+import {
+  createAcount,
+  login,
+  logout,
+  refreshToken
+} from "../controllers/authController.js";
 import { isAdmin } from "../middlewares/authMiddleware.js";
 import { ipRateCheck } from "../controllers/redisCloudControllers.js";
 
@@ -9,26 +14,21 @@ authRouters.post(
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300,
+    blockSeconds: 300
   }),
   isAdmin,
-  createAcount,
+  createAcount
 );
 authRouters.post(
   "/login",
   ipRateCheck({
     maxAttempts: 5,
     windowSeconds: 60,
-    blockSeconds: 300,
+    blockSeconds: 300
   }),
-  login,
+  login
 );
 authRouters.post("/logout", isAdmin, logout);
-
-// ✅ REMOVED: /me route (getMe - auto-login no longer used)
-// authRouters.get("/me", ..., authMiddleware, getMe);
-
-// ✅ REMOVED: /refresh-token route (auto-login no longer used)
-// authRouters.post("/refresh-token", ..., authMiddleware, refreshToken);
+authRouters.post("/refresh-token", refreshToken);
 
 export default authRouters;

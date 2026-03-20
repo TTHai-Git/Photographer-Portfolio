@@ -19,6 +19,7 @@ export const endpoints = {
   getMe: "/auth/me",
   saveAssetToDB: "/cloudinaries/save",
   clearCachedData: "/redisCloud/flush-db",
+  refreshToken: "/auth/refresh-token"
 };
 
 // ======================================================
@@ -27,9 +28,11 @@ export const endpoints = {
 export const authApi = axios.create({
   baseURL: BASE_URL,
   timeout: 30000,
+  withCredentials: true
 });
 
 // ✅ REQUEST INTERCEPTOR → AUTO ATTACH TOKEN
+
 authApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -42,25 +45,43 @@ authApi.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 // ✅ RESPONSE INTERCEPTOR → AUTO HANDLE 401
 authApi.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      console.warn("🔒 Unauthorized - token expired or invalid");
+  async (error) => {
+    // 🛠 KHAI BÁO BIẾN NÀY ĐỂ HẾT LỖI "NOT DEFINED"
+    const originalRequest = error.config;
 
-      // ❌ clear token
-      localStorage.removeItem("accessToken");
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      originalRequest.url !== endpoints.refreshToken // Tránh lặp vô tận nếu chính api refresh cũng lỗi
+    ) {
+      originalRequest._retry = true;
 
-      // 👉 redirect login
-      window.location.href = "/login";
+      try {
+        // Gọi API lấy token mới
+        const res = await authApi.post(endpoints.refreshToken);
+        const newAccessToken = res.data.accessToken;
+
+        // Lưu lại vào localStorage
+        localStorage.setItem("accessToken", newAccessToken);
+
+        // ✅ Gán token mới vào header của request cũ để thử lại
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return authApi(originalRequest);
+      } catch (refreshError) {
+        // Nếu refresh thất bại (ví dụ cookie hết hạn 7 ngày) -> Logout
+        localStorage.removeItem("accessToken");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
     }
-
     return Promise.reject(error);
-  },
+  }
 );
 
 // ======================================================
@@ -70,8 +91,8 @@ const api = axios.create({
   baseURL: BASE_URL,
   timeout: 30000,
   headers: {
-    "Content-Type": "application/json",
-  },
+    "Content-Type": "application/json"
+  }
 });
 
 export default api;

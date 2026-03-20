@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/v1/:path*",
+      "destination": "https://hoang-truc-photographer-portfolio.onrender.com/v1/:path*"
+    }
+  ]
+}
