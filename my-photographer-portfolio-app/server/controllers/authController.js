@@ -94,7 +94,7 @@ export const login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: isProduction ? true : false,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax",
       partitioned: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days,
       path: "/v1/auth/refresh-token"
@@ -103,7 +103,7 @@ export const login = async (req, res) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: isProduction ? true : false,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax",
       partitioned: true,
       maxAge: 60 * 60 * 1000, // 1 hour,
       path: "/v1"
@@ -154,7 +154,7 @@ export const refreshToken = async (req, res) => {
 
     res.clearCookie("refreshToken", {
       path: "/v1/auth/refresh-token",
-      sameSite: isProduction ? "none" : "lax",
+      samesite: "lax",
       secure: isProduction ? true : false,
       partitioned: true,
       httpOnly: true
@@ -177,7 +177,7 @@ export const logout = (req, res) => {
 
   res.clearCookie("accessToken", {
     path: "/v1",
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: "lax",
     secure: isProduction ? true : false,
     partitioned: true,
     httpOnly: true
