@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
 
       if (res.data.isVerified) {
         setUser({ username });
-        localStorage.setItem("accessToken", res.data.accessToken);
         showNotification(res.data.message, "success");
         return true;
       } else {
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       await authApi.post(endpoints.logout);
       setUser(null);
-      localStorage.removeItem("accessToken");
     } catch (error) {
       console.log(error);
     } finally {

@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = "/v1";
+const BASE_URL =
+  process.env.REACT_APP_NODE_ENV === "production"
+    ? "/v1"
+    : process.env.REACT_APP_BASE_URL;
 
 // ======================================================
 // 📌 ENDPOINTS
@@ -30,52 +33,29 @@ export const authApi = axios.create({
   timeout: 30000,
   withCredentials: true
 });
-
-// ✅ REQUEST INTERCEPTOR → AUTO ATTACH TOKEN
-
-authApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    config.headers["Content-Type"] = "application/json";
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ✅ RESPONSE INTERCEPTOR → AUTO HANDLE 401
+// ✅ RESPONSE INTERCEPTOR → Xử lý khi Token hết hạn (401)
 authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // 🛠 KHAI BÁO BIẾN NÀY ĐỂ HẾT LỖI "NOT DEFINED"
     const originalRequest = error.config;
 
+    // Nếu lỗi 401 và không phải là request refresh token
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== endpoints.refreshToken // Tránh lặp vô tận nếu chính api refresh cũng lỗi
+      originalRequest.url !== endpoints.refreshToken
     ) {
       originalRequest._retry = true;
 
       try {
-        // Gọi API lấy token mới
-        const res = await authApi.post(endpoints.refreshToken);
-        const newAccessToken = res.data.accessToken;
+        // Chỉ cần gọi API, Server sẽ tự đọc Refresh Cookie và set lại Access Cookie mới
+        await authApi.post(endpoints.refreshToken);
 
-        // Lưu lại vào localStorage
-        localStorage.setItem("accessToken", newAccessToken);
-
-        // ✅ Gán token mới vào header của request cũ để thử lại
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // Sau khi refresh thành công, gọi lại request cũ
+        // Lúc này trình duyệt đã có Cookie mới nên sẽ không bị 401 nữa
         return authApi(originalRequest);
       } catch (refreshError) {
-        // Nếu refresh thất bại (ví dụ cookie hết hạn 7 ngày) -> Logout
-        localStorage.removeItem("accessToken");
+        // Refresh thất bại (hết hạn cả refresh token) -> Đá về login
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
