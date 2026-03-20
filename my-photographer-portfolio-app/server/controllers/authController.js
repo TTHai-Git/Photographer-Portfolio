@@ -71,6 +71,13 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Mật khẩu không hợp lệ!" });
     }
 
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true, // Ép cứng true vì Render luôn có HTTPS
+      sameSite: "lax",
+      path: "/" // Để "/" cho chắc chắn
+    };
+
     // Create JWT token (only accessToken now)
     const accessToken = jwt.sign(
       { username: user.username, role: user.role },
@@ -92,21 +99,12 @@ export const login = async (req, res) => {
     const isProduction = process.env.REACT_APP_NODE_ENV === "production";
 
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: isProduction ? true : false,
-      sameSite: "lax",
-      partitioned: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days,
-      path: "/v1/auth/refresh-token"
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
-
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: isProduction ? true : false,
-      sameSite: "lax",
-      partitioned: true,
-      maxAge: 60 * 60 * 1000, // 1 hour,
-      path: "/v1"
+      ...cookieOptions,
+      maxAge: 60 * 60 * 1000
     });
 
     return res.status(200).json({
@@ -152,13 +150,7 @@ export const refreshToken = async (req, res) => {
 
     const isProduction = process.env.REACT_APP_NODE_ENV === "production";
 
-    res.clearCookie("refreshToken", {
-      path: "/v1/auth/refresh-token",
-      samesite: "lax",
-      secure: isProduction ? true : false,
-      partitioned: true,
-      httpOnly: true
-    });
+    res.clearCookie("refreshToken");
     return res
       .status(403)
       .json({ message: "Refresh token không hợp lệ hoặc đã hết hạn!" });
@@ -175,12 +167,6 @@ export const logout = (req, res) => {
   //   httpOnly: true
   // });
 
-  res.clearCookie("accessToken", {
-    path: "/v1",
-    sameSite: "lax",
-    secure: isProduction ? true : false,
-    partitioned: true,
-    httpOnly: true
-  });
+  res.clearCookie("accessToken");
   return res.status(200).json({ message: "Logged out" });
 };
