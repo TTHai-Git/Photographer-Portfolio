@@ -75,7 +75,7 @@ jobs:
 
       - name: Create client env
         run: |
-          echo "${{ secrets.CLIENT_ENV }}" > my-photographer-portfolio-app/client/.env.production
+          echo "${{ secrets.CLIENT_ENV }}" > my-photographer-portfolio-app/client/.env
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -171,8 +171,8 @@ jobs:
             git reset --hard
             git pull origin main
 
-            echo "${{ secrets.SERVER_ENV }}" > server/.env.production
-            echo "${{ secrets.CLIENT_ENV }}" > client/.env.production
+            echo "${{ secrets.SERVER_ENV }}" > server/.env
+            echo "${{ secrets.CLIENT_ENV }}" > client/.env
 
             docker compose down
             docker pull ${{ env.IMAGE_CLIENT }}
