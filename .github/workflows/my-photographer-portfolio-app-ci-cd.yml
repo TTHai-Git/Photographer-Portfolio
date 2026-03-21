@@ -1,250 +1,3 @@
-# name: CI/CD Pipeline
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# env:
-#   IMAGE_CLIENT: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:latest
-#   IMAGE_SERVER: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:latest
-
-# jobs:
-#   # ================================================================
-#   # 1️⃣ TEST JOB
-#   # ================================================================
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - uses: actions/checkout@v4
-
-#       - name: Install dependencies (Client)
-#         working-directory: my-photographer-portfolio-app/client
-#         run: npm ci
-
-#       - name: Run tests (Client)
-#         working-directory: my-photographer-portfolio-app/client
-#         run: npm test -- --watchAll=false --passWithNoTests
-
-#       - name: Install dependencies (Server)
-#         working-directory: my-photographer-portfolio-app/server
-#         run: npm ci
-
-#       - name: Run tests (Server)
-#         working-directory: my-photographer-portfolio-app/server
-#         run: npm test -- --watchAll=false --passWithNoTests
-
-#       # 🔔 Notify TEST
-#       - name: Notify Test Result
-#         if: always()
-#         run: |
-#           STATUS="${{ job.status }}"
-#           if [ "$STATUS" == "success" ]; then
-#             ICON="🧪✅"
-#             COLOR=3066993
-#           else
-#             ICON="🧪❌"
-#             COLOR=15158332
-#           fi
-
-#           curl -H "Content-Type: application/json" \
-#           -d "{
-#             \"embeds\": [{
-#               \"title\": \"$ICON TEST JOB: $STATUS\",
-#               \"color\": $COLOR,
-#               \"fields\": [
-#                 {\"name\": \"👤 Actor\", \"value\": \"${{ github.actor }}\", \"inline\": true},
-#                 {\"name\": \"🌿 Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
-#                 {\"name\": \"📝 Commit\", \"value\": \"${{ github.event.head_commit.message }}\"}
-#               ],
-#               \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-#             }]
-#           }" \
-#           ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-#   # ================================================================
-#   # 2️⃣ BUILD & PUSH (changes values ENV of client and server (.env))
-#   # ================================================================
-#   build-and-push:
-#     runs-on: ubuntu-latest
-#     needs: test
-
-#     steps:
-#       - uses: actions/checkout@v4
-
-#       - name: Create client env
-#         run: |
-#           echo "${{ secrets.CLIENT_ENV }}" > my-photographer-portfolio-app/client/.env
-
-#       - name: Set up QEMU
-#         uses: docker/setup-qemu-action@v3
-
-#       - name: Set up Buildx
-#         uses: docker/setup-buildx-action@v3
-
-#       - name: Login DockerHub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-#       - name: Build & Push Client
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: ./my-photographer-portfolio-app/client
-#           file: ./my-photographer-portfolio-app/client/Dockerfile
-#           platforms: linux/amd64,linux/arm64
-#           push: true
-#           tags: ${{ env.IMAGE_CLIENT }}
-
-#       - name: Build & Push Server
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: ./my-photographer-portfolio-app/server
-#           file: ./my-photographer-portfolio-app/server/Dockerfile
-#           platforms: linux/amd64,linux/arm64
-#           push: true
-#           tags: ${{ env.IMAGE_SERVER }}
-
-#       # 🔔 Notify BUILD
-#       - name: Notify Build Result
-#         if: always()
-#         run: |
-#           STATUS="${{ job.status }}"
-#           if [ "$STATUS" == "success" ]; then
-#             ICON="🐳✅"
-#             COLOR=3066993
-#           else
-#             ICON="🐳❌"
-#             COLOR=15158332
-#           fi
-
-#           curl -H "Content-Type: application/json" \
-#           -d "{
-#             \"embeds\": [{
-#               \"title\": \"$ICON BUILD JOB: $STATUS\",
-#               \"color\": $COLOR,
-#               \"fields\": [
-#                 {\"name\": \"📦 Client Image\", \"value\": \"${{ env.IMAGE_CLIENT }}\"},
-#                 {\"name\": \"🖥 Server Image\", \"value\": \"${{ env.IMAGE_SERVER }}\"}
-#               ],
-#               \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-#             }]
-#           }" \
-#           ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-#   # ================================================================
-#   # 3️⃣ DEPLOY
-#   # ================================================================
-#   deploy:
-#     runs-on: ubuntu-latest
-#     needs: build-and-push
-
-#     steps:
-#       - uses: actions/checkout@v4
-
-#       - name: Connect Tailscale
-#         uses: tailscale/github-action@v2
-#         with:
-#           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-#           oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-#           tags: tag:ci
-
-#       - name: SSH Deploy
-#         uses: appleboy/ssh-action@v1.1.0
-#         with:
-#           host: ${{ secrets.VM_HOST }}
-#           username: ${{ secrets.VM_USER }}
-#           key: ${{ secrets.VM_SSH_KEY }}
-#           command_timeout: 20m
-#           script: |
-#             set -e
-
-#             cd /home/${{ secrets.VM_USER }}
-
-#             if [ ! -d "Photographer-Portfolio" ]; then
-#               git clone https://github.com/TTHai-Git/Photographer-Portfolio
-#             fi
-
-#             cd Photographer-Portfolio/my-photographer-portfolio-app
-#             git reset --hard
-#             git pull origin main
-
-#             echo "${{ secrets.SERVER_ENV }}" > server/.env
-#             echo "${{ secrets.CLIENT_ENV }}" > client/.env
-
-#             docker compose down
-#             docker pull ${{ env.IMAGE_CLIENT }}
-#             docker pull ${{ env.IMAGE_SERVER }}
-#             docker compose up -d --force-recreate
-#             docker image prune -f
-
-#       # 🔔 Notify DEPLOY
-#       - name: Notify Deploy Result
-#         if: always()
-#         run: |
-#           STATUS="${{ job.status }}"
-#           if [ "$STATUS" == "success" ]; then
-#             ICON="🚀✅"
-#             COLOR=3066993
-#             DESC="Deploy thành công!"
-#           else
-#             ICON="🚀❌"
-#             COLOR=15158332
-#             DESC="Deploy thất bại!"
-#           fi
-
-#           curl -H "Content-Type: application/json" \
-#           -d "{
-#             \"embeds\": [{
-#               \"title\": \"$ICON DEPLOY JOB: $STATUS\",
-#               \"description\": \"$DESC\",
-#               \"color\": $COLOR,
-#               \"fields\": [
-#                 {\"name\": \"🌿 Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
-#                 {\"name\": \"👤 Actor\", \"value\": \"${{ github.actor }}\", \"inline\": true}
-#               ],
-#               \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-#             }]
-#           }" \
-#           ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-#   # ================================================================
-#   # 4️⃣ FINAL SUMMARY
-#   # ================================================================
-#   notify:
-#     runs-on: ubuntu-latest
-#     needs: [test, build-and-push, deploy]
-#     if: always()
-
-#     steps:
-#       - name: Final Notification
-#         run: |
-#           if [[ "${{ needs.deploy.result }}" == "success" ]]; then
-#             STATUS="🎉 ALL SUCCESS"
-#             COLOR=3066993
-#           else
-#             STATUS="💥 PIPELINE FAILED"
-#             COLOR=15158332
-#           fi
-
-#           curl -H "Content-Type: application/json" \
-#           -d "{
-#             \"embeds\": [{
-#               \"title\": \"$STATUS\",
-#               \"color\": $COLOR,
-#               \"fields\": [
-#                 {\"name\": \"🧪 Test\", \"value\": \"${{ needs.test.result }}\", \"inline\": true},
-#                 {\"name\": \"🐳 Build\", \"value\": \"${{ needs.build-and-push.result }}\", \"inline\": true},
-#                 {\"name\": \"🚀 Deploy\", \"value\": \"${{ needs.deploy.result }}\", \"inline\": true}
-#               ],
-#               \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-#             }]
-#           }" \
-#           ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-# reverse old code (discard Notify Deploy Result step by Discord)
 name: CI/CD Pipeline
 
 on:
@@ -252,15 +5,19 @@ on:
     branches:
       - main
 
+env:
+  IMAGE_CLIENT: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:latest
+  IMAGE_SERVER: ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:latest
+
 jobs:
   # ================================================================
   # 1️⃣ TEST JOB
   # ================================================================
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install dependencies (Client)
         working-directory: my-photographer-portfolio-app/client
@@ -278,84 +35,129 @@ jobs:
         working-directory: my-photographer-portfolio-app/server
         run: npm test -- --watchAll=false --passWithNoTests
 
+      # 🔔 Notify TEST
+      - name: Notify Test Result
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" == "success" ]; then
+            ICON="🧪✅"
+            COLOR=3066993
+          else
+            ICON="🧪❌"
+            COLOR=15158332
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+            \"embeds\": [{
+              \"title\": \"$ICON TEST JOB: $STATUS\",
+              \"color\": $COLOR,
+              \"fields\": [
+                {\"name\": \"👤 Actor\", \"value\": \"${{ github.actor }}\", \"inline\": true},
+                {\"name\": \"🌿 Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
+                {\"name\": \"📝 Commit\", \"value\": \"${{ github.event.head_commit.message }}\"}
+              ],
+              \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }]
+          }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   # ================================================================
-  # 2️⃣ BUILD & PUSH (MULTI-ARCH)
+  # 2️⃣ BUILD & PUSH (changes values ENV of client and server (.env))
   # ================================================================
   build-and-push:
     runs-on: ubuntu-latest
     needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Create client env file (BUILD TIME)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create client env
         run: |
           echo "${{ secrets.CLIENT_ENV }}" > my-photographer-portfolio-app/client/.env.production
 
-      # 🔑 BẮT BUỘC cho ARM
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: Login DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # --- Build & Push Client (amd64 + arm64) ---
-      - name: Build & Push Client Image (Multi-Arch)
+      - name: Build & Push Client
         uses: docker/build-push-action@v5
         with:
           context: ./my-photographer-portfolio-app/client
           file: ./my-photographer-portfolio-app/client/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-client:latest
+          tags: ${{ env.IMAGE_CLIENT }}
 
-      # --- Build & Push Server (amd64 + arm64) ---
-      - name: Build & Push Server Image (Multi-Arch)
+      - name: Build & Push Server
         uses: docker/build-push-action@v5
         with:
           context: ./my-photographer-portfolio-app/server
           file: ./my-photographer-portfolio-app/server/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/my-photographer-portfolio-app-server:latest
+          tags: ${{ env.IMAGE_SERVER }}
+
+      # 🔔 Notify BUILD
+      - name: Notify Build Result
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" == "success" ]; then
+            ICON="🐳✅"
+            COLOR=3066993
+          else
+            ICON="🐳❌"
+            COLOR=15158332
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+            \"embeds\": [{
+              \"title\": \"$ICON BUILD JOB: $STATUS\",
+              \"color\": $COLOR,
+              \"fields\": [
+                {\"name\": \"📦 Client Image\", \"value\": \"${{ env.IMAGE_CLIENT }}\"},
+                {\"name\": \"🖥 Server Image\", \"value\": \"${{ env.IMAGE_SERVER }}\"}
+              ],
+              \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }]
+          }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   # ================================================================
-  # 3️⃣ DEPLOY JOB
+  # 3️⃣ DEPLOY
   # ================================================================
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Connect to Tailscale
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Connect Tailscale
         uses: tailscale/github-action@v2
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
           tags: tag:ci
 
-      - name: Test Tailscale status
-        run: |
-          tailscale status
-          ping -c 3 ${{ secrets.VM_HOST }}
-
-      - name: SSH to VM & deploy
+      - name: SSH Deploy
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
-          command_timeout: 20m # ⬅️ QUAN TRỌNG
+          command_timeout: 20m
           script: |
             set -e
 
@@ -372,17 +174,72 @@ jobs:
             echo "${{ secrets.SERVER_ENV }}" > server/.env.production
             echo "${{ secrets.CLIENT_ENV }}" > client/.env.production
 
-            export COMPOSE_PARALLEL_LIMIT=1
-
-            # ⛔ Dừng & xóa container cũ
             docker compose down
-
-            # ⬇️ Pull image mới
-            docker pull haiou2003/my-photographer-portfolio-app-client:latest
-            docker pull haiou2003/my-photographer-portfolio-app-server:latest
-
-            # ▶️ Chạy container từ image mới
+            docker pull ${{ env.IMAGE_CLIENT }}
+            docker pull ${{ env.IMAGE_SERVER }}
             docker compose up -d --force-recreate
-
-            # 🧹 Xóa image không còn dùng
             docker image prune -f
+
+      # 🔔 Notify DEPLOY
+      - name: Notify Deploy Result
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" == "success" ]; then
+            ICON="🚀✅"
+            COLOR=3066993
+            DESC="Deploy thành công!"
+          else
+            ICON="🚀❌"
+            COLOR=15158332
+            DESC="Deploy thất bại!"
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+            \"embeds\": [{
+              \"title\": \"$ICON DEPLOY JOB: $STATUS\",
+              \"description\": \"$DESC\",
+              \"color\": $COLOR,
+              \"fields\": [
+                {\"name\": \"🌿 Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
+                {\"name\": \"👤 Actor\", \"value\": \"${{ github.actor }}\", \"inline\": true}
+              ],
+              \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }]
+          }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  # ================================================================
+  # 4️⃣ FINAL SUMMARY
+  # ================================================================
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, build-and-push, deploy]
+    if: always()
+
+    steps:
+      - name: Final Notification
+        run: |
+          if [[ "${{ needs.deploy.result }}" == "success" ]]; then
+            STATUS="🎉 ALL SUCCESS"
+            COLOR=3066993
+          else
+            STATUS="💥 PIPELINE FAILED"
+            COLOR=15158332
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+            \"embeds\": [{
+              \"title\": \"$STATUS\",
+              \"color\": $COLOR,
+              \"fields\": [
+                {\"name\": \"🧪 Test\", \"value\": \"${{ needs.test.result }}\", \"inline\": true},
+                {\"name\": \"🐳 Build\", \"value\": \"${{ needs.build-and-push.result }}\", \"inline\": true},
+                {\"name\": \"🚀 Deploy\", \"value\": \"${{ needs.deploy.result }}\", \"inline\": true}
+              ],
+              \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }]
+          }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
