@@ -64,7 +64,7 @@ jobs:
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   # ================================================================
-  # 2️⃣ BUILD & PUSH (changes values ENV of client and server (.env))
+  # 2️⃣ BUILD & PUSH (changes values ENV of client and server (.env: NodeENV = development))
   # ================================================================
   build-and-push:
     runs-on: ubuntu-latest
