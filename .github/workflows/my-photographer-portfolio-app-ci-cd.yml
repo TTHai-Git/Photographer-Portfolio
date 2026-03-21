@@ -64,7 +64,7 @@ jobs:
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   # ================================================================
-  # 2️⃣ BUILD & PUSH
+  # 2️⃣ BUILD & PUSH (changes values ENV of client and server (.env))
   # ================================================================
   build-and-push:
     runs-on: ubuntu-latest
