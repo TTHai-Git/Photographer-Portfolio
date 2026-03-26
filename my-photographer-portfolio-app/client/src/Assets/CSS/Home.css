@@ -9,14 +9,14 @@
 
 /* ===== Heading ===== */
 .home-heading {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  font-weight: 500;
-  line-height: 1.167;
-  letter-spacing: 0em;
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  margin-bottom: 32px;
+  font-family: "Poppins", "Roboto", "Helvetica", Arial, sans-serif;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #222;
 }
 
 .home-subtitle {
@@ -42,7 +42,20 @@
 }
 
 .MuiImageListItem-root img {
-  transition: transform 0.5s ease, filter 0.5s ease;
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
+  background-color: #f0f0f0; /* Reduces CLS visibility jump */
+}
+
+.priority-image {
+  /* Priority images: visible immediately for LCP — do NOT apply fade-in opacity:0 */
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important;
+  object-fit: cover;
+  display: block;
 }
 
 /* Hover effect */
@@ -51,23 +64,17 @@
   filter: brightness(0.9);
 }
 
-/* ===== Fade-in Animation ===== */
-.fade-in {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
+/* Removed generic fade-in utilities — animations are now explicitly controlled via components' onLoad state */
 
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Overlay mờ toàn màn hình */
+/* Overlay mờ toàn màn hình (Fix CLS) */
 .loading-overlay {
-  background: rgba(255, 255, 255, 0.75);
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
 }
 
@@ -88,17 +95,15 @@
 }
 
 
-@keyframes fadeIn {
-  to {
-    opacity: 1;
+/* Removed unused fadeIn keyframes */
+
+/* ===== Shimmer placeholder for LazyImage ===== */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
   }
-}
-
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% {
+    background-position: 200% 0;
   }
 }
 

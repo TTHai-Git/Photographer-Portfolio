@@ -2,10 +2,11 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import LazyImage from "../Components/LazyImage";
+import EagerImage from "../Components/EagerImage";
 import { useImages } from "../hooks/loadImages";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
@@ -36,53 +37,45 @@ export const Portrait = () => {
     setIsOpen(true);
   };
 
-  useEffect(() => {
-    if (!loading) return;
-  }, [loading, sort, page]);
-
   return (
-    <Box className="home-container">
+    <Box component="main" className="home-container">
       <Typography
         variant="h3"
-        component="div"
+        component="h1"
         gutterBottom
         align="center"
         className="home-heading">
         Portrait Photography
       </Typography>
 
-      {/* <Typography className="home-subtitle">
-        Photography & Visual Storytelling
-      </Typography> */}
-
       <SortBar sort={sort} onSortChange={setSort} />
-
-      {/* --- Loading Overlay --- */}
-      {loading && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-        </div>
-      )}
 
       {/* --- Masonry Image Grid --- */}
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
-        {images.map((image, index) => (
-          <ImageListItem key={image._id}>
-            {/* <img
-              src={`${image.secure_url}?w=auto&fit=crop&auto=format`}
-              alt={image.file_name}
-              onClick={() => handleImageClick(index)}
-              loading="lazy"
-              className="fade-in"
-            /> */}
-            <LazyImage
-              src={image.secure_url}
-              alt={image.file_name}
-              className="fade-in"
-              onClick={() => handleImageClick(index)}
-            />
-          </ImageListItem>
-        ))}
+        {loading
+          ? /* Skeleton placeholders while data fetches */
+            Array.from({ length: 9 }).map((_, i) => (
+              <ImageListItem key={`skeleton-${i}`}>
+                <div className="image-skeleton" />
+              </ImageListItem>
+            ))
+          : images.map((image, index) => (
+              <ImageListItem key={image._id}>
+                {index < 6 ? (
+                  <EagerImage
+                    src={image.secure_url}
+                    alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
+                    onClick={() => handleImageClick(index)}
+                  />
+                ) : (
+                  <LazyImage
+                    src={image.secure_url}
+                    alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
+                    onClick={() => handleImageClick(index)}
+                  />
+                )}
+              </ImageListItem>
+            ))}
       </ImageList>
 
       <Pagination
@@ -92,7 +85,7 @@ export const Portrait = () => {
       />
 
       {/* --- LightBox --- */}
-      {!loading && isOpen && (
+      {isOpen && (
         <LightBox
           isOpen={isOpen}
           slides={slides}

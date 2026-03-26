@@ -1,21 +1,33 @@
-import React from "react";
+import { useState } from "react";
 import "../Assets/CSS/About.css";
 
 const About = () => {
+  // Track hero image load state — eager images reveal instantly (no delay)
+  const [heroLoaded, setHeroLoaded] = useState(false);
   return (
-    <div className="about-container">
+    <article className="about-container">
       {/* Title pinned to the very top and centered */}
       <h1 className="about-title">Hoang Truc</h1>
 
       <div className="about-main-content">
         {/* LEFT COLUMN - Only Hero Image */}
         <div className="about-left-column">
-          {/* Hero Image */}
+        {/* Hero Image – eager loaded for LCP, reveals via onLoad */}
           <div className="about-hero-wrapper">
             <img
-              src={`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}${process.env.REACT_APP_DIR_CLOUD}v1773729068/Hoang-Truc-Photographer-Portfolio/about/Avatar_ic7riv.webp`}
-              alt="Hoang Truc"
+              src={`https://res.cloudinary.com/${process.env.REACT_APP_CLOUD_NAME}${process.env.REACT_APP_DIR_CLOUD}v1774530792/Hoang-Truc-Photographer-Portfolio/about/78f02857fa1474ad5bdf5be18b0f353cae6d517e_rysbbk.webp`}
+              alt="Hoang Truc – Graphic Designer & Photographer"
               className="about-hero"
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              width="600"
+              height="800"
+              onLoad={() => setHeroLoaded(true)}
+              style={{
+                opacity: heroLoaded ? 1 : 0,
+                transition: "opacity 0.5s ease-out",
+              }}
             />
           </div>
         </div>
@@ -23,7 +35,7 @@ const About = () => {
         {/* RIGHT COLUMN */}
         <div className="about-right-column">
           {/* Intro Section */}
-          <div className="about-intro-section">
+          <section className="about-intro-section" aria-label="Introduction">
             <h2 className="about-subtitle">Graphic designer</h2>
             <p className="about-desc">
               I'm a graphic designer, with 3 years of experience in fields such
@@ -32,10 +44,10 @@ const About = () => {
               multi-dimensional perspective, believing in the story behind each
               project to convey the message effectively.
             </p>
-          </div>
+          </section>
 
           {/* Experience Section */}
-          <div className="experience-section">
+          <section className="experience-section" aria-label="Work Experience">
             <h3 className="experience-title">Experience</h3>
 
             <div className="experience-item">
@@ -133,10 +145,10 @@ const About = () => {
                 </li>
               </ul>
             </div>
-          </div>
+          </section>
 
           {/* Education Section */}
-          <div className="education-section">
+          <section className="education-section" aria-label="Education">
             <h3 className="education-title">Education</h3>
 
             <div className="education-item">
@@ -154,7 +166,7 @@ const About = () => {
               </span>
               <p className="education-school">Keyframe multimedia school</p>
             </div>
-          </div>
+          </section>
         </div>
       </div>
 
@@ -237,7 +249,7 @@ const About = () => {
             <div className="client-circle" aria-hidden="true" />
             <div className="client-circle" aria-hidden="true" />
 
-            {/* duplicate set for seamless loop */}
+            {/*duplicate set for seamless loop*/}
             <div className="client-circle" aria-hidden="true" />
             <div className="client-circle" aria-hidden="true" />
             <div className="client-circle" aria-hidden="true" />
@@ -247,7 +259,7 @@ const About = () => {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

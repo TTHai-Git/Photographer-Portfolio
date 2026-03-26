@@ -39,11 +39,17 @@
 
 .about-hero-wrapper {
   width: 100%;
+  /* Reserve space before image loads to eliminate CLS */
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #f0f0f0;
 }
 
 .about-hero {
   width: 100%;
-  height: auto;
+  height: 100%;
+  display: block;
   object-fit: cover;
   border-radius: 12px;
 }

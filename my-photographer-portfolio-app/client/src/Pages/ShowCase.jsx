@@ -2,10 +2,8 @@
 import { useEffect, useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 import LightBox from "../utils/LightBox";
-// import { scrollToElement } from "../Helpers/ScrollToElement";
 import ShowCaseItem from "../Components/ShowCaseItem";
 import { useImages } from "../hooks/loadImages";
-// import useFolders from "../hooks/loadFolders";
 import { handleGetFolderName } from "../Helpers/getFolderName";
 import { useEachImageOfEachFolder } from "../hooks/loadEachImageOfEachFolder";
 import SortBar from "../Components/SortBar";
@@ -15,7 +13,6 @@ export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
-  // const {folders, loadingFolders} = useFolders(1, 500, "oldest")
   const { mainPhotoList, totalPages, loadingEachImageOfEachFolder } =
     useEachImageOfEachFolder(
       page,
@@ -32,7 +29,7 @@ export const ShowCase = () => {
   const handleImageClick = (folderDir, index) => {
     setFolder(folderDir);
     setStartIndex(index);
-    setPendingOpen(true); // đánh dấu chờ load ảnh
+    setPendingOpen(true);
   };
 
   useEffect(() => {
@@ -42,11 +39,7 @@ export const ShowCase = () => {
         .map((img) => {
           const parts = img.public_id.split("/");
           const folderName = parts[parts.length - 2];
-
-          return {
-            src: img.secure_url,
-            title: folderName,
-          };
+          return { src: img.secure_url, title: folderName };
         });
 
       setSlides(slidesData);
@@ -56,59 +49,35 @@ export const ShowCase = () => {
   }, [loading, images, pendingOpen]);
 
   return (
-    <div className="showcase-container">
-      {/* <h1 className="showcase-title">Show Case</h1> */}
-
-      {/* --- Navigation Bar --- */}
-      {/* <nav>
-        <ul className="showcase-nav">
-          {loadingEachImageOfEachFolder ? (
-            <li>Loading Folders...</li>
-          ) : (
-            <>
-              {mainPhotoList.filter(f =>
-                f.Folder.path.startsWith("Hoang-Truc-Photographer-Portfolio/SHOW CASE/")
-              ).map(folder => (
-                <li
-                  key={folder.Folder._id}
-                  onClick={() => scrollToElement(folder.Folder._id)}
-                >
-                  <span>{handleGetFolderName(folder.Folder.path)}</span>
-                </li>
-              ))}
-            </>
-          )}
-        </ul>
-      </nav> */}
+    <main className="showcase-container">
+      <h1 className="showcase-page-title">Showcase</h1>
 
       <SortBar sort={sort} onSortChange={setSort} />
 
-      {/* --- Each Image (full width) --- */}
+      {/* --- Each Image — per-card shimmer, no full-screen overlay --- */}
       <div className="showcase-list">
-        {loadingEachImageOfEachFolder ? (
-          <p>Loading Images...</p>
-        ) : (
-          <>
-            {mainPhotoList?.map((image) => {
-              return (
-                <div
+        {loadingEachImageOfEachFolder
+          ? /* Skeleton cards while list loads */
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={`sk-${i}`} className="showcase-card">
+                <div className="showcase-skeleton" />
+              </div>
+            ))
+          : mainPhotoList?.map((image, index) => (
+              <div
+                key={image._id}
+                id={image.folder._id}
+                className="showcase-card">
+                <ShowCaseItem
                   key={image._id}
-                  id={image.folder._id}
-                  className="showcase-card fade-in">
-                  {/* <p className="showcase-caption">{image.caption}</p> */}
-                  <ShowCaseItem
-                    key={image._id}
-                    src={image.secure_url}
-                    alt={image.public_id}
-                    folderName={handleGetFolderName(image.folder.path)}
-                    className="showcase-image"
-                    onClick={() => handleImageClick(image.folder.path, 0)}
-                  />
-                </div>
-              );
-            })}
-          </>
-        )}
+                  src={image.secure_url}
+                  alt={`${handleGetFolderName(image.folder.path)} – showcase project by Hoang Truc`}
+                  folderName={handleGetFolderName(image.folder.path)}
+                  eager={index < 4}
+                  onClick={() => handleImageClick(image.folder.path, 0)}
+                />
+              </div>
+            ))}
       </div>
 
       <Pagination
@@ -117,14 +86,8 @@ export const ShowCase = () => {
         onPageChange={(page) => setPage(page)}
       />
 
-      {loading && loadingEachImageOfEachFolder && pendingOpen && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-        </div>
-      )}
-
-      {/* --- Lightbox Modal --- */}
-      {!loading && isOpen && (
+      {/* --- Lightbox — opens automatically once folder images are ready --- */}
+      {isOpen && (
         <LightBox
           isOpen={isOpen}
           slides={slides}
@@ -136,7 +99,7 @@ export const ShowCase = () => {
           }}
         />
       )}
-    </div>
+    </main>
   );
 };
 
