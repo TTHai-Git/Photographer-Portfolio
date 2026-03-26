@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.5",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "axios": "^1.13.2",
     "lightgallery": "^2.9.0",
@@ -15,10 +16,10 @@
     "p-limit": "^7.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "4.9.5",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.30.1",
     "react-scripts": "5.0.1",
+    "typescript": "4.9.5",
     "yet-another-react-lightbox": "^3.25.0"
   },
   "scripts": {

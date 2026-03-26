@@ -5,6 +5,7 @@ import "./Assets/CSS/Style.css";
 import { AuthProvider } from "./Context/AuthContext";
 import { NotificationProvider } from "./Context/NotificationContext";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -13,6 +14,7 @@ root.render(
       <AuthProvider>
         <App />
         <SpeedInsights />
+        <Analytics />
       </AuthProvider>
     </NotificationProvider>
   </React.StrictMode>
