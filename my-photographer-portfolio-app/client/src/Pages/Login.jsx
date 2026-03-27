@@ -19,9 +19,9 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      <div className="login-card">
+      <div className="login-card" style={{ position: "relative", minHeight: "450px" }}>
         <h2 className="login-title">Quản Trị Viên Đăng Nhập</h2>
-        <p className="login-subtitle">Truy cập vào thư viện ảnh</p>
+        <p className="login-subtitle">Truy cập vào thư viện ảnh để quản lý</p>
 
         <form onSubmit={handleSubmit} className="login-form">
           {/* Username */}
@@ -48,20 +48,35 @@ const Login = () => {
             />
           </div>
 
-          {loading && (
-            <div className="loading-overlay">
-              <div className="spinner"></div>
-              <p>Đang xử lý đăng nhập...</p>
-            </div>
-          )}
-
           {/* Button */}
-          <button type="submit" className="login-btn">
-            Đăng nhập
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Đang xác thực..." : "Đăng nhập"}
           </button>
         </form>
+
+        {loading && (
+          <div 
+            className="loading-overlay" 
+            style={{ 
+              position: "absolute", 
+              inset: 0, 
+              backgroundColor: "rgba(255,255,255,0.7)", 
+              zIndex: 10,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "12px",
+              backdropFilter: "blur(2px)"
+            }}
+          >
+            <div className="spinner"></div>
+            <p style={{ marginTop: "10px", fontWeight: "500" }}>Đang kiểm tra tài khoản...</p>
+          </div>
+        )}
       </div>
     </div>
+
   );
 };
 

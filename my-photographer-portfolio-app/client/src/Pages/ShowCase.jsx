@@ -1,13 +1,15 @@
-// ShowCase.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import "../Assets/CSS/ShowCase.css";
-import LightBox from "../utils/LightBox";
 import ShowCaseItem from "../Components/ShowCaseItem";
 import { useImages } from "../hooks/loadImages";
 import { handleGetFolderName } from "../Helpers/getFolderName";
 import { useEachImageOfEachFolder } from "../hooks/loadEachImageOfEachFolder";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
+
+// Lazy load LightBox (bundle-dynamic-imports)
+const LightBox = lazy(() => import("../utils/LightBox"));
+
 
 export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
@@ -26,11 +28,17 @@ export const ShowCase = () => {
   const [slides, setSlides] = useState([]);
   const [pendingOpen, setPendingOpen] = useState(false);
 
-  const handleImageClick = (folderDir, index) => {
+  // Memoize handlers (rerender-memo)
+  const handleImageClick = useCallback((folderDir, index) => {
     setFolder(folderDir);
     setStartIndex(index);
     setPendingOpen(true);
-  };
+  }, []);
+
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   useEffect(() => {
     if (!loading && pendingOpen && images.length > 0) {
@@ -56,11 +64,13 @@ export const ShowCase = () => {
 
       {/* --- Each Image — per-card shimmer, no full-screen overlay --- */}
       <div className="showcase-list">
-        {loadingEachImageOfEachFolder
-          ? /* Skeleton cards while list loads */
-            Array.from({ length: 8 }).map((_, i) => (
+        {loadingEachImageOfEachFolder && mainPhotoList.length === 0
+          ? Array.from({ length: 8 }).map((_, i) => (
               <div key={`sk-${i}`} className="showcase-card">
-                <div className="showcase-skeleton" />
+                <div 
+                  className="showcase-skeleton" 
+                  style={{ aspectRatio: "16/9", backgroundColor: "#f0f0f0" }} 
+                />
               </div>
             ))
           : mainPhotoList?.map((image, index) => (
@@ -69,9 +79,10 @@ export const ShowCase = () => {
                 id={image.folder._id}
                 className="showcase-card">
                 <ShowCaseItem
-                  key={image._id}
                   src={image.secure_url}
-                  alt={`${handleGetFolderName(image.folder.path)} – showcase project by Hoang Truc`}
+                  width={image.width}
+                  height={image.height}
+                  alt={`${handleGetFolderName(image.folder.path)} – showcase`}
                   folderName={handleGetFolderName(image.folder.path)}
                   eager={index < 4}
                   onClick={() => handleImageClick(image.folder.path, 0)}
@@ -83,21 +94,23 @@ export const ShowCase = () => {
       <Pagination
         currentPage={page}
         totalPages={totalPages}
-        onPageChange={(page) => setPage(page)}
+        onPageChange={handlePageChange}
       />
 
-      {/* --- Lightbox — opens automatically once folder images are ready --- */}
+      {/* --- Lightbox — dynamic load --- */}
       {isOpen && (
-        <LightBox
-          isOpen={isOpen}
-          slides={slides}
-          startIndex={startIndex}
-          onClose={() => {
-            setIsOpen(false);
-            setFolder(null);
-            setSlides([]);
-          }}
-        />
+        <Suspense fallback={null}>
+          <LightBox
+            isOpen={isOpen}
+            slides={slides}
+            startIndex={startIndex}
+            onClose={() => {
+              setIsOpen(false);
+              setFolder(null);
+              setSlides([]);
+            }}
+          />
+        </Suspense>
       )}
     </main>
   );
