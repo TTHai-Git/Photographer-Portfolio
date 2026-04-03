@@ -1,25 +1,34 @@
 import { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import "../Assets/CSS/Login.css";
 import { useNotification } from "../Context/NotificationContext";
 
 const Login = () => {
-  const { login, loading } = useAuth();
+  const { login, loading, user, isInitialized } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  // ⏳ Chờ fetch user xong mới quyết định
+  if (!isInitialized) return null;
+
+  // ✅ Đã đăng nhập → về trang chủ
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const ok = await login(username, password);
-    if (ok) navigate("/dashboard");
+    if (ok) navigate("/");
   };
 
   return (
     <div className="login-page">
-      <div className="login-card" style={{ position: "relative", minHeight: "450px" }}>
+      <div
+        className="login-card"
+        style={{ position: "relative", minHeight: "450px" }}
+      >
         <h2 className="login-title">Quản Trị Viên Đăng Nhập</h2>
         <p className="login-subtitle">Truy cập vào thư viện ảnh để quản lý</p>
 
@@ -55,28 +64,29 @@ const Login = () => {
         </form>
 
         {loading && (
-          <div 
-            className="loading-overlay" 
-            style={{ 
-              position: "absolute", 
-              inset: 0, 
-              backgroundColor: "rgba(255,255,255,0.7)", 
+          <div
+            className="loading-overlay"
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "rgba(255,255,255,0.7)",
               zIndex: 10,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               borderRadius: "12px",
-              backdropFilter: "blur(2px)"
+              backdropFilter: "blur(2px)",
             }}
           >
             <div className="spinner"></div>
-            <p style={{ marginTop: "10px", fontWeight: "500" }}>Đang kiểm tra tài khoản...</p>
+            <p style={{ marginTop: "10px", fontWeight: "500" }}>
+              Đang kiểm tra tài khoản...
+            </p>
           </div>
         )}
       </div>
     </div>
-
   );
 };
 

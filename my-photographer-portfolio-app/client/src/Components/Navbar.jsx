@@ -49,16 +49,19 @@ export const Navbar = () => {
               <span className="nav-user">Xin chào {user.username}</span>
 
               <div className="nav-user-menu">
-                <NavLink to="/dashboard" onClick={closeMenu}>
-                  Dashboard
-                </NavLink>
+                {user?.role === "admin" && (
+                  <NavLink to="/dashboard" onClick={closeMenu}>
+                    Dashboard
+                  </NavLink>
+                )}
+
                 <NavLink
-                  to="/"
+                  to="/login"
                   onClick={() => {
                     logout();
                     closeMenu();
-                    navigate("/");
-                  }}>
+                  }}
+                >
                   logout
                 </NavLink>
               </div>

@@ -82,7 +82,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (!user) navigate("/login");
+    // if (!user) navigate("/login");
     loadFolders();
   }, [folderParams]);
 

@@ -35,28 +35,31 @@ authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const isTokenExpired = error.response?.data?.tokenExpired === true;
 
-    // Nếu lỗi 401 và không phải là request refresh token
+    // Chỉ thử refresh khi: lỗi 401 + token hết hạn + chưa retry + không phải chính request refresh
     if (
       error.response?.status === 401 &&
+      isTokenExpired &&
       !originalRequest._retry &&
       originalRequest.url !== endpoints.refreshToken
     ) {
       originalRequest._retry = true;
 
       try {
-        // Chỉ cần gọi API, Server sẽ tự đọc Refresh Cookie và set lại Access Cookie mới
+        // Server tự đọc refreshToken cookie và set lại accessToken cookie mới
         await authApi.post(endpoints.refreshToken);
 
-        // Sau khi refresh thành công, gọi lại request cũ
-        // Lúc này trình duyệt đã có Cookie mới nên sẽ không bị 401 nữa
+        // Gọi lại request gốc, trình duyệt sẽ tự gửi cookie mới
         return authApi(originalRequest);
       } catch (refreshError) {
-        // Refresh thất bại (hết hạn cả refresh token) -> Đá về login
+        // Refresh thất bại (refreshToken hết hạn) → redirect login
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
+
+    // 401 mà token KHÔNG hết hạn (chưa login) → KHÔNG redirect, để AuthContext tự xử lý
     return Promise.reject(error);
   }
 );

@@ -1,0 +1,70 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#f8f9fa"/>
+  
+  <!-- Floating warning elements -->
+  <g id="warning-bg-1" opacity="0.2">
+    <path d="M 80 100 L 120 50 L 160 100 Z" fill="#f5576c"/>
+    <text x="105" y="85" font-size="16" font-weight="bold" fill="#f5576c" text-anchor="middle">!</text>
+  </g>
+  
+  <g id="warning-bg-2" opacity="0.15">
+    <circle cx="320" cy="120" r="30" fill="none" stroke="#f093fb" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="320" y1="100" x2="320" y2="60" stroke="#f093fb" stroke-width="2"/>
+  </g>
+  
+  <!-- Main error code 400 -->
+  <g id="error-code-400">
+    <!-- Four -->
+    <g transform="translate(70, 130)">
+      <path d="M 0 0 L 0 80 M 0 30 L 50 80" stroke="#f5576c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <line x1="0" y1="50" x2="50" y2="50" stroke="#f5576c" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    
+    <!-- Zero 1 -->
+    <g transform="translate(150, 130)">
+      <ellipse cx="25" cy="40" rx="20" ry="40" fill="none" stroke="#f093fb" stroke-width="4"/>
+      <ellipse cx="25" cy="40" rx="15" ry="35" fill="none" stroke="#f093fb" stroke-width="2" opacity="0.3"/>
+    </g>
+    
+    <!-- Zero 2 -->
+    <g transform="translate(230, 130)">
+      <ellipse cx="25" cy="40" rx="20" ry="40" fill="none" stroke="#f5576c" stroke-width="4"/>
+      <ellipse cx="25" cy="40" rx="15" ry="35" fill="none" stroke="#f5576c" stroke-width="2" opacity="0.3"/>
+    </g>
+  </g>
+  
+  <!-- Error indication symbols -->
+  <g id="error-symbols">
+    <!-- X mark (crossed out) -->
+    <g transform="translate(80, 280)">
+      <line x1="0" y1="0" x2="40" y2="40" stroke="#f5576c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="40" y1="0" x2="0" y2="40" stroke="#f5576c" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    
+    <!-- Exclamation mark -->
+    <g transform="translate(280, 260)">
+      <rect x="-5" y="0" width="10" height="30" rx="3" fill="#f093fb"/>
+      <circle cx="0" cy="45" r="6" fill="#f093fb"/>
+    </g>
+  </g>
+  
+  <!-- Validation/error marks scattered -->
+  <g id="validation-marks" opacity="0.4">
+    <text x="120" y="340" font-size="28" fill="#f5576c">✗</text>
+    <text x="260" y="350" font-size="28" fill="#f093fb">✗</text>
+    <text x="200" y="320" font-size="24" fill="#f5576c">⚠</text>
+  </g>
+  
+  <!-- Error particles -->
+  <g id="error-particles" opacity="0.6">
+    <circle cx="90" cy="100" r="2" fill="#f5576c"/>
+    <circle cx="320" cy="200" r="2.5" fill="#f093fb"/>
+    <circle cx="150" cy="350" r="1.5" fill="#f5576c"/>
+    <circle cx="300" cy="300" r="2" fill="#f093fb"/>
+    <circle cx="50" cy="250" r="2.5" fill="#f5576c"/>
+  </g>
+  
+  <!-- Decorative broken lines -->
+  <path d="M 50 360 L 120 360 M 140 360 L 260 360 M 280 360 L 350 360" stroke="#f5576c" stroke-width="2" opacity="0.3" stroke-dasharray="3,3"/>
+</svg>

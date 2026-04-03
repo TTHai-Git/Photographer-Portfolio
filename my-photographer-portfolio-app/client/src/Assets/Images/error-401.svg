@@ -1,0 +1,56 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#f8f9fa"/>
+  
+  <!-- Floating shield elements -->
+  <g id="shield-bg-1" opacity="0.2">
+    <path d="M 50 80 L 80 60 L 110 80 L 110 130 Q 80 150 50 130 Z" fill="#667eea"/>
+  </g>
+  
+  <g id="shield-bg-2" opacity="0.15">
+    <path d="M 300 120 L 340 100 L 380 120 L 380 180 Q 340 210 300 180 Z" fill="#764ba2"/>
+  </g>
+  
+  <!-- Main Lock Illustration -->
+  <g id="main-lock">
+    <!-- Lock body -->
+    <rect x="140" y="160" width="120" height="100" rx="8" fill="none" stroke="#667eea" stroke-width="4"/>
+    
+    <!-- Lock shackle (top curved part) -->
+    <path d="M 160 160 Q 160 80 240 80 Q 320 80 320 160" fill="none" stroke="#667eea" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Keyhole circle -->
+    <circle cx="200" cy="200" r="15" fill="none" stroke="#667eea" stroke-width="3"/>
+    <circle cx="200" cy="200" r="8" fill="#667eea" opacity="0.2"/>
+    
+    <!-- Key illustration next to lock -->
+    <g id="key-beside-lock" transform="translate(250, 140)">
+      <rect x="0" y="8" width="50" height="8" rx="4" fill="#764ba2"/>
+      <circle cx="55" cy="12" r="12" fill="#764ba2"/>
+      <circle cx="55" cy="12" r="8" fill="none" stroke="#764ba2" stroke-width="2"/>
+    </g>
+  </g>
+  
+  <!-- Lock status icons -->
+  <g id="lock-icons">
+    <!-- Locked symbol -->
+    <text x="140" y="320" font-size="24" font-weight="bold" fill="#667eea" opacity="0.4">🔒</text>
+    <!-- Alert symbol -->
+    <text x="240" y="320" font-size="24" font-weight="bold" fill="#764ba2" opacity="0.3">⚠</text>
+  </g>
+  
+  <!-- Animated security particles -->
+  <g id="security-particles" opacity="0.5">
+    <circle cx="80" cy="200" r="2.5" fill="#667eea"/>
+    <circle cx="320" cy="150" r="2" fill="#764ba2"/>
+    <circle cx="150" cy="350" r="2" fill="#667eea"/>
+    <circle cx="270" cy="340" r="2.5" fill="#764ba2"/>
+    <circle cx="100" cy="280" r="1.5" fill="#667eea"/>
+  </g>
+  
+  <!-- Padlock chain animation suggestion -->
+  <path d="M 120 200 Q 110 180 100 200 Q 95 220 100 240" stroke="#667eea" stroke-width="2" fill="none" opacity="0.3" stroke-dasharray="3,3"/>
+  
+  <!-- Decorative line -->
+  <path d="M 50 360 L 350 360" stroke="#667eea" stroke-width="2" opacity="0.2" stroke-dasharray="5,5"/>
+</svg>

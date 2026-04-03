@@ -1,0 +1,741 @@
+/* ============================================
+   ERROR PAGES STYLES - SASS SYSTEM
+   ============================================ */
+
+/* -------- Color Variables -------- */
+:root {
+  --color-primary: #ff6b6b;
+  --color-secondary: #4ecdc4;
+  --color-accent: #ffe66d;
+  --color-dark: #1a1a1a;
+  --color-light: #f8f9fa;
+  --color-text: #2d3436;
+  --color-border: #dfe6e9;
+  --gradient-primary: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  --gradient-secondary: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  --gradient-accent: linear-gradient(135deg, #ffe66d 0%, #ffa502 100%);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* -------- Base Error Container -------- */
+.error-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+.error-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+}
+
+.error-content {
+  background: white;
+  border-radius: 20px;
+  padding: 60px 40px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* -------- Error Code Display -------- */
+.error-code {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.code-digit {
+  font-size: 120px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  animation: slideInDown 0.8s ease-out forwards;
+}
+
+.code-digit:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.code-digit:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Individual digit colors */
+.code-4 {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.code-0-1 {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.code-0-2 {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.code-1 {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.code-4-last {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* -------- Error Title & Description -------- */
+.error-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0 0 20px 0;
+  animation: fadeInUp 0.8s ease-out 0.3s backwards;
+}
+
+.error-description {
+  font-size: 18px;
+  color: #636e72;
+  margin: 0 0 40px 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+/* -------- Error Illustration -------- */
+.error-illustration {
+  position: relative;
+  height: 200px;
+  margin: 40px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 0.8s ease-out 0.5s backwards;
+}
+
+/* Error Image SVG styling */
+.error-image {
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  animation:
+    float 3s ease-in-out infinite,
+    fadeInUp 0.8s ease-out 0.5s backwards;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+}
+
+/* 400 Error - Broken Element */
+.broken-element {
+  width: 100px;
+  height: 100px;
+  background: var(--gradient-primary);
+  border-radius: 15px;
+  position: relative;
+  animation:
+    shake 0.6s ease-in-out 0.7s,
+    bounce 2s ease-in-out 1.4s infinite;
+}
+
+.broken-element::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 10px;
+}
+
+.broken-element::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  background: var(--gradient-accent);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 401 Error - Lock Icon */
+.lock-icon {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.lock-body {
+  width: 80px;
+  height: 90px;
+  background: var(--gradient-secondary);
+  border-radius: 10px 10px 15px 15px;
+  position: absolute;
+  left: 20px;
+  top: 50px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  animation: lockJingle 0.5s ease-in-out 0.7s;
+}
+
+.lock-shackle {
+  width: 60px;
+  height: 80px;
+  border: 8px solid var(--gradient-secondary);
+  border-bottom: none;
+  border-radius: 50px 50px 0 0;
+  position: absolute;
+  left: 30px;
+  top: 5px;
+  background: transparent;
+  animation: lockJingle 0.5s ease-in-out 0.7s;
+}
+
+.lock-keyhole {
+  width: 15px;
+  height: 20px;
+  background: var(--color-dark);
+  border-radius: 50%;
+  position: absolute;
+  left: 52.5px;
+  top: 75px;
+  animation: keyholePulse 1.5s ease-in-out 1.2s infinite;
+}
+
+/* 404 Error - Floating Object */
+.floating-object {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  animation: float 3s ease-in-out infinite;
+}
+
+.object-inner {
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(255, 166, 2, 0.3);
+}
+
+.object-inner::before {
+  content: "?";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  color: white;
+  font-weight: 900;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* -------- Floating Particles -------- */
+.floating-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ff6b6b 0%, #ee5a6f 100%);
+  border-radius: 50%;
+  animation: particleFloat 4s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+  left: 20%;
+  top: 10%;
+  animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+  right: 20%;
+  top: 20%;
+  animation-delay: 0.5s;
+  background: radial-gradient(circle, #4ecdc4 0%, #44a08d 100%);
+}
+
+.particle:nth-child(3) {
+  left: 15%;
+  bottom: 20%;
+  animation-delay: 1s;
+  background: radial-gradient(circle, #ffe66d 0%, #ffa502 100%);
+}
+
+.particle:nth-child(4) {
+  right: 15%;
+  bottom: 25%;
+  animation-delay: 1.5s;
+  background: radial-gradient(circle, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+/* -------- Error Actions -------- */
+.error-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 40px 0;
+  animation: fadeInUp 0.8s ease-out 0.6s backwards;
+}
+
+.btn {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--color-light);
+  color: var(--color-dark);
+  border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-border);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* -------- Error Footer -------- */
+.error-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  animation: fadeInUp 0.8s ease-out 0.7s backwards;
+}
+
+.error-footer p {
+  margin: 8px 0;
+  color: #b2bec3;
+  font-size: 14px;
+}
+
+.error-footer code {
+  background: #f1f2f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* -------- Decoration -------- */
+.error-decoration {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 107, 107, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  z-index: 1;
+  animation: rotate 20s linear infinite;
+}
+
+/* ============================================
+   ERROR-SPECIFIC BACKGROUND IMAGES
+   ============================================ */
+
+/* 401 Unauthorized - Lock/Security themed */
+.error-401 {
+  background:
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="lock-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><path d="M100,50 L150,50 L150,100 Q150,120 130,120 L70,120 Q50,120 50,100 L50,50 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><circle cx="100" cy="110" r="5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="1200" height="600" fill="url(%23lock-pattern)"/></svg>');
+  background-size:
+    cover,
+    200px 200px;
+  background-position:
+    center,
+    0 0;
+  background-attachment: fixed;
+}
+
+/* 404 Not Found - Space/Missing themed */
+.error-404 {
+  background:
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="space-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.3)"/><circle cx="80" cy="60" r="1.5" fill="rgba(255,255,255,0.2)"/><circle cx="50" cy="30" r="1" fill="rgba(255,255,255,0.15)"/></pattern></defs><rect width="1200" height="600" fill="url(%23space-pattern)"/></svg>');
+  background-size:
+    cover,
+    100px 100px;
+  background-position:
+    center,
+    0 0;
+  background-attachment: fixed;
+}
+
+/* 400 Bad Request - Error/Warning themed */
+.error-400 {
+  background:
+    linear-gradient(135deg, #f093fb 0%, #f5576c 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="warning-pattern" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse"><path d="M75,20 L130,120 L20,120 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></pattern></defs><rect width="1200" height="600" fill="url(%23warning-pattern)"/></svg>');
+  background-size:
+    cover,
+    150px 150px;
+  background-position:
+    center,
+    0 0;
+  background-attachment: fixed;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(10px) rotate(2deg);
+  }
+  75% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes lockJingle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes keyholePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(26, 26, 26, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(26, 26, 26, 0);
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(100px, -100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .error-container {
+    padding: 20px 15px;
+  }
+
+  .error-content {
+    padding: 40px 25px;
+    border-radius: 15px;
+  }
+
+  .error-code {
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+
+  .code-digit {
+    font-size: 70px;
+  }
+
+  .error-title {
+    font-size: 36px;
+    margin-bottom: 15px;
+  }
+
+  .error-description {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .error-illustration {
+    height: 150px;
+    margin: 30px 0;
+  }
+
+  .error-actions {
+    gap: 10px;
+    margin: 30px 0;
+    flex-direction: column;
+  }
+
+  .btn {
+    padding: 12px 30px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .error-decoration {
+    width: 200px;
+    height: 200px;
+    top: -30px;
+    right: -30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .error-container {
+    min-height: auto;
+    padding: 40px 15px;
+  }
+
+  .error-content {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+
+  .error-code {
+    gap: 5px;
+    margin-bottom: 25px;
+  }
+
+  .code-digit {
+    font-size: 50px;
+  }
+
+  .error-title {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .error-description {
+    font-size: 14px;
+    margin-bottom: 25px;
+  }
+
+  .error-illustration {
+    height: 120px;
+    margin: 25px 0;
+  }
+
+  .error-footer {
+    margin-top: 25px;
+    padding-top: 15px;
+  }
+
+  .error-footer p {
+    font-size: 12px;
+  }
+
+  .error-decoration {
+    display: none;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT (OPTIONAL)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .error-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .error-content {
+    background: #0f3460;
+    color: #ffffff;
+  }
+
+  .error-title {
+    color: #ffffff;
+  }
+
+  .error-description {
+    color: #b0b0b0;
+  }
+
+  .error-footer p {
+    color: #707070;
+  }
+
+  .btn-secondary {
+    background: #16213e;
+    color: #ffffff;
+    border-color: #2d3561;
+  }
+
+  .btn-secondary:hover {
+    background: #2d3561;
+  }
+
+  .error-footer {
+    border-top-color: #2d3561;
+  }
+
+  .error-decoration {
+    background: radial-gradient(
+      circle,
+      rgba(255, 107, 107, 0.05) 0%,
+      transparent 70%
+    );
+  }
+}

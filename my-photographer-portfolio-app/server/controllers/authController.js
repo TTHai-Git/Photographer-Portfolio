@@ -4,6 +4,7 @@ import "../config/dotenv.config.js";
 import User from "../models/userModel.js";
 import Role from "../models/roleModel.js";
 import validator from "validator";
+import { getToken } from "../middlewares/authMiddleware.js";
 
 export const createAcount = async (req, res) => {
   const { username, password, email, roleName } = req.body;
@@ -36,7 +37,7 @@ export const createAcount = async (req, res) => {
       username,
       password: hashedPassword,
       email,
-      role
+      role,
     });
     // console.log(newUser);
 
@@ -47,7 +48,6 @@ export const createAcount = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  // console.log(req.body);
   const username = req.body.username;
   const password = req.body.password;
 
@@ -58,8 +58,8 @@ export const login = async (req, res) => {
         .json({ message: "Tên đăng nhập và mật khẩu không được bỏ trống!" });
 
     const user =
-      (await User.findOne({ username })) ||
-      (await User.findOne({ email: username }));
+      (await User.findOne({ username }).populate("role")) ||
+      (await User.findOne({ email: username }).populate("role"));
 
     if (!user)
       return res
@@ -75,41 +75,41 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.REACT_APP_NODE_ENV === "production" ? true : false,
       sameSite: "lax",
-      path: "/" // Để "/" cho chắc chắn
+      path: "/", // Để "/" cho chắc chắn
     };
 
     // Create JWT token (only accessToken now)
     const accessToken = jwt.sign(
-      { username: user.username, role: user.role },
+      { username: user.username, role: user.role.name },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h"
-      }
+        expiresIn: "1h",
+      },
     );
 
     const refreshToken = jwt.sign(
       {
         username: user.username,
-        role: user.role
+        role: user.role.name,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET_BACKUP,
+      { expiresIn: "7d" },
     );
 
     const isProduction = process.env.REACT_APP_NODE_ENV === "production";
 
     res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.cookie("accessToken", accessToken, {
       ...cookieOptions,
-      maxAge: 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000,
     });
 
     return res.status(200).json({
       isVerified: true,
-      message: "Đăng nhập thành công."
+      message: "Đăng nhập thành công.",
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -124,12 +124,12 @@ export const refreshToken = async (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET_BACKUP);
 
     const newAccessToken = jwt.sign(
-      { username: decoded.username, role: decoded.role },
+      { username: decoded.username, role: decoded.role }, // decoded.role đã là string
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } // Đồng bộ với thời gian 1h ở hàm login
+      { expiresIn: "1h" }, // Đồng bộ với thời gian 1h ở hàm login
     );
 
     // ✅ PHẢI SET LẠI COOKIE Ở ĐÂY
@@ -139,7 +139,7 @@ export const refreshToken = async (req, res) => {
       secure: isProduction,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 1000 // 1 hour
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     return res.status(200).json({ message: "Token refreshed" });
@@ -157,11 +157,30 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: "lax",
-    path: "/"
+    path: "/",
   };
 
   res.clearCookie("accessToken", clearOptions);
   res.clearCookie("refreshToken", clearOptions);
 
   return res.status(200).json({ message: "Logged out" });
+};
+
+export const getMe = (req, res) => {
+  const accessToken = getToken(req);
+  if (!accessToken) {
+    // Không có token = chưa đăng nhập, client sẽ không refresh
+    return res.status(401).json({ message: "Unauthorized", tokenExpired: false });
+  }
+
+  try {
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+    return res.status(200).json({ user: decoded });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      // Token hết hạn → client interceptor sẽ tự động refresh
+      return res.status(401).json({ message: "Access token is expired", tokenExpired: true });
+    }
+    return res.status(401).json({ message: "Invalid token", tokenExpired: false });
+  }
 };

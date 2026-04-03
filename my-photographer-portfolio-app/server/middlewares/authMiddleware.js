@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import Role from "../models/roleModel.js";
 
-const getToken = (req) => {
+export const getToken = (req) => {
   // 1. Kiểm tra trong Cookies trước (Ưu tiên vì an toàn hơn)
   if (req.cookies && req.cookies.accessToken) {
     return req.cookies.accessToken;
@@ -20,9 +20,7 @@ export const authMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const role = await Role.findById(decoded.role).select("name");
-
-    if (role?.name !== "user") {
+    if (!decoded.role?.includes("user") && !decoded.role?.includes("admin")) {
       return res.status(403).json({ message: "Forbidden: Users only" });
     }
 
@@ -41,9 +39,7 @@ export const isAdmin = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const role = await Role.findById(decoded.role).select("name");
-
-    if (role?.name !== "admin") {
+    if (decoded.role !== "admin") {
       return res.status(403).json({ message: "Forbidden: Admins only" });
     }
 
