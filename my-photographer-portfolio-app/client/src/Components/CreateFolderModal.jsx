@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../Assets/CSS/modal.css";
+import "../Assets/CSS/dashboard.css";
 import { authApi, endpoints } from "../config/APIs";
 import { useNotification } from "../Context/NotificationContext";
 
@@ -104,7 +105,7 @@ export default function CreateFolderModal({
             </button>
 
             <button
-              className="btn btn-primary"
+              className="btn btn-green"
               onClick={handleCreateFolder}
               disabled={loadingCreate}>
               {loadingCreate ? (

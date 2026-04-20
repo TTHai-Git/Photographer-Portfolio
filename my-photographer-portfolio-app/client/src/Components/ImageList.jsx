@@ -108,7 +108,7 @@ export default function ImageList({
           </button>
 
           <button
-            className="btn btn-primary"
+            className="btn btn-green"
             onClick={() => {
               if (oldPublicIds.length === 0) {
                 showNotification("Vui lòng chọn ảnh để di chuyển!", "warning");

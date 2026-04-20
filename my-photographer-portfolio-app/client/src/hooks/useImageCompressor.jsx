@@ -1,48 +1,65 @@
 import { useRef, useEffect } from "react";
 
-let requestCounter = 0;
-
 export const useImageCompressor = () => {
   const workerRef = useRef(null);
   const callbacks = useRef({});
+  // 🔥 requestCounter nằm bên trong hook, không chia sẻ giữa các instance
+  const requestCounterRef = useRef(0);
 
   useEffect(() => {
-    // 🔥 Tạo worker khi component mount
-    workerRef.current = new Worker(
+    // Tạo worker khi component mount
+    const worker = new Worker(
       new URL("../workers/imageCompressor.worker.js", import.meta.url),
       { type: "module" }
     );
 
-    workerRef.current.onmessage = (e) => {
+    workerRef.current = worker;
+
+    worker.onmessage = (e) => {
       const { requestId, success, blob, error } = e.data;
 
-      // console.log("Got response from worker:", requestId);
-
       const callback = callbacks.current[requestId];
-      if (!callback) return;
+      if (!callback) return; // callback đã bị xóa (do unmount) → bỏ qua
 
       delete callbacks.current[requestId];
 
       if (success) {
         callback.resolve(blob);
       } else {
-        callback.reject(error);
+        callback.reject(new Error(error));
       }
     };
 
-    // 🔥 CLEANUP — khi component unmount
-    return () => {
-      // console.log("Terminating worker...");
-      workerRef.current?.terminate();
-      workerRef.current = null;
+    worker.onerror = (e) => {
+      // Reject tất cả pending callbacks nếu worker gặp lỗi nghiêm trọng
+      console.error("Worker fatal error:", e);
+      Object.values(callbacks.current).forEach(({ reject }) =>
+        reject(new Error(`Worker error: ${e.message}`))
+      );
       callbacks.current = {};
+    };
+
+    // CLEANUP — khi component unmount
+    return () => {
+      // Reject tất cả pending requests thay vì bỏ lơ (tránh promise leak)
+      Object.values(callbacks.current).forEach(({ reject }) =>
+        reject(new Error("Component unmounted — compression cancelled"))
+      );
+      callbacks.current = {};
+
+      worker.terminate();
+      workerRef.current = null;
     };
   }, []);
 
   const compressImage = (file, options = {}) => {
+    // 🛡️ Guard: worker chưa sẵn sàng
+    if (!workerRef.current) {
+      return Promise.reject(new Error("Image compressor worker is not ready"));
+    }
+
     return new Promise((resolve, reject) => {
-      const requestId = requestCounter++;
-      // console.log("Posting to worker:", requestId);
+      const requestId = requestCounterRef.current++;
 
       callbacks.current[requestId] = { resolve, reject };
 

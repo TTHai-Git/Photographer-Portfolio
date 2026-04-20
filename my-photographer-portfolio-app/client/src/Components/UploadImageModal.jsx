@@ -190,23 +190,27 @@ const UploadImageModal = ({
     const CLOUD_NAME = process.env.REACT_APP_CLOUD_NAME;
     const UPLOAD_PRESET = process.env.REACT_APP_UPLOAD_PRESET;
 
+    // 🔥 Dùng ref để đếm số ảnh đã hoàn thành — tránh stale closure của index
+    let completedCount = 0;
+
     try {
       setLoadingUpload(true);
       setUploadProgress(0);
 
       const limit = pLimit(3); // chỉ upload 3 ảnh cùng lúc
-      const uploadedAssets = [];
 
-      const tasks = files.map((file, index) =>
+      // ✅ Fix race condition: mỗi task return value, không push vào shared array
+      const tasks = files.map((file) =>
         limit(async () => {
-          setCurrentUploadFile(`Đang tải: ${file.name}`);
-          setUploadProgress((index / files.length) * 100);
+          setCurrentUploadFile(`Đang nén: ${file.name}`);
 
           // 🔥 Compress in Worker
           const compressed = await compressImage(file, {
             maxBytes: 10 * 1024 * 1024,
             maxWidthOrHeight: 2560
           });
+
+          setCurrentUploadFile(`Đang tải lên: ${file.name}`);
 
           const imageFormat = getImageFormat(file.name);
           const formData = new FormData();
@@ -227,10 +231,13 @@ const UploadImageModal = ({
           );
 
           const data = await res.json();
-          // console.log("data", data)
           if (!res.ok) throw new Error(data.error?.message);
 
-          uploadedAssets.push({
+          // ✅ Fix progress: cập nhật dựa trên số lượng thực sự đã hoàn thành
+          completedCount++;
+          setUploadProgress((completedCount / files.length) * 100);
+
+          return {
             public_id: data.public_id,
             original_filename: data.original_filename,
             secure_url: data.secure_url,
@@ -241,13 +248,14 @@ const UploadImageModal = ({
             format: data.format,
             original_format: imageFormat?.ext?.replace(".", ""),
             videoMeta: null
-          });
+          };
         })
       );
 
-      await Promise.all(tasks);
-      // console.log("All uploads completed", uploadedAssets);
-      // 3️⃣ Gửi về backend chỉ metadata
+      // ✅ uploadedAssets thu thập từ return values — không có shared mutable array
+      const uploadedAssets = await Promise.all(tasks);
+
+      // Gửi về backend chỉ metadata
       await authApi.post(endpoints.saveAssetToDB, {
         assets: uploadedAssets,
         folder: selectedFolder
@@ -256,14 +264,15 @@ const UploadImageModal = ({
       showNotification("Tải ảnh lên thành công!", "success");
       resetUploadState();
       await loadImages();
+      // ✅ Fix: chỉ đóng modal khi thành công
+      onClose();
     } catch (err) {
       showNotification(`Upload thất bại! ${err}`, "error");
-      console.log(err);
+      console.error(err);
     } finally {
       setLoadingUpload(false);
       setUploadProgress(0);
       setCurrentUploadFile("");
-      onClose();
     }
   };
 

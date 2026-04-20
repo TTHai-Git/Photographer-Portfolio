@@ -181,33 +181,33 @@ const FolderList = ({
       {/* Folder Items */}
       {loading
         ? Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="folder-skeleton"></div>
-          ))
+          <div key={i} className="folder-skeleton"></div>
+        ))
         : folders.map((f) => (
-            <div
-              key={f._id}
-              className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
-              onClick={() => setSelectedFolder(f.path)}
-            >
-              <input
-                type="checkbox"
-                checked={selectedDirs.includes(f.path)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedDirs((prev) =>
-                    prev.includes(f.path)
-                      ? prev.filter((x) => x !== f.path)
-                      : [...prev, f.path],
-                  );
-                }}
-              />
+          <div
+            key={f._id}
+            className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
+            onClick={() => setSelectedFolder(f.path)}
+          >
+            <input
+              type="checkbox"
+              checked={selectedDirs.includes(f.path)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedDirs((prev) =>
+                  prev.includes(f.path)
+                    ? prev.filter((x) => x !== f.path)
+                    : [...prev, f.path],
+                );
+              }}
+            />
 
-              <div className="folder-left">
-                <FaFolder className="folder-icon" />
-                <span>{handleGetFolderName(f.path)}</span>
-              </div>
+            <div className="folder-left">
+              <FaFolder className="folder-icon" />
+              <span>{handleGetFolderName(f.path)}</span>
             </div>
-          ))}
+          </div>
+        ))}
 
       <CreateFolderModal
         folders={foldersForCombobox}
