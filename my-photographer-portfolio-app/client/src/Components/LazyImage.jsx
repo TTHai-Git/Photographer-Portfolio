@@ -1,15 +1,28 @@
 import { useState } from "react";
+import {
+  buildCloudinaryOptimizedUrl,
+  DEFAULT_PORTFOLIO_IMAGE_SIZE,
+  getFixedAspectRatio
+} from "../Helpers/cloudinaryImage";
 
 /**
  * LazyImage — for below-the-fold images.
  * - Saves bandwidth by loading only when near viewport
  * - Prevents CLS by reserving space using width/height metadata
  */
-const LazyImage = ({ src, alt, onClick, width, height, className }) => {
+const LazyImage = ({
+  src,
+  alt,
+  onClick,
+  width = DEFAULT_PORTFOLIO_IMAGE_SIZE.width,
+  height = DEFAULT_PORTFOLIO_IMAGE_SIZE.height,
+  className
+}) => {
   const [loaded, setLoaded] = useState(false);
 
-  // Reserve space using original dimensions to prevent CLS
-  const aspectRatio = width && height ? `${width} / ${height}` : "4 / 5";
+  // Reserve space with fixed portfolio ratio to prevent CLS
+  const aspectRatio = getFixedAspectRatio(width, height);
+  const optimizedSrc = buildCloudinaryOptimizedUrl(src, { width, height });
 
   return (
     <div
@@ -23,13 +36,17 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
         borderRadius: "2px",
       }}>
       <img
-        src={src}
+        src={optimizedSrc}
         alt={alt}
+        width={width}
+        height={height}
         onClick={onClick}
         className={className}
         loading="lazy"
         decoding="async"
-        onLoad={() => setLoaded(true)}
+        onLoad={() => {
+          setLoaded(true);
+        }}
         style={{
           width: "100%",
           height: "100%",
@@ -59,5 +76,3 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
 };
 
 export default LazyImage;
-
-
