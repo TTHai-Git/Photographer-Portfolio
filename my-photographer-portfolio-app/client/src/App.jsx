@@ -1,16 +1,23 @@
+import { Suspense, lazy } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Components/Layout";
-import Home from "./Pages/Home";
-import ShowCase from "./Pages/ShowCase";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import Dashboard from "./Pages/Dashboard";
-import Login from "./Pages/Login";
-import About from "./Pages/About";
-import VideoGallery from "./Pages/VideoGallery";
-import Portrait from "./Pages/Portrait";
-import Error400 from "./Pages/Error400";
-import Error401 from "./Pages/Error401";
-import Error404 from "./Pages/Error404";
+
+const Home = lazy(() => import("./Pages/Home"));
+const ShowCase = lazy(() => import("./Pages/ShowCase"));
+const Dashboard = lazy(() => import("./Pages/Dashboard"));
+const Login = lazy(() => import("./Pages/Login"));
+const About = lazy(() => import("./Pages/About"));
+const Portrait = lazy(() => import("./Pages/Portrait"));
+const Error400 = lazy(() => import("./Pages/Error400"));
+const Error401 = lazy(() => import("./Pages/Error401"));
+const Error404 = lazy(() => import("./Pages/Error404"));
+
+const withSuspense = (component) => (
+  <Suspense fallback={<div className="route-skeleton">Loading...</div>}>
+    {component}
+  </Suspense>
+);
 
 function App() {
   const router = createBrowserRouter([
@@ -20,11 +27,11 @@ function App() {
       children: [
         {
           index: true, // default child route
-          element: <Home />,
+          element: withSuspense(<Home />),
         },
         {
           path: "login",
-          element: <Login />,
+          element: withSuspense(<Login />),
         },
         // {
         //   path: "dashboard",
@@ -33,15 +40,15 @@ function App() {
         // Nhóm trang CHỈ ADMIN mới vào được
         {
           element: <ProtectedRoute allowedRoles={["admin"]} />,
-          children: [{ path: "dashboard", element: <Dashboard /> }],
+          children: [{ path: "dashboard", element: withSuspense(<Dashboard />) }],
         },
         {
           path: "my-project",
-          element: <ShowCase />,
+          element: withSuspense(<ShowCase />),
         },
         {
           path: "portrait",
-          element: <Portrait />,
+          element: withSuspense(<Portrait />),
         },
         // {
         //   path: "animation",
@@ -49,24 +56,24 @@ function App() {
         // },
         {
           path: "about",
-          element: <About />,
+          element: withSuspense(<About />),
         },
         {
           path: "error-400",
-          element: <Error400 />,
+          element: withSuspense(<Error400 />),
         },
         {
           path: "error-401",
-          element: <Error401 />,
+          element: withSuspense(<Error401 />),
         },
         {
           path: "error-404",
-          element: <Error404 />,
+          element: withSuspense(<Error404 />),
         },
         // Wildcard route - bắt tất cả routes không tồn tại
         {
           path: "*",
-          element: <Error404 />,
+          element: withSuspense(<Error404 />),
         },
       ],
     },

@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import LazyImage from "../Components/LazyImage";
@@ -16,7 +16,7 @@ export const Home = () => {
   const [sort, setSort] = useState("latest");
   const { images, totalPages, loading } = useImages(
     page,
-    500,
+    60,
     "Hoang-Truc-Photographer-Portfolio/HOME",
     sort
   );
@@ -24,15 +24,19 @@ export const Home = () => {
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 
-  const handleImageClick = (index) => {
-    const slideList = images
-      .filter((image) => image.resource_type === "image")
-      .map((image) => ({
-        src: image.secure_url,
-        title: "HOME"
-      }));
+  const imageSlides = useMemo(
+    () =>
+      images
+        .filter((image) => image.resource_type === "image")
+        .map((image) => ({
+          src: image.secure_url,
+          title: "HOME"
+        })),
+    [images]
+  );
 
-    setSlides(slideList);
+  const handleImageClick = (index) => {
+    setSlides(imageSlides);
     setStartIndex(index);
     setIsOpen(true);
   };
@@ -61,15 +65,19 @@ export const Home = () => {
             ))
           : images.map((image, index) => (
               <ImageListItem key={image._id}>
-                {index < 6 ? (
+                {index === 0 ? (
                   <EagerImage
                     src={image.secure_url}
+                    width={image.width}
+                    height={image.height}
                     alt={`Portfolio photograph ${index + 1} - ${image.file_name || "artwork"}`}
                     onClick={() => handleImageClick(index)}
                   />
                 ) : (
                   <LazyImage
                     src={image.secure_url}
+                    width={image.width}
+                    height={image.height}
                     alt={`Portfolio photograph ${index + 1} - ${image.file_name || "artwork"}`}
                     onClick={() => handleImageClick(index)}
                   />

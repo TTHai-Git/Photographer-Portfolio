@@ -1,4 +1,9 @@
 import { useState } from "react";
+import {
+  buildCloudinaryOptimizedUrl,
+  DEFAULT_PORTFOLIO_IMAGE_SIZE,
+  getFixedAspectRatio
+} from "../Helpers/cloudinaryImage";
 
 /**
  * EagerImage — for above-the-fold (LCP) images.
@@ -6,8 +11,16 @@ import { useState } from "react";
  * - Shows a shimmer placeholder until bytes arrive
  * - Fades in via opacity transition on onLoad
  */
-const EagerImage = ({ src, alt, onClick }) => {
+const EagerImage = ({
+  src,
+  alt,
+  onClick,
+  width = DEFAULT_PORTFOLIO_IMAGE_SIZE.width,
+  height = DEFAULT_PORTFOLIO_IMAGE_SIZE.height
+}) => {
   const [loaded, setLoaded] = useState(false);
+  const aspectRatio = getFixedAspectRatio(width, height);
+  const optimizedSrc = buildCloudinaryOptimizedUrl(src, { width, height });
 
   return (
     <div
@@ -15,21 +28,26 @@ const EagerImage = ({ src, alt, onClick }) => {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: 200,
+        aspectRatio,
         backgroundColor: "#eaeaea",
         overflow: "hidden",
       }}>
       <img
-        src={src}
+        src={optimizedSrc}
         alt={alt}
+        width={width}
+        height={height}
         onClick={onClick}
         fetchPriority="high"
         loading="eager"
         decoding="async"
-        onLoad={() => setLoaded(true)}
+        onLoad={() => {
+          setLoaded(true);
+        }}
         style={{
           width: "100%",
-          height: "auto",
+          height: "100%",
+          objectFit: "cover",
           display: "block",
           opacity: loaded ? 1 : 0,
           transition: "opacity 0.5s ease-out",
