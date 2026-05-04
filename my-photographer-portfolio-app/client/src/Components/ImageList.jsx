@@ -189,13 +189,7 @@ export default function ImageList({
                 // <img src={img.secure_url} alt="" />
                 <ImageListItem key={img.public_id}>
                   <LazyImage
-                    src={buildImageUrl(img.public_id, { width: 400 })}
-                    srcSet={`
-                      ${buildImageUrl(img.public_id, { width: 300 })} 300w,
-                      ${buildImageUrl(img.public_id, { width: 400 })} 400w,
-                      ${buildImageUrl(img.public_id, { width: 800 })} 800w,
-                      ${buildImageUrl(img.public_id, { width: 1200 })} 1200w
-                    `}
+                    src={img.secure_url}
                     alt={img.file_name}
                     className="fade-in"
                     onClick={() => handleImageClick(index)}
