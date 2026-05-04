@@ -17,7 +17,7 @@ export const Home = () => {
     page,
     60,
     "Hoang-Truc-Photographer-Portfolio/HOME",
-    sort
+    sort,
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,8 +36,7 @@ export const Home = () => {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort(
-            (a, b) =>
-              b.boundingClientRect.height - a.boundingClientRect.height
+            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height,
           );
 
         if (visible.length > 0) {
@@ -46,7 +45,7 @@ export const Home = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     imgRefs.current.forEach((el) => el && observer.observe(el));
@@ -93,54 +92,52 @@ export const Home = () => {
         Welcome to My Photography Portfolio
       </Typography>
 
-      <SortBar sort={sort} onSortChange={setSort} />
+      {images.length > 0 && <SortBar sort={sort} onSortChange={setSort} />}
 
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
           ? Array.from({ length: 9 }).map((_, i) => (
-            <ImageListItem key={`skeleton-${i}`}>
-              <div className="image-skeleton" />
-            </ImageListItem>
-          ))
+              <ImageListItem key={`skeleton-${i}`}>
+                <div className="image-skeleton" />
+              </ImageListItem>
+            ))
           : images.map((image, index) => {
-            const isLCP = index === lcpIndex;
+              const isLCP = index === lcpIndex;
 
-            return (
-              <ImageListItem key={image._id}>
-                <img
-                  ref={(el) => (imgRefs.current[index] = el)}
-                  data-index={index}
-                  src={buildImageUrl(image.public_id, { width: 400 })}
-                  srcSet={`
+              return (
+                <ImageListItem key={image._id}>
+                  <img
+                    ref={(el) => (imgRefs.current[index] = el)}
+                    data-index={index}
+                    src={buildImageUrl(image.public_id, { width: 400 })}
+                    srcSet={`
                       ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                       ${buildImageUrl(image.public_id, { width: 400 })} 400w,
                       ${buildImageUrl(image.public_id, { width: 800 })} 800w,
                       ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
                     `}
-                  sizes="(max-width: 600px) 100vw,
+                    sizes="(max-width: 600px) 100vw,
                            (max-width: 900px) 50vw,
                            (max-width: 1200px) 33vw,
                            385px"
-                  width={385}
-                  height={481}
-                  alt={`Portfolio photograph ${index + 1}`}
-                  onClick={() => handleImageClick(index)}
-                  loading={isLCP ? "eager" : "lazy"}
-                  fetchPriority={isLCP ? "high" : "auto"}
-                  decoding="async"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    aspectRatio: "385 / 481",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-
-
-              </ImageListItem>
-            );
-          })}
+                    width={385}
+                    height={481}
+                    alt={`Portfolio photograph ${index + 1}`}
+                    onClick={() => handleImageClick(index)}
+                    loading={isLCP ? "eager" : "lazy"}
+                    fetchPriority={isLCP ? "high" : "auto"}
+                    decoding="async"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      aspectRatio: "385 / 481",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                </ImageListItem>
+              );
+            })}
       </ImageList>
 
       {images.length > 0 && (

@@ -85,7 +85,9 @@ export const ShowCase = () => {
     <main className="showcase-container">
       <h1 className="showcase-page-title">Showcase</h1>
 
-      <SortBar sort={sort} onSortChange={setSort} />
+      {mainPhotoList.length > 0 && (
+        <SortBar sort={sort} onSortChange={setSort} />
+      )}
 
       <div className="showcase-list">
         {loadingEachImageOfEachFolder && mainPhotoList.length === 0

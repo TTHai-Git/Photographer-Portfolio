@@ -18,7 +18,7 @@ export const Portrait = () => {
     page,
     60,
     "Hoang-Truc-Photographer-Portfolio/Portrait",
-    sort
+    sort,
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -37,8 +37,7 @@ export const Portrait = () => {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort(
-            (a, b) =>
-              b.boundingClientRect.height - a.boundingClientRect.height
+            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height,
           );
 
         if (visible.length > 0) {
@@ -47,7 +46,7 @@ export const Portrait = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     imgRefs.current.forEach((el) => el && observer.observe(el));
@@ -90,63 +89,63 @@ export const Portrait = () => {
         Portrait Photography
       </Typography>
 
-      <SortBar sort={sort} onSortChange={setSort} />
+      {images.length > 0 && <SortBar sort={sort} onSortChange={setSort} />}
 
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
           ? Array.from({ length: 9 }).map((_, i) => (
-            <ImageListItem key={`skeleton-${i}`}>
-              <div className="image-skeleton" />
-            </ImageListItem>
-          ))
+              <ImageListItem key={`skeleton-${i}`}>
+                <div className="image-skeleton" />
+              </ImageListItem>
+            ))
           : images.map((image, index) => {
-            const isLCP = index === lcpIndex;
+              const isLCP = index === lcpIndex;
 
-            return (
-              <ImageListItem key={image._id}>
-                <img
-                  ref={(el) => (imgRefs.current[index] = el)}
-                  data-index={index}
-                  src={buildImageUrl(image.public_id, { width: 400 })}
-                  srcSet={`
+              return (
+                <ImageListItem key={image._id}>
+                  <img
+                    ref={(el) => (imgRefs.current[index] = el)}
+                    data-index={index}
+                    src={buildImageUrl(image.public_id, { width: 400 })}
+                    srcSet={`
                       ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                       ${buildImageUrl(image.public_id, { width: 400 })} 400w,
                       ${buildImageUrl(image.public_id, { width: 800 })} 800w,
                       ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
                     `}
-                  sizes="
+                    sizes="
                       (max-width: 600px) 100vw,
                       (max-width: 900px) 50vw,
                       (max-width: 1200px) 33vw,
                       385px
                     "
-                  width={385}
-                  height={481}
-                  alt={`Portrait photograph ${index + 1}`}
-                  onClick={() => handleImageClick(index)}
-                  loading={isLCP ? "eager" : "lazy"}
-                  fetchPriority={isLCP ? "high" : "auto"}
-                  decoding="async"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    aspectRatio: "385 / 481",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-
-                {index === images.length - 1 && (
-                  <Pagination
-                    currentPage={page}
-                    totalPages={totalPages || 1}
-                    onPageChange={setPage}
+                    width={385}
+                    height={481}
+                    alt={`Portrait photograph ${index + 1}`}
+                    onClick={() => handleImageClick(index)}
+                    loading={isLCP ? "eager" : "lazy"}
+                    fetchPriority={isLCP ? "high" : "auto"}
+                    decoding="async"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      aspectRatio: "385 / 481",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
                   />
-                )}
-              </ImageListItem>
-            );
-          })}
+                </ImageListItem>
+              );
+            })}
       </ImageList>
+
+      {images.length > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages || 1}
+          onPageChange={setPage}
+        />
+      )}
 
       {isOpen && (
         <LightBox
