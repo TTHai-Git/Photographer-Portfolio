@@ -20,7 +20,7 @@ export const ShowCase = () => {
       page,
       8,
       sort,
-      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/"
+      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/",
     );
 
   const { images, loading } = useImages(1, 200, folder, "oldest");
@@ -90,44 +90,44 @@ export const ShowCase = () => {
       <div className="showcase-list">
         {loadingEachImageOfEachFolder && mainPhotoList.length === 0
           ? Array.from({ length: 8 }).map((_, i) => (
-            <div key={`sk-${i}`} className="showcase-card">
-              <div className="showcase-skeleton" />
-            </div>
-          ))
+              <div key={`sk-${i}`} className="showcase-card">
+                <div className="showcase-skeleton" />
+              </div>
+            ))
           : mainPhotoList?.map((image, index) => (
-            <div key={image._id} className="showcase-card">
-              <ShowCaseItem
-                src={buildImageUrl(image.public_id, { width: 400 })}
-                srcSet={`
+              <div key={image._id} className="showcase-card">
+                <ShowCaseItem
+                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  srcSet={`
                     ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                     ${buildImageUrl(image.public_id, { width: 400 })} 400w,
                     ${buildImageUrl(image.public_id, { width: 800 })} 800w,
                     ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
                   `}
-                sizes="
+                  sizes="
                     (max-width: 600px) 100vw,
                     (max-width: 900px) 50vw,
                     (max-width: 1200px) 33vw,
                     400px
                   "
-                width={400}
-                height={225} // 🔥 FIX 16:9
-                alt={image.file_name || "artwork"}
-                folderName={handleGetFolderName(image.folder.path)}
-                eager={index === 0} // 🔥 chỉ 1 ảnh eager
-                onClick={() => handleImageClick(image.folder.path, 0)}
-              />
-
-              {index === mainPhotoList.length - 1 && (
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
+                  width={400}
+                  height={225} // 🔥 FIX 16:9
+                  alt={image.file_name || "artwork"}
+                  folderName={handleGetFolderName(image.folder.path)}
+                  eager={index === 0} // 🔥 chỉ 1 ảnh eager
+                  onClick={() => handleImageClick(image.folder.path, 0)}
                 />
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
       </div>
+
+      {mainPhotoList.length > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       {isOpen && (
         <Suspense fallback={null}>
