@@ -2,11 +2,9 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
-import LazyImage from "../Components/LazyImage";
-import EagerImage from "../Components/EagerImage";
 import { useImages } from "../hooks/loadImages";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
@@ -15,23 +13,71 @@ import buildImageUrl from "../Helpers/buildImageUrl";
 export const Portrait = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
+
   const { images, totalPages, loading } = useImages(
     page,
-    500,
+    60,
     "Hoang-Truc-Photographer-Portfolio/Portrait",
-    sort,
+    sort
   );
+
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 
+  // 🔥 LCP detection
+  const [lcpIndex, setLcpIndex] = useState(null);
+  const imgRefs = useRef([]);
+
+  useEffect(() => {
+    if (!images?.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.boundingClientRect.height - a.boundingClientRect.height
+          );
+
+        if (visible.length > 0) {
+          const index = Number(visible[0].target.dataset.index);
+          setLcpIndex(index);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    imgRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [images]);
+
+  // 🔥 preload LCP
+  useEffect(() => {
+    if (lcpIndex === null) return;
+
+    const img = images[lcpIndex];
+    if (!img) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = buildImageUrl(img.public_id, { width: 800 });
+
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, [lcpIndex, images]);
+
+  // 🔥 Lightbox
   const handleImageClick = (index) => {
-    const slideList = images
-      .filter((image) => image.resource_type === "image")
-      .map((image) => ({
-        src: buildImageUrl(image.public_id, { width: window.innerWidth }),
-        title: "Portrait",
-      }));
+    const slideList = images.map((image) => ({
+      src: buildImageUrl(image.public_id, {
+        width: window.innerWidth,
+      }),
+      title: "Portrait",
+    }));
 
     setSlides(slideList);
     setStartIndex(index);
@@ -40,80 +86,68 @@ export const Portrait = () => {
 
   return (
     <Box component="main" className="home-container">
-      <Typography
-        variant="h3"
-        component="h1"
-        gutterBottom
-        align="center"
-        className="home-heading">
+      <Typography variant="h3" align="center" className="home-heading">
         Portrait Photography
       </Typography>
 
       <SortBar sort={sort} onSortChange={setSort} />
 
-      {/* --- Masonry Image Grid --- */}
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
-          ? /* Skeleton placeholders while data fetches */
-          Array.from({ length: 9 }).map((_, i) => (
+          ? Array.from({ length: 9 }).map((_, i) => (
             <ImageListItem key={`skeleton-${i}`}>
               <div className="image-skeleton" />
             </ImageListItem>
           ))
-          : images.map((image, index) => (
-            <ImageListItem key={image._id}>
-              {index < 2 ? (
-                <EagerImage
-                  src={buildImageUrl(image.public_id, { width: 385 })}
+          : images.map((image, index) => {
+            const isLCP = index === lcpIndex;
+
+            return (
+              <ImageListItem key={image._id}>
+                <img
+                  ref={(el) => (imgRefs.current[index] = el)}
+                  data-index={index}
+                  src={buildImageUrl(image.public_id, { width: 400 })}
                   srcSet={`
-                    ${buildImageUrl(image.public_id, { width: 300 })} 300w,
-                    ${buildImageUrl(image.public_id, { width: 400 })} 400w,
-                    ${buildImageUrl(image.public_id, { width: 800 })} 800w,
-                    ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
-                  `}
+                      ${buildImageUrl(image.public_id, { width: 300 })} 300w,
+                      ${buildImageUrl(image.public_id, { width: 400 })} 400w,
+                      ${buildImageUrl(image.public_id, { width: 800 })} 800w,
+                      ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
+                    `}
                   sizes="
-                    (max-width: 600px) 100vw,
-                    (max-width: 900px) 50vw,
-                    (max-width: 1200px) 33vw,
-                    385px
-                  "
+                      (max-width: 600px) 100vw,
+                      (max-width: 900px) 50vw,
+                      (max-width: 1200px) 33vw,
+                      385px
+                    "
                   width={385}
                   height={481}
-                  alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
+                  alt={`Portrait photograph ${index + 1}`}
                   onClick={() => handleImageClick(index)}
+                  loading={isLCP ? "eager" : "lazy"}
+                  fetchPriority={isLCP ? "high" : "auto"}
+                  decoding="async"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    aspectRatio: "385 / 481",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                 />
-              ) : (
-                <LazyImage
-                  src={buildImageUrl(image.public_id, { width: 385 })}
-                  srcSet={`
-                    ${buildImageUrl(image.public_id, { width: 300 })} 300w,
-                    ${buildImageUrl(image.public_id, { width: 400 })} 400w,
-                    ${buildImageUrl(image.public_id, { width: 800 })} 800w,
-                    ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
-                  `}
-                  sizes="
-                    (max-width: 600px) 100vw,
-                    (max-width: 900px) 50vw,
-                    (max-width: 1200px) 33vw,
-                    385px
-                  "
-                  width={385}
-                  height={481}
-                  alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
-                  onClick={() => handleImageClick(index)}
-                />
-              )}
-            </ImageListItem>
-          ))}
+
+                {index === images.length - 1 && (
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages || 1}
+                    onPageChange={setPage}
+                  />
+                )}
+              </ImageListItem>
+            );
+          })}
       </ImageList>
 
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages || 1}
-        onPageChange={(page) => setPage(page)}
-      />
-
-      {/* --- LightBox --- */}
       {isOpen && (
         <LightBox
           isOpen={isOpen}

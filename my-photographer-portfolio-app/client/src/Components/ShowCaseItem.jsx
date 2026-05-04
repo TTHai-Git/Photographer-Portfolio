@@ -1,10 +1,9 @@
 import { useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 
-const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager = false }) => {
+const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager = false, alt }) => {
   const [loaded, setLoaded] = useState(eager);
 
-  // Reserve space using original dimensions to prevent CLS
   const aspectRatio = width && height ? `${width} / ${height}` : "16 / 9";
 
   return (
@@ -27,6 +26,7 @@ const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager =
           srcSet={srcSet}
           fetchPriority={eager ? "high" : "auto"}
           loading={eager ? "eager" : "lazy"}
+          alt={alt}
           onLoad={() => {
             if (!eager) setLoaded(true);
           }}

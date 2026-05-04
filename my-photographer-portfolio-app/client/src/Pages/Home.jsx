@@ -2,11 +2,9 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Typography from "@mui/material/Typography";
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
-import LazyImage from "../Components/LazyImage";
-import EagerImage from "../Components/EagerImage";
 import { useImages } from "../hooks/loadImages";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
@@ -21,18 +19,68 @@ export const Home = () => {
     "Hoang-Truc-Photographer-Portfolio/HOME",
     sort
   );
+
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 
+  // 🔥 LCP detection
+  const [lcpIndex, setLcpIndex] = useState(null);
+  const imgRefs = useRef([]);
+
+  useEffect(() => {
+    if (!images?.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.boundingClientRect.height - a.boundingClientRect.height
+          );
+
+        if (visible.length > 0) {
+          const index = Number(visible[0].target.dataset.index);
+          setLcpIndex(index);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    imgRefs.current.forEach((el) => el && observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [images]);
+
+  // 🔥 Preload LCP image
+  useEffect(() => {
+    if (lcpIndex === null) return;
+    const img = images[lcpIndex];
+    if (!img) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = buildImageUrl(img.public_id, { width: 800 });
+
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
+  }, [lcpIndex, images]);
+
+  // 🔥 Lightbox
   const handleImageClick = (index) => {
-    const imageSlides = images
-      .filter((image) => image.resource_type === "image")
-      .map((image) => {
-        const parts = image.public_id.split("/");
-        const folderName = parts[parts.length - 2];
-        return { src: buildImageUrl(image.public_id, { width: window.innerWidth }), title: folderName };
-      });
+    const imageSlides = images.map((image) => {
+      const parts = image.public_id.split("/");
+      const folderName = parts[parts.length - 2];
+      return {
+        src: buildImageUrl(image.public_id, {
+          width: window.innerWidth,
+        }),
+        title: folderName,
+      };
+    });
 
     setSlides(imageSlides);
     setStartIndex(index);
@@ -41,70 +89,68 @@ export const Home = () => {
 
   return (
     <Box component="main" className="home-container">
-      <Typography
-        variant="h3"
-        component="h1"
-        gutterBottom
-        align="center"
-        className="home-heading">
+      <Typography variant="h3" align="center" className="home-heading">
         Welcome to My Photography Portfolio
       </Typography>
 
       <SortBar sort={sort} onSortChange={setSort} />
 
-      {/* --- Masonry Image Grid --- */}
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
-          ? /* Skeleton placeholders while data fetches */
-          Array.from({ length: 9 }).map((_, i) => (
+          ? Array.from({ length: 9 }).map((_, i) => (
             <ImageListItem key={`skeleton-${i}`}>
               <div className="image-skeleton" />
             </ImageListItem>
           ))
-          : images.map((image, index) => (
-            <ImageListItem key={image._id}>
-              {index < 2 ? (
-                <EagerImage
-                  src={buildImageUrl(image.public_id, { width: 385 })}
-                  srcSet={
-                    `${buildImageUrl(image.public_id, { width: 300 })} 300w, ` +
-                    `${buildImageUrl(image.public_id, { width: 400 })} 400w, ` +
-                    `${buildImageUrl(image.public_id, { width: 800 })} 800w, ` +
-                    `${buildImageUrl(image.public_id, { width: 1200 })} 1200w`
-                  }
-                  sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 385px"
-                  width={385}
-                  height={481}
-                  alt={`Portfolio photograph ${index + 1} - ${image.file_name || "artwork"}`}
-                  onClick={() => handleImageClick(index)}
-                />
-              ) : (
-                <LazyImage
+          : images.map((image, index) => {
+            const isLCP = index === lcpIndex;
+
+            return (
+              <ImageListItem key={image._id}>
+                <img
+                  ref={(el) => (imgRefs.current[index] = el)}
+                  data-index={index}
                   src={buildImageUrl(image.public_id, { width: 400 })}
-                  srcSet={
-                    `${buildImageUrl(image.public_id, { width: 300 })} 300w, ` +
-                    `${buildImageUrl(image.public_id, { width: 400 })} 400w, ` +
-                    `${buildImageUrl(image.public_id, { width: 800 })} 800w, ` +
-                    `${buildImageUrl(image.public_id, { width: 1200 })} 1200w`
-                  }
-                  sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 385px"
+                  srcSet={`
+                      ${buildImageUrl(image.public_id, { width: 300 })} 300w,
+                      ${buildImageUrl(image.public_id, { width: 400 })} 400w,
+                      ${buildImageUrl(image.public_id, { width: 800 })} 800w,
+                      ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
+                    `}
+                  sizes="(max-width: 600px) 100vw,
+                           (max-width: 900px) 50vw,
+                           (max-width: 1200px) 33vw,
+                           385px"
                   width={385}
                   height={481}
-                  alt={`Portfolio photograph ${index + 1} - ${image.file_name || "artwork"}`}
+                  alt={`Portfolio photograph ${index + 1}`}
                   onClick={() => handleImageClick(index)}
+                  loading={isLCP ? "eager" : "lazy"}
+                  fetchPriority={isLCP ? "high" : "auto"}
+                  decoding="async"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    aspectRatio: "385 / 481",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                 />
-              )}
-            </ImageListItem>
-          ))}
+
+
+              </ImageListItem>
+            );
+          })}
       </ImageList>
 
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages || 1}
-        onPageChange={(page) => setPage(page)}
-      />
+      {images.length > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages || 1}
+          onPageChange={setPage}
+        />
+      )}
 
-      {/* --- LightBox --- */}
       {isOpen && (
         <LightBox
           isOpen={isOpen}
@@ -116,4 +162,5 @@ export const Home = () => {
     </Box>
   );
 };
+
 export default Home;
