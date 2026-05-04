@@ -64,7 +64,7 @@ export const Portrait = () => {
             <ImageListItem key={image._id}>
               {index < 2 ? (
                 <EagerImage
-                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  src={buildImageUrl(image.public_id, { width: 385 })}
                   srcSet={`
                     ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                     ${buildImageUrl(image.public_id, { width: 400 })} 400w,
@@ -84,7 +84,7 @@ export const Portrait = () => {
                 />
               ) : (
                 <LazyImage
-                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  src={buildImageUrl(image.public_id, { width: 385 })}
                   srcSet={`
                     ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                     ${buildImageUrl(image.public_id, { width: 400 })} 400w,

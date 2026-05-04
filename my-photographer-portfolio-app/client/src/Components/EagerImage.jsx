@@ -1,9 +1,4 @@
 import { useState } from "react";
-import {
-  buildCloudinaryOptimizedUrl,
-  DEFAULT_PORTFOLIO_IMAGE_SIZE,
-  getFixedAspectRatio
-} from "../Helpers/cloudinaryImage";
 
 /**
  * EagerImage — for above-the-fold (LCP) images.
@@ -11,26 +6,25 @@ import {
  * - Shows a shimmer placeholder until bytes arrive
  * - Fades in via opacity transition on onLoad
  */
-const EagerImage = ({ src, alt, onClick }) => {
+const EagerImage = ({ src, srcSet, sizes, width, height, alt, onClick }) => {
   const [loaded, setLoaded] = useState(false);
-  const aspectRatio = getFixedAspectRatio(width, height);
-  const optimizedSrc = buildCloudinaryOptimizedUrl(src, { width, height });
-
   return (
     <div
       className="eager-image-wrapper"
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio,
+        aspectRatio: width && height ? `${width} / ${height}` : "16 / 9",
         backgroundColor: "#eaeaea",
         overflow: "hidden",
       }}>
       <img
         src={src}
-        alt={alt}
+        srcSet={srcSet}
+        sizes={sizes}
         width={width}
         height={height}
+        alt={alt}
         onClick={onClick}
         fetchPriority="high"
         loading="eager"
@@ -40,7 +34,7 @@ const EagerImage = ({ src, alt, onClick }) => {
         }}
         style={{
           width: "100%",
-          height: "100%",
+          height: "auto",
           objectFit: "cover",
           display: "block",
           opacity: loaded ? 1 : 0,

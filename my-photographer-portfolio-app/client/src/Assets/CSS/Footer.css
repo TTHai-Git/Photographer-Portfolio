@@ -18,7 +18,8 @@ main {
   position: relative;
   overflow: hidden;
   margin-top: auto;
-  contain: content; /* Helps isolate layout shifts */
+  contain: content;
+  /* Helps isolate layout shifts */
 }
 
 .footer-content {
@@ -48,6 +49,9 @@ main {
   height: 1em;
   display: block;
   transition: color 0.3s, transform 0.3s;
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 
 .social-icon:hover {

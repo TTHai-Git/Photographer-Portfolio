@@ -1,16 +1,6 @@
 import { useState } from "react";
-
-/**
- * LazyImage — for below-the-fold images.
- * - Saves bandwidth by loading only when near viewport
- * - Prevents CLS by reserving space using width/height metadata
- */
-const LazyImage = ({ src, alt, onClick, width, height, className }) => {
+const LazyImage = ({ src, alt, onClick, width, height, className, srcSet, sizes }) => {
   const [loaded, setLoaded] = useState(false);
-
-  // Reserve space with fixed portfolio ratio to prevent CLS
-  const aspectRatio = getFixedAspectRatio(width, height);
-  const optimizedSrc = buildCloudinaryOptimizedUrl(src, { width, height });
 
   return (
     <div
@@ -18,7 +8,7 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
       style={{
         width: "100%",
         position: "relative",
-        aspectRatio: aspectRatio,
+        aspectRatio: `${width} / ${height}`,
         overflow: "hidden",
         backgroundColor: "#f4f4f4",
         borderRadius: "2px",
@@ -28,6 +18,8 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
         alt={alt}
         width={width}
         height={height}
+        srcSet={srcSet}
+        sizes={sizes}
         onClick={onClick}
         className={className}
         loading="lazy"
