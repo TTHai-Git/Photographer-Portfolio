@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 
-const ShowCaseItem = ({ src, alt, folderName, onClick, width, height, eager = false }) => {
+const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager = false }) => {
   const [loaded, setLoaded] = useState(eager);
 
   // Reserve space using original dimensions to prevent CLS
@@ -10,8 +10,8 @@ const ShowCaseItem = ({ src, alt, folderName, onClick, width, height, eager = fa
   return (
     <div className="showcase-item-container">
       {/* Thumbnail with stable aspect-ratio */}
-      <div 
-        className="showcase-thumb" 
+      <div
+        className="showcase-thumb"
         onClick={onClick}
         style={{
           position: "relative",
@@ -24,7 +24,7 @@ const ShowCaseItem = ({ src, alt, folderName, onClick, width, height, eager = fa
       >
         <img
           src={src}
-          alt={alt}
+          srcSet={srcSet}
           fetchPriority={eager ? "high" : "auto"}
           loading={eager ? "eager" : "lazy"}
           onLoad={() => {

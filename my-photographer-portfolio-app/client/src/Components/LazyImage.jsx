@@ -1,11 +1,5 @@
 import { useState } from "react";
-
-/**
- * LazyImage — for below-the-fold images.
- * - Saves bandwidth by loading only when near viewport
- * - Prevents CLS by reserving space using width/height metadata
- */
-const LazyImage = ({ src, alt, onClick, width, height, className }) => {
+const LazyImage = ({ src, srcSet, alt, onClick, width, height, className }) => {
   const [loaded, setLoaded] = useState(false);
 
   // Reserve space using original dimensions to prevent CLS
@@ -24,6 +18,7 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
       }}>
       <img
         src={src}
+        srcSet={srcSet}
         alt={alt}
         onClick={onClick}
         className={className}
@@ -39,8 +34,6 @@ const LazyImage = ({ src, alt, onClick, width, height, className }) => {
           transition: "opacity 0.6s ease-out",
         }}
       />
-
-      {/* Placeholder with shimmer animation */}
       {!loaded && (
         <div
           className="lazy-image-placeholder"

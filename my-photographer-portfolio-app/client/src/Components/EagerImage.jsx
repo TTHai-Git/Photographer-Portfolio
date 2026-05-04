@@ -6,7 +6,7 @@ import { useState } from "react";
  * - Shows a shimmer placeholder until bytes arrive
  * - Fades in via opacity transition on onLoad
  */
-const EagerImage = ({ src, alt, onClick }) => {
+const EagerImage = ({ src, srcSet, sizes, width, height, alt, onClick }) => {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -21,6 +21,10 @@ const EagerImage = ({ src, alt, onClick }) => {
       }}>
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
+        width={width}
+        height={height}
         alt={alt}
         onClick={onClick}
         fetchPriority="high"

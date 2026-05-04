@@ -6,6 +6,7 @@ import { handleGetFolderName } from "../Helpers/getFolderName";
 import { useEachImageOfEachFolder } from "../hooks/loadEachImageOfEachFolder";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
+import buildImageUrl from "../Helpers/buildImageUrl";
 
 // Lazy load LightBox (bundle-dynamic-imports)
 const LightBox = lazy(() => import("../utils/LightBox"));
@@ -47,7 +48,7 @@ export const ShowCase = () => {
         .map((img) => {
           const parts = img.public_id.split("/");
           const folderName = parts[parts.length - 2];
-          return { src: img.secure_url, title: folderName };
+          return { src: buildImageUrl(img.public_id, { width: window.innerWidth }), title: folderName };
         });
 
       setSlides(slidesData);
@@ -66,29 +67,35 @@ export const ShowCase = () => {
       <div className="showcase-list">
         {loadingEachImageOfEachFolder && mainPhotoList.length === 0
           ? Array.from({ length: 8 }).map((_, i) => (
-              <div key={`sk-${i}`} className="showcase-card">
-                <div 
-                  className="showcase-skeleton" 
-                  style={{ aspectRatio: "16/9", backgroundColor: "#f0f0f0" }} 
-                />
-              </div>
-            ))
-          : mainPhotoList?.map((image, index) => (
+            <div key={`sk-${i}`} className="showcase-card">
               <div
-                key={image._id}
-                id={image.folder._id}
-                className="showcase-card">
-                <ShowCaseItem
-                  src={image.secure_url}
-                  width={image.width}
-                  height={image.height}
-                  alt={`${handleGetFolderName(image.folder.path)} – showcase`}
-                  folderName={handleGetFolderName(image.folder.path)}
-                  eager={index < 4}
-                  onClick={() => handleImageClick(image.folder.path, 0)}
-                />
-              </div>
-            ))}
+                className="showcase-skeleton"
+                style={{ aspectRatio: "16/9", backgroundColor: "#f0f0f0" }}
+              />
+            </div>
+          ))
+          : mainPhotoList?.map((image, index) => (
+            <div
+              key={image._id}
+              id={image.folder._id}
+              className="showcase-card">
+              <ShowCaseItem
+                src={buildImageUrl(image.public_id, { width: 400 })}
+                srcSet={`
+                    ${buildImageUrl(image.public_id, { width: 300 })} 300w,
+                    ${buildImageUrl(image.public_id, { width: 400 })} 400w,
+                    ${buildImageUrl(image.public_id, { width: 800 })} 800w,
+                    ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
+                  `}
+                sizes="(max-width: 768px) 100vw, 385px"
+                width={385}
+                height={481}
+                folderName={handleGetFolderName(image.folder.path)}
+                eager={index < 2}
+                onClick={() => handleImageClick(image.folder.path, 0)}
+              />
+            </div>
+          ))}
       </div>
 
       <Pagination

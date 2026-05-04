@@ -10,6 +10,7 @@ import EagerImage from "../Components/EagerImage";
 import { useImages } from "../hooks/loadImages";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
+import buildImageUrl from "../Helpers/buildImageUrl";
 
 export const Portrait = () => {
   const [page, setPage] = useState(1);
@@ -28,7 +29,7 @@ export const Portrait = () => {
     const slideList = images
       .filter((image) => image.resource_type === "image")
       .map((image) => ({
-        src: image.secure_url,
+        src: buildImageUrl(image.public_id, { width: window.innerWidth }),
         title: "Portrait",
       }));
 
@@ -54,28 +55,56 @@ export const Portrait = () => {
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
           ? /* Skeleton placeholders while data fetches */
-            Array.from({ length: 9 }).map((_, i) => (
-              <ImageListItem key={`skeleton-${i}`}>
-                <div className="image-skeleton" />
-              </ImageListItem>
-            ))
+          Array.from({ length: 9 }).map((_, i) => (
+            <ImageListItem key={`skeleton-${i}`}>
+              <div className="image-skeleton" />
+            </ImageListItem>
+          ))
           : images.map((image, index) => (
-              <ImageListItem key={image._id}>
-                {index < 6 ? (
-                  <EagerImage
-                    src={image.secure_url}
-                    alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
-                    onClick={() => handleImageClick(index)}
-                  />
-                ) : (
-                  <LazyImage
-                    src={image.secure_url}
-                    alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
-                    onClick={() => handleImageClick(index)}
-                  />
-                )}
-              </ImageListItem>
-            ))}
+            <ImageListItem key={image._id}>
+              {index < 2 ? (
+                <EagerImage
+                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  srcSet={`
+                    ${buildImageUrl(image.public_id, { width: 300 })} 300w,
+                    ${buildImageUrl(image.public_id, { width: 400 })} 400w,
+                    ${buildImageUrl(image.public_id, { width: 800 })} 800w,
+                    ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
+                  `}
+                  sizes="
+                    (max-width: 600px) 100vw,
+                    (max-width: 900px) 50vw,
+                    (max-width: 1200px) 33vw,
+                    385px
+                  "
+                  width={385}
+                  height={481}
+                  alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
+                  onClick={() => handleImageClick(index)}
+                />
+              ) : (
+                <LazyImage
+                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  srcSet={`
+                    ${buildImageUrl(image.public_id, { width: 300 })} 300w,
+                    ${buildImageUrl(image.public_id, { width: 400 })} 400w,
+                    ${buildImageUrl(image.public_id, { width: 800 })} 800w,
+                    ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
+                  `}
+                  sizes="
+                    (max-width: 600px) 100vw,
+                    (max-width: 900px) 50vw,
+                    (max-width: 1200px) 33vw,
+                    385px
+                  "
+                  width={385}
+                  height={481}
+                  alt={`Portrait photograph ${index + 1} - ${image.file_name || "portrait"}`}
+                  onClick={() => handleImageClick(index)}
+                />
+              )}
+            </ImageListItem>
+          ))}
       </ImageList>
 
       <Pagination

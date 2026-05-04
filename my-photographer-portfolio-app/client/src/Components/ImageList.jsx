@@ -15,7 +15,8 @@ import { authApi, endpoints } from "../config/APIs";
 import UploadVideoModal from "./UploadVideoModel";
 import VideoCard from "./VideoCard";
 import LightBox from "../utils/LightBox";
-import LazyImage from "./LazyImage";
+import LazyImage from "./LazyImage"
+import buildImageUrl from "../Helpers/buildImageUrl";
 
 export default function ImageList({
   foldersForCombobox,
@@ -38,6 +39,7 @@ export default function ImageList({
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 
+
   const updateParams = (key, val) => {
     setImageParams((prev) => ({
       ...prev,
@@ -54,7 +56,7 @@ export default function ImageList({
         const folderName = parts[parts.length - 2];
 
         return {
-          src: image.secure_url,
+          src: buildImageUrl(image.public_id, { width: window.innerWidth }),
           title: folderName
         };
       });
@@ -187,7 +189,13 @@ export default function ImageList({
                 // <img src={img.secure_url} alt="" />
                 <ImageListItem key={img.public_id}>
                   <LazyImage
-                    src={img.secure_url}
+                    src={buildImageUrl(img.public_id, { width: 400 })}
+                    srcSet={`
+                      ${buildImageUrl(img.public_id, { width: 300 })} 300w,
+                      ${buildImageUrl(img.public_id, { width: 400 })} 400w,
+                      ${buildImageUrl(img.public_id, { width: 800 })} 800w,
+                      ${buildImageUrl(img.public_id, { width: 1200 })} 1200w
+                    `}
                     alt={img.file_name}
                     className="fade-in"
                     onClick={() => handleImageClick(index)}

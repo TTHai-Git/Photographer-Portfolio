@@ -24,21 +24,21 @@ export const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook">
-            <FaFacebookF className="social-icon" />
+            <FaFacebookF className="social-icon" size="1.8em" />
           </a>
           <a
             href="https://www.instagram.com/trucluvyelou/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram">
-            <FaInstagram className="social-icon" />
+            <FaInstagram className="social-icon" size="1.8em" />
           </a>
           <a
             href="https://www.behance.net/trucpham3"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Behance">
-            <FaBehance className="social-icon" />
+            <FaBehance className="social-icon" size="1.8em" />
           </a>
         </div>
       </div>
@@ -53,7 +53,7 @@ export const Footer = () => {
         className="back-to-top"
         onClick={scrollToTop}
         aria-label="Back to top">
-        <FaArrowUp />
+        <FaArrowUp size="1.2em" />
       </button>
     </footer>
   );
