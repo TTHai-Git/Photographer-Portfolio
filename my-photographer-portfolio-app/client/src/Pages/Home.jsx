@@ -75,7 +75,7 @@ export const Home = () => {
       const folderName = parts[parts.length - 2];
       return {
         src: buildImageUrl(image.public_id, {
-          width: window.innerWidth,
+          width: 800,
         }),
         title: folderName,
       };

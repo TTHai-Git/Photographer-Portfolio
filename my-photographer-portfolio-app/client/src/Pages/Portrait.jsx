@@ -73,7 +73,7 @@ export const Portrait = () => {
   const handleImageClick = (index) => {
     const slideList = images.map((image) => ({
       src: buildImageUrl(image.public_id, {
-        width: window.innerWidth,
+        width: 800,
       }),
       title: "Portrait",
     }));

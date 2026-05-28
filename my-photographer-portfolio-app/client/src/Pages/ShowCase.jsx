@@ -69,7 +69,7 @@ export const ShowCase = () => {
 
           return {
             src: buildImageUrl(img.public_id, {
-              width: window.innerWidth,
+              width: 800,
             }),
             title: folderName,
           };
