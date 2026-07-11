@@ -18,9 +18,9 @@ export const ShowCase = () => {
   const { mainPhotoList, totalPages, loadingEachImageOfEachFolder } =
     useEachImageOfEachFolder(
       page,
-      8,
+      6,
       sort,
-      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/",
+      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/"
     );
 
   const { images, loading } = useImages(1, 200, folder, "oldest");
@@ -69,9 +69,9 @@ export const ShowCase = () => {
 
           return {
             src: buildImageUrl(img.public_id, {
-              width: window.innerWidth,
+              width: window.innerWidth
             }),
-            title: folderName,
+            title: folderName
           };
         });
 
@@ -83,7 +83,7 @@ export const ShowCase = () => {
 
   return (
     <main className="showcase-container">
-      <h1 className="showcase-page-title">Showcase</h1>
+      <h1 className="showcase-page-title">My Projects</h1>
 
       {mainPhotoList.length > 0 && (
         <SortBar sort={sort} onSortChange={setSort} />
@@ -99,21 +99,16 @@ export const ShowCase = () => {
           : mainPhotoList?.map((image, index) => (
               <div key={image._id} className="showcase-card">
                 <ShowCaseItem
-                  src={buildImageUrl(image.public_id, { width: 400 })}
+                  src={buildImageUrl(image.public_id, { width: 1200 })}
                   srcSet={`
                     ${buildImageUrl(image.public_id, { width: 300 })} 300w,
                     ${buildImageUrl(image.public_id, { width: 400 })} 400w,
                     ${buildImageUrl(image.public_id, { width: 800 })} 800w,
                     ${buildImageUrl(image.public_id, { width: 1200 })} 1200w
                   `}
-                  sizes="
-                    (max-width: 600px) 100vw,
-                    (max-width: 900px) 50vw,
-                    (max-width: 1200px) 33vw,
-                    400px
-                  "
-                  width={400}
-                  height={225} // 🔥 FIX 16:9
+                  sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  width={385}
+                  height={481}
                   alt={image.file_name || "artwork"}
                   folderName={handleGetFolderName(image.folder.path)}
                   eager={index === 0} // 🔥 chỉ 1 ảnh eager

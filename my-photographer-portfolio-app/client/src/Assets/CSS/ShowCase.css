@@ -4,7 +4,8 @@
 
 /* ===== Container ===== */
 .showcase-container {
-  max-width: 1400px;
+  width: 90%;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 32px 24px;
   font-family: "Poppins", "Helvetica Neue", Arial, sans-serif;
@@ -63,20 +64,16 @@
   color: #fff;
 }
 
-/* ===== Masonry Layout (Behance Core) ===== */
+/* ===== Masonry Layout ===== */
 .showcase-list {
-  /* display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px; */
-
-  column-count: 4;
-  column-gap: 20px;
+  column-count: 3;
+  column-gap: 24px;
 }
 
 /* ===== Card ===== */
 .showcase-card {
   break-inside: avoid;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   cursor: pointer;
 }
 
@@ -95,7 +92,9 @@
   display: block;
   max-height: fit-content;
   object-fit: cover;
-  transition: transform 0.5s ease, filter 0.5s ease;
+  transition:
+    transform 0.5s ease,
+    filter 0.5s ease;
 }
 
 /* Hover zoom */
@@ -104,24 +103,42 @@
   filter: brightness(0.9);
 }
 
-/* ===== Overlay (Behance-like) ===== */
+/* ===== Overlay (Hint) ===== */
 .showcase-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: all 0.4s ease;
+  pointer-events: none; /* Let clicks pass through */
 }
 
 .showcase-card:hover .showcase-overlay {
   opacity: 1;
+}
+
+.showcase-overlay-btn {
+  padding: 14px 32px;
+  border: 2px solid #fff;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-radius: 40px;
+  transform: translateY(30px);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.3s ease;
+}
+
+.showcase-card:hover .showcase-overlay-btn {
+  transform: translateY(0);
 }
 
 /* ===== Meta ===== */
@@ -165,9 +182,9 @@
 /* Removed generic fade-in utilities — animations are now explicitly controlled via components' onLoad state */
 
 /* ===== Responsive ===== */
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .showcase-list {
-    column-count: 3;
+    column-count: 2;
   }
 }
 
@@ -178,12 +195,22 @@
 
   .showcase-list {
     column-count: 2;
+    column-gap: 16px;
+  }
+
+  .showcase-overlay-btn {
+    padding: 10px 24px;
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
   .showcase-list {
     column-count: 1;
+  }
+
+  .showcase-card {
+    margin-bottom: 16px;
   }
 }
 

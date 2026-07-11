@@ -1,7 +1,16 @@
 import { useState } from "react";
 import "../Assets/CSS/ShowCase.css";
 
-const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager = false, alt }) => {
+const ShowCaseItem = ({
+  src,
+  srcSet,
+  folderName,
+  onClick,
+  width,
+  height,
+  eager = false,
+  alt
+}) => {
   const [loaded, setLoaded] = useState(eager);
 
   const aspectRatio = width && height ? `${width} / ${height}` : "16 / 9";
@@ -19,8 +28,7 @@ const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager =
           backgroundColor: "#f4f4f4",
           overflow: "hidden",
           cursor: "pointer"
-        }}
-      >
+        }}>
         <img
           src={src}
           srcSet={srcSet}
@@ -36,7 +44,7 @@ const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager =
             objectFit: "cover",
             display: "block",
             opacity: loaded ? 1 : 0,
-            transition: eager ? "none" : "opacity 0.6s ease-out",
+            transition: eager ? "none" : "opacity 0.6s ease-out"
           }}
         />
 
@@ -49,11 +57,17 @@ const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager =
               position: "absolute",
               inset: 0,
               backgroundSize: "200% 100%",
-              background: "linear-gradient(90deg, #f0f0f0 25%, #f7f7f7 50%, #f0f0f0 75%)",
-              animation: "shimmer-load 1.5s infinite linear",
+              background:
+                "linear-gradient(90deg, #f0f0f0 25%, #f7f7f7 50%, #f0f0f0 75%)",
+              animation: "shimmer-load 1.5s infinite linear"
             }}
           />
         )}
+
+        {/* Hint Overlay */}
+        <div className="showcase-overlay">
+          <div className="showcase-overlay-btn">View Collection</div>
+        </div>
       </div>
 
       {/* Meta info remains below the reserved space */}
@@ -65,4 +79,3 @@ const ShowCaseItem = ({ src, srcSet, folderName, onClick, width, height, eager =
 };
 
 export default ShowCaseItem;
-

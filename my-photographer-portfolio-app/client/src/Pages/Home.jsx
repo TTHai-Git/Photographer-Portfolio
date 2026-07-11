@@ -17,7 +17,7 @@ export const Home = () => {
     page,
     60,
     "Hoang-Truc-Photographer-Portfolio/HOME",
-    sort,
+    sort
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,7 @@ export const Home = () => {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort(
-            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height,
+            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height
           );
 
         if (visible.length > 0) {
@@ -45,7 +45,7 @@ export const Home = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.5 },
+      { threshold: 0.5 }
     );
 
     imgRefs.current.forEach((el) => el && observer.observe(el));
@@ -75,9 +75,9 @@ export const Home = () => {
       const folderName = parts[parts.length - 2];
       return {
         src: buildImageUrl(image.public_id, {
-          width: window.innerWidth,
+          width: window.innerWidth
         }),
-        title: folderName,
+        title: folderName
       };
     });
 
@@ -88,9 +88,9 @@ export const Home = () => {
 
   return (
     <Box component="main" className="home-container">
-      <Typography variant="h3" align="center" className="home-heading">
+      {/* <Typography variant="h3" align="center" className="home-heading">
         Welcome to My Photography Portfolio
-      </Typography>
+      </Typography> */}
 
       {images.length > 0 && <SortBar sort={sort} onSortChange={setSort} />}
 
@@ -132,7 +132,7 @@ export const Home = () => {
                       height: "auto",
                       aspectRatio: "385 / 481",
                       objectFit: "cover",
-                      display: "block",
+                      display: "block"
                     }}
                   />
                 </ImageListItem>
