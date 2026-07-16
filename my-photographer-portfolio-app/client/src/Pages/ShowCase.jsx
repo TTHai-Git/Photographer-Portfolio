@@ -23,7 +23,7 @@ export const ShowCase = () => {
       "Hoang-Truc-Photographer-Portfolio/SHOW CASE/"
     );
 
-  const { images, loading } = useImages(1, 200, folder, "oldest");
+  const { images, loading } = useImages(1, 200, folder, sort);
 
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);

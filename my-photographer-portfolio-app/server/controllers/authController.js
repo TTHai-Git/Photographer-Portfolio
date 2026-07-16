@@ -37,7 +37,7 @@ export const createAcount = async (req, res) => {
       username,
       password: hashedPassword,
       email,
-      role,
+      role
     });
     // console.log(newUser);
 
@@ -75,44 +75,52 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.REACT_APP_NODE_ENV === "production" ? true : false,
       sameSite: "lax",
-      path: "/", // Để "/" cho chắc chắn
+      path: "/" // Để "/" cho chắc chắn
     };
+
+    console.log("JWT_SECRET =", process.env.JWT_SECRET);
+    console.log("JWT_SECRET_BACKUP =", process.env.JWT_SECRET_BACKUP);
 
     // Create JWT token (only accessToken now)
     const accessToken = jwt.sign(
       { username: user.username, role: user.role.name },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
-      },
+        expiresIn: "1h"
+      }
     );
 
     const refreshToken = jwt.sign(
       {
         username: user.username,
-        role: user.role.name,
+        role: user.role.name
       },
       process.env.JWT_SECRET_BACKUP,
-      { expiresIn: "7d" },
+      { expiresIn: "7d" }
     );
 
     const isProduction = process.env.REACT_APP_NODE_ENV === "production";
 
     res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
     res.cookie("accessToken", accessToken, {
       ...cookieOptions,
-      maxAge: 60 * 60 * 1000,
+      maxAge: 60 * 60 * 1000
     });
 
     return res.status(200).json({
       isVerified: true,
-      message: "Đăng nhập thành công.",
+      message: "Đăng nhập thành công."
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error(error);
+
+    return res.status(500).json({
+      message: error.message,
+      stack: error.stack
+    });
   }
 };
 
@@ -129,7 +137,7 @@ export const refreshToken = async (req, res) => {
     const newAccessToken = jwt.sign(
       { username: decoded.username, role: decoded.role }, // decoded.role đã là string
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }, // Đồng bộ với thời gian 1h ở hàm login
+      { expiresIn: "1h" } // Đồng bộ với thời gian 1h ở hàm login
     );
 
     // ✅ PHẢI SET LẠI COOKIE Ở ĐÂY
@@ -139,7 +147,7 @@ export const refreshToken = async (req, res) => {
       secure: isProduction,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 1000, // 1 hour
+      maxAge: 60 * 60 * 1000 // 1 hour
     });
 
     return res.status(200).json({ message: "Token refreshed" });
@@ -157,7 +165,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: "lax",
-    path: "/",
+    path: "/"
   };
 
   res.clearCookie("accessToken", clearOptions);
@@ -170,7 +178,9 @@ export const getMe = (req, res) => {
   const accessToken = getToken(req);
   if (!accessToken) {
     // Không có token = chưa đăng nhập, client sẽ không refresh
-    return res.status(401).json({ message: "Unauthorized", tokenExpired: false });
+    return res
+      .status(401)
+      .json({ message: "Unauthorized", tokenExpired: false });
   }
 
   try {
@@ -179,8 +189,12 @@ export const getMe = (req, res) => {
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       // Token hết hạn → client interceptor sẽ tự động refresh
-      return res.status(401).json({ message: "Access token is expired", tokenExpired: true });
+      return res
+        .status(401)
+        .json({ message: "Access token is expired", tokenExpired: true });
     }
-    return res.status(401).json({ message: "Invalid token", tokenExpired: false });
+    return res
+      .status(401)
+      .json({ message: "Invalid token", tokenExpired: false });
   }
 };

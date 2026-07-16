@@ -40,9 +40,9 @@ jobs:
         working-directory: my-photographer-portfolio-app/client
         run: npm test -- --watchAll=false --passWithNoTests
 
-# ================================================================
-# 2️⃣ TEST SERVER
-# ================================================================
+  # ================================================================
+  # 2️⃣ TEST SERVER
+  # ================================================================
   test-server:
     runs-on: ubuntu-latest
 
@@ -64,9 +64,9 @@ jobs:
         working-directory: my-photographer-portfolio-app/server
         run: npm test -- --watchAll=false --passWithNoTests
 
-# ================================================================
-# 3️⃣ BUILD CLIENT
-# ================================================================
+  # ================================================================
+  # 3️⃣ BUILD CLIENT
+  # ================================================================
   build-client:
     runs-on: ubuntu-latest
     needs: test-client
@@ -97,9 +97,9 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_CLIENT }}
           cache-to: type=inline
 
-# ================================================================
-# 4️⃣ BUILD SERVER
-# ================================================================
+  # ================================================================
+  # 4️⃣ BUILD SERVER
+  # ================================================================
   build-server:
     runs-on: ubuntu-latest
     needs: test-server
@@ -127,9 +127,9 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_SERVER }}
           cache-to: type=inline
 
-# ================================================================
-# 5️⃣ DEPLOY
-# ================================================================
+  # ================================================================
+  # 5️⃣ DEPLOY
+  # ================================================================
   deploy:
     runs-on: ubuntu-latest
     needs: [build-client, build-server]
@@ -137,10 +137,15 @@ jobs:
     steps:
       - name: Connect Tailscale
         uses: tailscale/github-action@v2
+        # with:
+        #   oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+        #   oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+        #   tags: tag:ci
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-          tags: tag:ci
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          timeout: 60s
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.1.0
@@ -170,9 +175,9 @@ jobs:
             docker compose up -d --force-recreate
             docker image prune -f
 
-# ================================================================
-# 6️⃣ FINAL NOTIFY
-# ================================================================
+  # ================================================================
+  # 6️⃣ FINAL NOTIFY
+  # ================================================================
   notify:
     runs-on: ubuntu-latest
     needs: [test-client, test-server, build-client, build-server, deploy]
