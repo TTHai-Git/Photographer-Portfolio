@@ -137,15 +137,10 @@ jobs:
     steps:
       - name: Connect Tailscale
         uses: tailscale/github-action@v2
-        # with:
-        #   oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-        #   oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-        #   tags: tag:ci
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          timeout: 60s
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.1.0
@@ -153,13 +148,15 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          timeout: 60s
+          debug: true
           script: |
             set -e
 
             cd /home/${{ secrets.VM_USER }}
 
             if [ ! -d "Photographer-Portfolio" ]; then
-              git clone https://github.com/TTHai-Git/Photographer-Portfolio
+              git clone https://github.com/TTHai-Git/Photographer-Portfolio.git
             fi
 
             cd Photographer-Portfolio/my-photographer-portfolio-app
