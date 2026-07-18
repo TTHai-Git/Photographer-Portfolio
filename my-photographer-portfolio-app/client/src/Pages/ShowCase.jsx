@@ -7,20 +7,25 @@ import { useEachImageOfEachFolder } from "../hooks/loadEachImageOfEachFolder";
 import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
 import buildImageUrl from "../Helpers/buildImageUrl";
+import TagFilter from "../Components/TagFilter";
+import { Box } from "@mui/material";
 
 const LightBox = lazy(() => import("../utils/LightBox"));
 
 export const ShowCase = () => {
   const [folder, setFolder] = useState(null);
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState("latest");
+  const [sort, setSort] = useState("order-increasing");
+  const [selectedTags, setSelectedTags] = useState([{ name: "Featured" }]);
+  const tagNamesStr = selectedTags.map((t) => t.name).join(",");
 
   const { mainPhotoList, totalPages, loadingEachImageOfEachFolder } =
     useEachImageOfEachFolder(
       page,
       6,
       sort,
-      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/"
+      "Hoang-Truc-Photographer-Portfolio/SHOW CASE/",
+      tagNamesStr
     );
 
   const { images, loading } = useImages(1, 200, folder, sort);
@@ -34,6 +39,7 @@ export const ShowCase = () => {
   useEffect(() => {
     if (!mainPhotoList?.length) return;
 
+    console.log("mainPhotoList", mainPhotoList);
     const first = mainPhotoList[0];
 
     const link = document.createElement("link");
@@ -85,9 +91,19 @@ export const ShowCase = () => {
     <main className="showcase-container">
       <h1 className="showcase-page-title">My Projects</h1>
 
-      {mainPhotoList.length > 0 && (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          flexWrap: "wrap",
+          gap: 2,
+          padding: "0 10px"
+        }}>
         <SortBar sort={sort} onSortChange={setSort} />
-      )}
+        <TagFilter selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+      </Box>
 
       <div className="showcase-list">
         {loadingEachImageOfEachFolder && mainPhotoList.length === 0

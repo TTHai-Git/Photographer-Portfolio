@@ -15,14 +15,15 @@ export default function Dashboard() {
   const [folderParams, setFolderParams] = useState({
     page: 1,
     search: "",
-    sort: "latest",
-    refresh: Date.now(), // thêm trường này để làm mới cache khi cần
+    sort: "order-increasing",
+    refresh: Date.now() // thêm trường này để làm mới cache khi cần
   });
 
   // Image params (tách riêng)
   const [imageParams, setImageParams] = useState({
     page: 1,
     sort: "latest",
+    tags: []
   });
 
   const [folders, setFolders] = useState([]);
@@ -37,12 +38,20 @@ export default function Dashboard() {
   const [totalPagesOfFolders, setTotalPagesOfFolders] = useState(0);
   const [totalPagesOfImages, setTotalPagesOfImages] = useState(0);
 
-  const sortFileds = [
+  const sortFiledsFiles = [
     { label: "Latest", id: "latest" },
     { label: "Oldest", id: "oldest" },
     { label: "A -> Z", id: "az" },
     { label: "Z -> A", id: "za" },
-    // { label: "None", id: "none" },
+    { label: "Order ⬆️", id: "order-increasing" },
+    { label: "Order ⬇️", id: "order-decreasing" }
+  ];
+
+  const sortFiledsImages = [
+    { label: "Latest", id: "latest" },
+    { label: "Oldest", id: "oldest" },
+    { label: "A -> Z", id: "az" },
+    { label: "Z -> A", id: "za" }
   ];
 
   /** Load folders */
@@ -50,7 +59,7 @@ export default function Dashboard() {
     try {
       setLoadingFolders(true);
       const res = await APIs.get(
-        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sort=${folderParams.sort}`,
+        `${endpoints.getFoldersFromDB}?page=${folderParams.page}&limit=10&search=${folderParams.search.trim()}&sort=${folderParams.sort}`
       );
       setFolders(res.data.folders);
       setTotalPagesOfFolders(res.data.totalPages);
@@ -71,11 +80,13 @@ export default function Dashboard() {
 
     try {
       setLoadingImages(true);
+      const tagNamesStr = (imageParams.tags || []).map((t) => t.name).join(",");
       const res = await authApi.get(
-        `${endpoints.getImagesFromDB}?page=${imageParams.page}&limit=10&sort=${imageParams.sort}&path=${selectedFolder}`,
+        `${endpoints.getImagesFromDB}?page=${imageParams.page}&limit=10&sort=${imageParams.sort}&path=${selectedFolder}&tags=${encodeURIComponent(tagNamesStr)}`
       );
       setImages(res.data.images);
       setTotalPagesOfImages(res.data.totalPages);
+      console.log("images", res.data.images);
     } finally {
       setLoadingImages(false);
     }
@@ -89,6 +100,10 @@ export default function Dashboard() {
   useEffect(() => {
     loadImages();
   }, [selectedFolder, imageParams]);
+
+  useEffect(() => {
+    loadFoldersForCombobox();
+  }, []);
 
   return (
     <div className="dashboard">
@@ -107,7 +122,7 @@ export default function Dashboard() {
           setSelectedFolder={setSelectedFolder}
           folderParams={folderParams}
           setFolderParams={setFolderParams}
-          sortFileds={sortFileds}
+          sortFileds={sortFiledsFiles}
         />
 
         <Pagination
@@ -130,7 +145,7 @@ export default function Dashboard() {
           loadImages={loadImages}
           imageParams={imageParams}
           setImageParams={setImageParams}
-          sortFileds={sortFileds}
+          sortFileds={sortFiledsImages}
         />
 
         {selectedFolder && (

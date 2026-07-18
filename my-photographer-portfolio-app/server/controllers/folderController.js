@@ -68,6 +68,8 @@ export const getFolders = async (req, res) => {
     const search = req.query.search || "";
     const sortKey = req.query.sort || "latest";
 
+    // console.log("sortKey", sortKey);
+
     const filter = {};
 
     if (search.trim() !== "") {
@@ -78,7 +80,9 @@ export const getFolders = async (req, res) => {
       latest: { createdAt: -1 },
       oldest: { createdAt: 1 },
       az: { path: 1 },
-      za: { path: -1 }
+      za: { path: -1 },
+      "order-increasing": { order: 1 },
+      "order-decreasing": { order: -1 }
     }[sortKey] || { createdAt: -1 };
 
     const fetchFolders = async () => {
@@ -88,6 +92,8 @@ export const getFolders = async (req, res) => {
         .limit(limit);
 
       const totalItems = await Folder.countDocuments(filter);
+
+      // console.log("folders", folders);
 
       return {
         folders,
@@ -116,5 +122,33 @@ export const getFoldersForCombobox = async (req, res) => {
   } catch (err) {
     console.error("❌ getFolders error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const reorderFolders = async (req, res) => {
+  try {
+    const { folders } = req.body; // folders is an array of { _id, order }
+    if (!folders || !Array.isArray(folders)) {
+      return res.status(400).json({ message: "Invalid payload" });
+    }
+
+    const bulkOps = folders.map((folder) => ({
+      updateOne: {
+        filter: { _id: folder._id },
+        update: { order: folder.order }
+      }
+    }));
+
+    await Folder.bulkWrite(bulkOps);
+
+    // Optional: Clear cache if getting folders rely on it
+    await clearRelatedCaches("GET:/v1/folders");
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Folders reordered successfully" });
+  } catch (error) {
+    console.error("❌ reorderFolders error:", error);
+    return res.status(500).json({ success: false, error: error.message });
   }
 };

@@ -1,14 +1,15 @@
 import "../Assets/CSS/folders.css";
-import { FaTrash, FaFolder, FaSync } from "react-icons/fa";
+import { FaTrash, FaFolder, FaSync, FaGripLines } from "react-icons/fa";
 import React, { useState } from "react";
 import CreateFolderModal from "./CreateFolderModal";
+import ManageFolderOrderModal from "./ManageFolderOrderModal";
 import { useNotification } from "../Context/NotificationContext";
 import { handleGetFolderName } from "../Helpers/getFolderName";
 import {
   Autocomplete,
   IconButton,
   InputAdornment,
-  TextField,
+  TextField
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -26,10 +27,11 @@ const FolderList = ({
   setSelectedFolder,
   folderParams,
   setFolderParams,
-  sortFileds,
+  sortFileds
 }) => {
   const [selectedDirs, setSelectedDirs] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
+  const [openOrderModal, setOpenOrderModal] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingClearCachedData, setLoadingClearCachedData] = useState(false);
   const { showNotification } = useNotification();
@@ -38,7 +40,7 @@ const FolderList = ({
     setFolderParams((prev) => ({
       ...prev,
       page: 1,
-      [key]: val,
+      [key]: val
     }));
   };
 
@@ -49,7 +51,7 @@ const FolderList = ({
     }
     if (
       !window.confirm(
-        "Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)",
+        "Bạn có muốn xóa các thư mục đã chọn không? (Nếu trong thư mục có các ảnh thì cũng sẽ bị xóa theo)"
       )
     )
       return;
@@ -58,14 +60,14 @@ const FolderList = ({
       setLoadingDelete(true);
 
       const res = await authApi.delete(endpoints.deleteFolders, {
-        data: { folderDirs: selectedDirs },
+        data: { folderDirs: selectedDirs }
       });
       if (res.status === 200) {
         showNotification(res.data.message, "success");
         setFolderParams((prev) => ({
           ...prev,
           page: 1,
-          refresh: Date.now(),
+          refresh: Date.now()
         }));
         setSelectedDirs([]);
         setImages([]);
@@ -87,7 +89,7 @@ const FolderList = ({
         setFolderParams((prev) => ({
           ...prev,
           page: 1,
-          refresh: Date.now(),
+          refresh: Date.now()
         }));
         setSelectedDirs([]);
         setImages([]);
@@ -105,12 +107,21 @@ const FolderList = ({
         <button className="btn btn-green" onClick={() => setOpenCreate(true)}>
           + Tạo thư mục
         </button>
+        <button
+          className="btn btn-blue"
+          style={{
+            backgroundColor: "#1976d2",
+            color: "white",
+            borderColor: "#1976d2"
+          }}
+          onClick={() => setOpenOrderModal(true)}>
+          <FaGripLines style={{ marginRight: 5 }} /> Sắp xếp
+        </button>
 
         <button
           className="btn btn-red"
           onClick={handleDeleteFolders}
-          disabled={loadingDelete}
-        >
+          disabled={loadingDelete}>
           {loadingDelete ? (
             "Đang xóa..."
           ) : (
@@ -122,8 +133,7 @@ const FolderList = ({
         <button
           className="btn "
           onClick={handleClearCachedData}
-          disabled={loadingClearCachedData}
-        >
+          disabled={loadingClearCachedData}>
           {loadingClearCachedData ? (
             "Đang đồng bộ ảnh và thư mục..."
           ) : (
@@ -150,7 +160,7 @@ const FolderList = ({
               <IconButton onClick={() => updateParams("search", "")}>
                 <ClearIcon />
               </IconButton>
-            ),
+            )
           }}
           sx={{ width: 350, bgcolor: "white", borderRadius: 2 }}
         />
@@ -170,7 +180,7 @@ const FolderList = ({
                   <InputAdornment position="start">
                     <SortIcon />
                   </InputAdornment>
-                ),
+                )
               }}
             />
           )}
@@ -181,33 +191,32 @@ const FolderList = ({
       {/* Folder Items */}
       {loading
         ? Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="folder-skeleton"></div>
-        ))
+            <div key={i} className="folder-skeleton"></div>
+          ))
         : folders.map((f) => (
-          <div
-            key={f._id}
-            className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
-            onClick={() => setSelectedFolder(f.path)}
-          >
-            <input
-              type="checkbox"
-              checked={selectedDirs.includes(f.path)}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedDirs((prev) =>
-                  prev.includes(f.path)
-                    ? prev.filter((x) => x !== f.path)
-                    : [...prev, f.path],
-                );
-              }}
-            />
+            <div
+              key={f._id}
+              className={`folder-item ${selectedFolder === f.path ? "active-folder" : ""}`}
+              onClick={() => setSelectedFolder(f.path)}>
+              <input
+                type="checkbox"
+                checked={selectedDirs.includes(f.path)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedDirs((prev) =>
+                    prev.includes(f.path)
+                      ? prev.filter((x) => x !== f.path)
+                      : [...prev, f.path]
+                  );
+                }}
+              />
 
-            <div className="folder-left">
-              <FaFolder className="folder-icon" />
-              <span>{handleGetFolderName(f.path)}</span>
+              <div className="folder-left">
+                <FaFolder className="folder-icon" />
+                <span>{handleGetFolderName(f.path)}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
       <CreateFolderModal
         folders={foldersForCombobox}
@@ -216,6 +225,14 @@ const FolderList = ({
         open={openCreate}
         onClose={() => setOpenCreate(false)}
         loadFolders={loadFolders}
+      />
+
+      <ManageFolderOrderModal
+        open={openOrderModal}
+        onClose={() => setOpenOrderModal(false)}
+        folders={foldersForCombobox}
+        loadFolders={loadFolders}
+        loadFoldersForCombobox={loadFoldersForCombobox}
       />
     </div>
   );

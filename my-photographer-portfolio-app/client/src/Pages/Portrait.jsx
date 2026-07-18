@@ -6,19 +6,23 @@ import { useEffect, useRef, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import { useImages } from "../hooks/loadImages";
-import SortBar from "../Components/SortBar";
+import SortBarBassic from "../Components/SortBarBassic";
 import Pagination from "../Components/Pagination";
 import buildImageUrl from "../Helpers/buildImageUrl";
+import TagFilter from "../Components/TagFilter";
 
 export const Portrait = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const tagNamesStr = selectedTags.map((t) => t.name).join(",");
 
   const { images, totalPages, loading } = useImages(
     page,
     60,
     "Hoang-Truc-Photographer-Portfolio/Portrait",
     sort,
+    tagNamesStr
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +41,7 @@ export const Portrait = () => {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort(
-            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height,
+            (a, b) => b.boundingClientRect.height - a.boundingClientRect.height
           );
 
         if (visible.length > 0) {
@@ -46,7 +50,7 @@ export const Portrait = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.5 },
+      { threshold: 0.5 }
     );
 
     imgRefs.current.forEach((el) => el && observer.observe(el));
@@ -73,9 +77,9 @@ export const Portrait = () => {
   const handleImageClick = (index) => {
     const slideList = images.map((image) => ({
       src: buildImageUrl(image.public_id, {
-        width: 800,
+        width: 800
       }),
-      title: "Portrait",
+      title: "Portrait"
     }));
 
     setSlides(slideList);
@@ -89,7 +93,19 @@ export const Portrait = () => {
         Portrait Photography
       </Typography>
 
-      {images.length > 0 && <SortBar sort={sort} onSortChange={setSort} />}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          flexWrap: "wrap",
+          gap: 2,
+          padding: "0 10px"
+        }}>
+        <SortBarBassic sort={sort} onSortChange={setSort} />
+        <TagFilter selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+      </Box>
 
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
@@ -131,7 +147,7 @@ export const Portrait = () => {
                       height: "auto",
                       aspectRatio: "385 / 481",
                       objectFit: "cover",
-                      display: "block",
+                      display: "block"
                     }}
                   />
                 </ImageListItem>

@@ -8,7 +8,7 @@ import {
   Autocomplete,
   ImageListItem,
   InputAdornment,
-  TextField,
+  TextField
 } from "@mui/material";
 import SortIcon from "@mui/icons-material/Sort";
 import { authApi, endpoints } from "../config/APIs";
@@ -17,6 +17,9 @@ import VideoCard from "./VideoCard";
 import LightBox from "../utils/LightBox";
 import LazyImage from "./LazyImage";
 import buildImageUrl from "../Helpers/buildImageUrl";
+import AssetTagList from "./AssetTagList";
+import ManageTagsModal from "./ManageTagsModal";
+import TagFilter from "./TagFilter";
 
 export default function ImageList({
   foldersForCombobox,
@@ -27,7 +30,7 @@ export default function ImageList({
   loadImages,
   imageParams,
   setImageParams,
-  sortFileds,
+  sortFileds
 }) {
   const [oldPublicIds, setOldPublicIds] = useState([]);
   const [openUpload, setOpenUpload] = useState(false);
@@ -38,12 +41,13 @@ export default function ImageList({
   const [isOpen, setIsOpen] = useState(false);
   const [slides, setSlides] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
+  const [assetForTags, setAssetForTags] = useState(null);
 
   const updateParams = (key, val) => {
     setImageParams((prev) => ({
       ...prev,
       page: 1,
-      [key]: val,
+      [key]: val
     }));
   };
 
@@ -56,7 +60,7 @@ export default function ImageList({
 
         return {
           src: buildImageUrl(image.public_id, { width: 800 }),
-          title: folderName,
+          title: folderName
         };
       });
 
@@ -76,7 +80,7 @@ export default function ImageList({
       setLoadingDelete(true);
 
       const res = await authApi.delete(endpoints.deleteImages, {
-        data: { public_ids: oldPublicIds, selectedFolder },
+        data: { public_ids: oldPublicIds, selectedFolder }
       });
 
       showNotification(res.data.message, "success");
@@ -104,8 +108,7 @@ export default function ImageList({
 
           <button
             className="btn btn-green"
-            onClick={() => setOpenUploadVideo(true)}
-          >
+            onClick={() => setOpenUploadVideo(true)}>
             + Tải video lên
           </button>
 
@@ -118,8 +121,7 @@ export default function ImageList({
               } else {
                 setOpenMove(true);
               }
-            }}
-          >
+            }}>
             + Di chuyển ảnh/video ({oldPublicIds.length})
           </button>
 
@@ -127,8 +129,7 @@ export default function ImageList({
             <button
               className="btn btn-red"
               onClick={handleDelete}
-              disabled={loadingDelete}
-            >
+              disabled={loadingDelete}>
               {loadingDelete ? (
                 "Đang xóa..."
               ) : (
@@ -140,7 +141,17 @@ export default function ImageList({
           )}
         </div>
 
-        <div>
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            alignItems: "center",
+            flexWrap: "wrap"
+          }}>
+          <TagFilter
+            selectedTags={imageParams.tags || []}
+            onTagsChange={(newTags) => updateParams("tags", newTags)}
+          />
           <Autocomplete
             disablePortal
             options={sortFileds}
@@ -156,11 +167,11 @@ export default function ImageList({
                     <InputAdornment position="start">
                       <SortIcon />
                     </InputAdornment>
-                  ),
+                  )
                 }}
               />
             )}
-            sx={{ width: 250, bgcolor: "white", borderRadius: 2 }}
+            sx={{ width: 200, bgcolor: "white", borderRadius: 2 }}
           />
         </div>
       </div>
@@ -181,7 +192,7 @@ export default function ImageList({
                   setOldPublicIds((prev) =>
                     prev.includes(img.public_id)
                       ? prev.filter((x) => x !== img.public_id)
-                      : [...prev, img.public_id],
+                      : [...prev, img.public_id]
                   )
                 }
               />
@@ -207,6 +218,12 @@ export default function ImageList({
                   />
                 </ImageListItem>
               )}
+              <div style={{ padding: "8px" }}>
+                <AssetTagList
+                  tags={img.tags}
+                  onEdit={() => setAssetForTags(img)}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -249,6 +266,14 @@ export default function ImageList({
         oldPublicIds={oldPublicIds}
         setOldPublicIds={setOldPublicIds}
         loadImages={loadImages}
+      />
+
+      <ManageTagsModal
+        open={!!assetForTags}
+        asset={assetForTags}
+        onClose={() => setAssetForTags(null)}
+        loadImages={loadImages}
+        selectedFolder={selectedFolder}
       />
     </div>
   );

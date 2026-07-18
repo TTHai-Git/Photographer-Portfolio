@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import APIs, { endpoints } from "../config/APIs";
 
-export const useEachImageOfEachFolder = (page, limit, sort, path) => {
+export const useEachImageOfEachFolder = (page, limit, sort, path, tags = "") => {
   const [mainPhotoList, setMainPhotoList] = useState([]);
   const [loadingEachImageOfEachFolder, setLoadingEachImageOfEachFolder] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -13,7 +13,7 @@ export const useEachImageOfEachFolder = (page, limit, sort, path) => {
     try {
       setLoadingEachImageOfEachFolder(true);
       const response = await APIs.get(
-        `${endpoints.getEachImageOfEachFolder}?page=${page}&limit=${limit}&sort=${sort}&path=${encodeURIComponent(path)}`
+        `${endpoints.getEachImageOfEachFolder}?page=${page}&limit=${limit}&sort=${sort}&path=${encodeURIComponent(path)}&tags=${encodeURIComponent(tags)}`
       );
 
       if (response.status === 200) {
@@ -41,7 +41,7 @@ export const useEachImageOfEachFolder = (page, limit, sort, path) => {
   
   useEffect(() => {
     loadEachImageOfEachFolder();
-  }, [page, limit, sort, path]);
+  }, [page, limit, sort, path, tags]);
 
   return { mainPhotoList, current, totalPages, totalItems, loadingEachImageOfEachFolder, loadEachImageOfEachFolder };
 };

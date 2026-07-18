@@ -4,6 +4,10 @@ const FolderSchema = new Schema(
     path: {
       type: String,
       require: true
+    },
+    order: {
+      type: Number,
+      default: 0
     }
   },
   {

@@ -33,6 +33,13 @@ const assetSchema = new Schema(
       ref: "Folder",
       require: true
     },
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
+        default: []
+      }
+    ],
 
     videoMeta: {
       codec: String,

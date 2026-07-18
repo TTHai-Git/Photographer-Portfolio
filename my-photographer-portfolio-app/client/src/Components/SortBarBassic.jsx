@@ -1,7 +1,7 @@
 import React from "react";
 import "../Assets/CSS/SortBar.css";
 
-const SortBar = ({ sort, onSortChange }) => {
+const SortBarBassic = ({ sort, onSortChange }) => {
   return (
     <div className="sortbar-container">
       <label className="sortbar-label">Sort by:</label>
@@ -14,11 +14,9 @@ const SortBar = ({ sort, onSortChange }) => {
         <option value="oldest">Oldest</option>
         <option value="az">A → Z</option>
         <option value="za">Z → A</option>
-        <option value="order-increasing">Order ⬆️</option>
-        <option value="order-decreasing">Order ⬇️</option>
       </select>
     </div>
   );
 };
 
-export default SortBar;
+export default SortBarBassic;

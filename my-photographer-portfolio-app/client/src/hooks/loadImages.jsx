@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import APIs, { endpoints } from "../config/APIs";
 
-export const useImages = (page, limit, directory, sort) => {
+export const useImages = (page, limit, directory, sort, tags = "") => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -22,7 +22,7 @@ export const useImages = (page, limit, directory, sort) => {
       setLoading(true);
 
       const response = await APIs.get(
-        `${endpoints.getImagesFromDB}?page=${page}&limit=${limit}&sort=${sort}&path=${directory}`
+        `${endpoints.getImagesFromDB}?page=${page}&limit=${limit}&sort=${sort}&path=${directory}&tags=${encodeURIComponent(tags)}`
       );
 
       if (response.status === 200) {
@@ -45,7 +45,7 @@ export const useImages = (page, limit, directory, sort) => {
     } finally {
       setLoading(false);
     }
-  }, [directory, page, limit, sort]);
+  }, [directory, page, limit, sort, tags]);
 
   
   useEffect(() => {

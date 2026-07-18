@@ -1,23 +1,27 @@
 import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
-import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import LightBox from "../utils/LightBox";
 import "../Assets/CSS/Home.css";
 import { useImages } from "../hooks/loadImages";
-import SortBar from "../Components/SortBar";
 import Pagination from "../Components/Pagination";
 import buildImageUrl from "../Helpers/buildImageUrl";
+import TagFilter from "../Components/TagFilter";
+import SortBarBassic from "../Components/SortBarBassic";
 
 export const Home = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("latest");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const tagNamesStr = selectedTags.map((t) => t.name).join(",");
+
   const { images, totalPages, loading } = useImages(
     page,
     60,
     "Hoang-Truc-Photographer-Portfolio/HOME",
-    sort
+    sort,
+    tagNamesStr
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -92,7 +96,19 @@ export const Home = () => {
         Welcome to My Photography Portfolio
       </Typography> */}
 
-      {images.length > 0 && <SortBar sort={sort} onSortChange={setSort} />}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          flexWrap: "wrap",
+          gap: 2,
+          padding: "0 10px"
+        }}>
+        <SortBarBassic sort={sort} onSortChange={setSort} />
+        <TagFilter selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+      </Box>
 
       <ImageList variant="masonry" cols={3} gap={24} className="gallery-grid">
         {loading
